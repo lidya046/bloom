@@ -1,0 +1,1381 @@
+<!DOCTYPE html>
+<html lang="id">
+
+<head>
+    <meta charset="UTF-8">
+
+    <meta name="viewport" content="width=device-width,
+    initial-scale=1.0,
+    maximum-scale=1.0,
+    user-scalable=no">
+
+    <title>Bloom 🌷</title>
+
+    <script src="https://telegram.org/js/telegram-web-app.js"></script>
+
+    <style>
+        * {
+            box-sizing: border-box;
+        }
+
+        body {
+            margin: 0;
+            font-family:
+                -apple-system,
+                BlinkMacSystemFont,
+                "Segoe UI",
+                sans-serif;
+
+            background:
+                linear-gradient(180deg,
+                    #fff7fb 0%,
+                    #f7f4ff 100%);
+
+            color: #33283a;
+            min-height: 100vh;
+        }
+
+        .app {
+            max-width: 520px;
+            margin: auto;
+            padding: 18px 16px 95px;
+        }
+
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 18px;
+        }
+
+        .logo {
+            font-size: 28px;
+            font-weight: 800;
+        }
+
+        .subtitle {
+            color: #8b7c91;
+            font-size: 13px;
+            margin-top: 2px;
+        }
+
+        .stats {
+            display: flex;
+            gap: 8px;
+        }
+
+        .stat {
+            background: white;
+            border-radius: 14px;
+            padding: 8px 10px;
+
+            box-shadow:
+                0 4px 16px rgba(80, 50, 90, .08);
+
+            font-size: 13px;
+        }
+
+        .hero {
+            background:
+                linear-gradient(135deg,
+                    #ffd8e8,
+                    #e6dcff);
+
+            border-radius: 24px;
+            padding: 22px;
+            margin-bottom: 16px;
+
+            box-shadow:
+                0 8px 24px rgba(90, 60, 100, .10);
+        }
+
+        .hero h1 {
+            margin: 0 0 7px;
+            font-size: 25px;
+        }
+
+        .hero p {
+            margin: 0;
+            color: #6e6075;
+            line-height: 1.45;
+        }
+
+        .section-title {
+            font-size: 17px;
+            font-weight: 750;
+            margin: 20px 0 10px;
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns:
+                repeat(2, 1fr);
+            gap: 10px;
+        }
+
+        button {
+            border: 0;
+            cursor: pointer;
+            font: inherit;
+
+            transition:
+                transform .12s ease,
+                opacity .12s ease;
+        }
+
+        button:active {
+            transform: scale(.97);
+        }
+
+        .card {
+            background: white;
+            border-radius: 18px;
+            padding: 16px;
+            text-align: left;
+
+            box-shadow:
+                0 4px 16px rgba(80, 50, 90, .07);
+        }
+
+        .card .icon {
+            font-size: 34px;
+        }
+
+        .card h3 {
+            margin: 7px 0 3px;
+            font-size: 16px;
+        }
+
+        .card p {
+            margin: 0;
+            color: #8b7c91;
+            font-size: 12px;
+        }
+
+        .primary {
+            width: 100%;
+            background: #8b5cf6;
+            color: white;
+
+            padding: 13px;
+            border-radius: 14px;
+
+            font-weight: 700;
+            margin-top: 12px;
+        }
+
+        .flower {
+            background: white;
+            border-radius: 18px;
+            padding: 13px;
+
+            box-shadow:
+                0 4px 16px rgba(80, 50, 90, .07);
+
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .flower-icon {
+            font-size: 31px;
+        }
+
+        .flower-info {
+            flex: 1;
+        }
+
+        .flower-name {
+            font-weight: 700;
+            font-size: 14px;
+        }
+
+        .rarity {
+            font-size: 11px;
+            color: #9b8aa2;
+        }
+
+        .qty {
+            font-weight: 800;
+        }
+
+        .page {
+            display: none;
+        }
+
+        .page.active {
+            display: block;
+        }
+
+        .back {
+            background: transparent;
+            padding: 4px 0 12px;
+            color: #765a84;
+            font-weight: 700;
+        }
+
+        .bouquet-preview {
+            background:
+                linear-gradient(135deg,
+                    #fff,
+                    #f7edff);
+
+            border-radius: 22px;
+            padding: 25px;
+            text-align: center;
+
+            min-height: 180px;
+
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+
+            margin-bottom: 15px;
+        }
+
+        .bouquet {
+            font-size: 64px;
+            letter-spacing: -10px;
+        }
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+
+            border:
+                1px solid #eadff0;
+
+            background: white;
+
+            border-radius: 14px;
+
+            padding: 12px;
+
+            font: inherit;
+            outline: none;
+
+            margin-top: 7px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 14px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 35px 15px;
+            color: #918394;
+
+            background: white;
+            border-radius: 18px;
+        }
+
+        .nav {
+            position: fixed;
+
+            bottom: 10px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            width:
+                min(490px,
+                    calc(100% - 22px));
+
+            background:
+                rgba(255, 255, 255, .94);
+
+            backdrop-filter: blur(10px);
+
+            border-radius: 20px;
+
+            padding: 7px;
+
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            box-shadow:
+                0 7px 30px rgba(60, 40, 70, .16);
+        }
+
+        .nav button {
+            background: transparent;
+            padding: 9px 5px;
+            border-radius: 14px;
+
+            color: #89798f;
+            font-size: 12px;
+        }
+
+        .nav button.active {
+            background: #f0e9ff;
+            color: #7145c8;
+            font-weight: 700;
+        }
+
+        .toast {
+            position: fixed;
+
+            top: 18px;
+            left: 50%;
+
+            transform:
+                translateX(-50%);
+
+            background: #33283a;
+            color: white;
+
+            padding: 10px 16px;
+
+            border-radius: 12px;
+
+            opacity: 0;
+            pointer-events: none;
+
+            transition: opacity .2s;
+
+            z-index: 10;
+
+            font-size: 13px;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .loading {
+            opacity: .6;
+            pointer-events: none;
+        }
+    </style>
+</head>
+
+<body>
+
+    <div id="toast" class="toast"></div>
+
+    <div class="app">
+
+        <div class="header">
+
+            <div>
+
+                <div class="logo">
+                    🌷 Bloom
+                </div>
+
+                <div class="subtitle" id="welcome">
+                    Buat bunga, buat bahagia.
+                </div>
+
+            </div>
+
+            <div class="stats">
+
+                <div class="stat">
+                    🪙
+                    <b id="coins">0</b>
+                </div>
+
+                <div class="stat">
+                    🌱
+                    <b id="seeds">0</b>
+                </div>
+
+            </div>
+
+        </div>
+
+
+        <!-- HOME -->
+
+        <section id="home" class="page active">
+
+            <div class="hero">
+
+                <h1>
+                    Selamat datang di Bloom 🌸
+                </h1>
+
+                <p>
+                    Tanam bunga, kumpulkan koleksi,
+                    lalu buat bouquet untuk orang spesial.
+                </p>
+
+            </div>
+
+
+            <div class="section-title">
+                Apa yang mau kamu lakukan?
+            </div>
+
+
+            <div class="grid">
+
+                <button class="card" onclick="showPage('garden')">
+
+                    <div class="icon">
+                        🌱
+                    </div>
+
+                    <h3>
+                        Garden
+                    </h3>
+
+                    <p>
+                        Tanam & panen bunga
+                    </p>
+
+                </button>
+
+
+                <button class="card" onclick="showPage('bouquet')">
+
+                    <div class="icon">
+                        💐
+                    </div>
+
+                    <h3>
+                        Make Bouquet
+                    </h3>
+
+                    <p>
+                        Buat bouquet sendiri
+                    </p>
+
+                </button>
+
+
+                <button class="card" onclick="showPage('collection')">
+
+                    <div class="icon">
+                        📚
+                    </div>
+
+                    <h3>
+                        Collection
+                    </h3>
+
+                    <p>
+                        Lihat bunga kamu
+                    </p>
+
+                </button>
+
+
+                <button class="card" onclick="dailyReward()">
+
+                    <div class="icon">
+                        🎁
+                    </div>
+
+                    <h3>
+                        Daily Reward
+                    </h3>
+
+                    <p>
+                        Ambil hadiah harian
+                    </p>
+
+                </button>
+
+            </div>
+
+        </section>
+
+
+        <!-- GARDEN -->
+
+        <section id="garden" class="page">
+
+            <button class="back" onclick="showPage('home')">
+                ← Kembali
+            </button>
+
+            <div class="hero">
+
+                <h1>
+                    🌱 Garden
+                </h1>
+
+                <p>
+                    Tanam satu benih untuk
+                    mendapatkan bunga secara acak.
+                </p>
+
+                <button id="plantButton" class="primary" onclick="plantFlower()">
+                    🌱 Tanam Benih
+                </button>
+
+            </div>
+
+            <div class="section-title">
+                Bunga yang tersedia
+            </div>
+
+            <div id="gardenFlowers" class="grid"></div>
+
+        </section>
+
+
+        <!-- BOUQUET -->
+
+        <section id="bouquet" class="page">
+
+            <button class="back" onclick="showPage('home')">
+                ← Kembali
+            </button>
+
+            <div class="section-title">
+                💐 Buat Bouquet
+            </div>
+
+            <div class="bouquet-preview">
+
+                <div id="bouquetEmoji" class="bouquet">
+                    🌷
+                </div>
+
+                <b id="bouquetText">
+                    Bouquet untuk seseorang spesial
+                </b>
+
+            </div>
+
+
+            <label>
+                Pilih bunga
+
+                <select id="flowerSelect" onchange="updateBouquet()"></select>
+
+            </label>
+
+
+            <label>
+                Nama penerima
+
+                <input id="receiver" placeholder="Contoh: Alya">
+
+            </label>
+
+
+            <label>
+                Telegram ID penerima
+                <span style="font-weight:400;color:#999">
+                    (opsional)
+                </span>
+
+                <input id="receiverTelegramId" placeholder="Contoh: 123456789" type="number">
+
+            </label>
+
+
+            <label>
+                Pesan
+
+                <textarea id="message" placeholder="Tulis pesan manis untuk penerima..."></textarea>
+
+            </label>
+
+
+            <button class="primary" onclick="sendBouquet()">
+                💌 Kirim Bouquet
+            </button>
+
+        </section>
+
+
+        <!-- COLLECTION -->
+
+        <section id="collection" class="page">
+
+            <button class="back" onclick="showPage('home')">
+                ← Kembali
+            </button>
+
+            <div class="section-title">
+                📚 My Collection
+            </div>
+
+            <div id="collectionList"></div>
+
+        </section>
+
+    </div>
+
+
+    <nav class="nav">
+
+        <button id="nav-home" class="active" onclick="showPage('home')">
+            🏠
+            <br>
+            Home
+        </button>
+
+        <button id="nav-garden" onclick="showPage('garden')">
+            🌱
+            <br>
+            Garden
+        </button>
+
+        <button id="nav-collection" onclick="showPage('collection')">
+            📚
+            <br>
+            Collection
+        </button>
+
+    </nav>
+
+
+    <script>
+
+        const tg =
+            window.Telegram?.WebApp;
+
+
+        if (tg) {
+
+            tg.ready();
+            tg.expand();
+
+        }
+
+
+        /*
+          IMPORTANT:
+      
+          Saat lokal:
+          http://localhost:3000
+      
+          Saat online:
+          ganti dengan URL backend kamu.
+      
+          Contoh:
+          https://api.bloomgame.com
+        */
+
+        const API_URL =
+            "http://localhost:3000";
+
+
+        let state = {
+
+            user: null,
+
+            flowers: [],
+
+            collection: []
+
+        };
+
+
+        async function api(
+            endpoint,
+            options = {}
+        ) {
+
+            const headers = {
+                "Content-Type":
+                    "application/json"
+            };
+
+
+            if (tg?.initData) {
+
+                headers.Authorization =
+                    `tma ${tg.initData}`;
+
+            }
+
+
+            const response =
+                await fetch(
+                    API_URL + endpoint,
+                    {
+                        ...options,
+                        headers: {
+                            ...headers,
+                            ...(options.headers || {})
+                        }
+                    }
+                );
+
+
+            const data =
+                await response.json();
+
+
+            if (!response.ok) {
+
+                throw new Error(
+                    data.error ||
+                    "Terjadi kesalahan"
+                );
+
+            }
+
+
+            return data;
+
+        }
+
+
+        function toast(text) {
+
+            const el =
+                document.getElementById(
+                    "toast"
+                );
+
+            el.textContent = text;
+
+            el.classList.add("show");
+
+
+            setTimeout(() => {
+
+                el.classList.remove("show");
+
+            }, 2200);
+
+        }
+
+
+        function updateStats() {
+
+            if (!state.user) {
+                return;
+            }
+
+
+            document.getElementById(
+                "coins"
+            ).textContent =
+                state.user.coins;
+
+
+            document.getElementById(
+                "seeds"
+            ).textContent =
+                state.user.seeds;
+
+        }
+
+
+        function showPage(id) {
+
+            document
+                .querySelectorAll(".page")
+                .forEach(
+                    page =>
+                        page.classList.remove(
+                            "active"
+                        )
+                );
+
+
+            document
+                .getElementById(id)
+                .classList.add("active");
+
+
+            document
+                .querySelectorAll(".nav button")
+                .forEach(
+                    button =>
+                        button.classList.remove(
+                            "active"
+                        )
+                );
+
+
+            const nav =
+                document.getElementById(
+                    "nav-" + id
+                );
+
+
+            if (nav) {
+
+                nav.classList.add("active");
+
+            }
+
+
+            if (id === "garden") {
+
+                renderGarden();
+
+            }
+
+
+            if (id === "collection") {
+
+                loadCollection();
+
+            }
+
+
+            window.scrollTo(0, 0);
+
+        }
+
+
+        async function login() {
+
+            try {
+
+                if (!tg?.initData) {
+
+                    /*
+                      Untuk testing browser biasa.
+                      Telegram authentication
+                      hanya bekerja di Mini App.
+                    */
+
+                    toast(
+                        "Buka Bloom dari Telegram 🌷"
+                    );
+
+                    return false;
+
+                }
+
+
+                state.user = await api("/api/user");
+
+
+                updateStats();
+
+
+                const firstName =
+                    state.user.first_name;
+
+
+                if (firstName) {
+
+                    document.getElementById(
+                        "welcome"
+                    ).textContent =
+                        `Halo, ${firstName}! 🌷`;
+
+                }
+
+
+                return true;
+
+            } catch (error) {
+
+                console.error(error);
+
+                toast(
+                    "Login Telegram gagal"
+                );
+
+                return false;
+
+            }
+
+        }
+
+
+        async function loadFlowers() {
+
+            try {
+
+                const result =
+                    await api(
+                        "/api/flowers"
+                    );
+
+
+                state.flowers = Array.isArray(result) ? result : (result.flowers || []);
+
+
+                initBouquet();
+
+                renderGarden();
+
+            } catch (error) {
+
+                console.error(error);
+
+                toast(
+                    "Gagal memuat bunga"
+                );
+
+            }
+
+        }
+
+
+        async function loadCollection() {
+
+            try {
+
+                const result =
+                    await api(
+                        "/api/garden/collection"
+                    );
+
+
+                state.collection = Array.isArray(result) ? result : (result.collection || []);
+
+
+                renderCollection();
+
+            } catch (error) {
+
+                console.error(error);
+
+                toast(
+                    "Gagal memuat collection"
+                );
+
+            }
+
+        }
+
+
+        function getQuantity(
+            flowerId
+        ) {
+
+            const item =
+                state.collection.find(
+                    x =>
+                        Number(x.id) ===
+                        Number(flowerId)
+                );
+
+
+            return item
+                ? Number(item.quantity)
+                : 0;
+
+        }
+
+
+        function renderGarden() {
+
+            const el =
+                document.getElementById(
+                    "gardenFlowers"
+                );
+
+
+            if (!state.flowers.length) {
+
+                el.innerHTML =
+                    `<div class="empty">
+          Loading flowers...
+        </div>`;
+
+                return;
+
+            }
+
+
+            el.innerHTML =
+                state.flowers
+                    .map(flower => `
+
+          <div class="flower">
+
+            <div class="flower-icon">
+              ${flower.emoji}
+            </div>
+
+            <div class="flower-info">
+
+              <div class="flower-name">
+                ${flower.name}
+              </div>
+
+              <div class="rarity">
+                ${flower.rarity}
+              </div>
+
+            </div>
+
+            <div class="qty">
+              ${getQuantity(flower.id)}
+            </div>
+
+          </div>
+
+        `)
+                    .join("");
+
+        }
+
+
+        function renderCollection() {
+
+            const el =
+                document.getElementById(
+                    "collectionList"
+                );
+
+
+            if (!state.collection.length) {
+
+                el.innerHTML =
+                    `
+        <div class="empty">
+
+          Belum ada bunga 🌱
+
+          <br>
+
+          Masuk Garden dan
+          tanam benih!
+
+        </div>
+        `;
+
+                return;
+
+            }
+
+
+            el.innerHTML =
+                state.collection
+                    .map(flower => `
+
+          <div
+            class="flower"
+            style="margin-bottom:10px"
+          >
+
+            <div class="flower-icon">
+              ${flower.emoji}
+            </div>
+
+            <div class="flower-info">
+
+              <div class="flower-name">
+                ${flower.name}
+              </div>
+
+              <div class="rarity">
+                ${flower.rarity}
+              </div>
+
+            </div>
+
+            <div class="qty">
+              ×${flower.quantity}
+            </div>
+
+          </div>
+
+        `)
+                    .join("");
+
+        }
+
+
+        async function plantFlower() {
+
+            const button =
+                document.getElementById(
+                    "plantButton"
+                );
+
+
+            try {
+
+                button.disabled = true;
+
+
+                const result =
+                    await api(
+                        "/api/garden/plant",
+                        {
+                            method: "POST"
+                        }
+                    );
+
+
+                state.user = await api("/api/user");
+                updateStats();
+                await loadCollection();
+
+
+                renderGarden();
+
+
+                toast(
+                    `${result.flower.emoji} Kamu mendapatkan ${result.flower.name}! +5 coins`
+                );
+
+            } catch (error) {
+
+                console.error(error);
+
+                toast(error.message);
+
+            } finally {
+
+                button.disabled = false;
+
+            }
+
+        }
+
+
+        async function dailyReward() {
+
+            try {
+
+                const result =
+                    await api(
+                        "/api/rewards/daily",
+                        {
+                            method: "POST"
+                        }
+                    );
+
+
+                state.user = await api("/api/user");
+                updateStats();
+                toast(
+                    "🎁 +50 coins & +2 seeds!"
+                );
+
+            } catch (error) {
+
+                toast(error.message);
+
+            }
+
+        }
+
+
+        function initBouquet() {
+
+            const select =
+                document.getElementById(
+                    "flowerSelect"
+                );
+
+
+            select.innerHTML =
+                state.flowers
+                    .map(flower => `
+
+          <option
+            value="${flower.id}"
+          >
+            ${flower.emoji}
+            ${flower.name}
+            — ${getQuantity(flower.id)}
+          </option>
+
+        `)
+                    .join("");
+
+
+            updateBouquet();
+
+        }
+
+
+        function updateBouquet() {
+
+            const select =
+                document.getElementById(
+                    "flowerSelect"
+                );
+
+
+            const flower =
+                state.flowers.find(
+                    x =>
+                        Number(x.id) ===
+                        Number(select.value)
+                );
+
+
+            if (!flower) {
+                return;
+            }
+
+
+            document.getElementById(
+                "bouquetEmoji"
+            ).textContent =
+                flower.emoji;
+
+
+            document.getElementById(
+                "bouquetText"
+            ).textContent =
+                `Bouquet ${flower.name}`;
+
+        }
+
+
+        async function sendBouquet() {
+
+            const flowerId =
+                Number(
+                    document.getElementById(
+                        "flowerSelect"
+                    ).value
+                );
+
+
+            const receiverName =
+                document.getElementById(
+                    "receiver"
+                ).value.trim();
+
+
+            const receiverTelegramId =
+                document.getElementById(
+                    "receiverTelegramId"
+                ).value.trim();
+
+
+            const message =
+                document.getElementById(
+                    "message"
+                ).value.trim();
+
+
+            if (!receiverName) {
+
+                toast(
+                    "Isi nama penerima dulu 💌"
+                );
+
+                return;
+
+            }
+
+
+            if (
+                getQuantity(flowerId) < 1
+            ) {
+
+                toast(
+                    "Kamu belum punya bunga ini 🌱"
+                );
+
+                return;
+
+            }
+
+
+            try {
+
+                const result =
+                    await api(
+                        "/api/bouquets",
+                        {
+                            method: "POST",
+
+                            body: JSON.stringify({
+
+                                items: [{ flowerId, quantity: 1 }],
+
+                                receiverTelegramId:
+                                    receiverTelegramId
+                                        ? Number(
+                                            receiverTelegramId
+                                        )
+                                        : null,
+
+                                receiverUsername: receiverName,
+
+                                message,
+
+                                wrapping: "pink"
+
+                            })
+                        }
+                    );
+
+
+                state.user = await api("/api/user");
+                updateStats();
+                await loadCollection();
+
+                toast(
+                    `💌 Bouquet untuk ${receiverName} berhasil dibuat!`
+                );
+
+
+                document.getElementById(
+                    "receiver"
+                ).value = "";
+
+
+                document.getElementById(
+                    "receiverTelegramId"
+                ).value = "";
+
+
+                document.getElementById(
+                    "message"
+                ).value = "";
+
+
+                await loadCollection();
+
+
+                showPage(
+                    "collection"
+                );
+
+
+            } catch (error) {
+
+                console.error(error);
+
+                toast(error.message);
+
+            }
+
+        }
+
+
+        async function init() {
+
+            const loggedIn =
+                await login();
+
+
+            if (!loggedIn) {
+                return;
+            }
+
+
+            await loadFlowers();
+
+            await loadCollection();
+
+            updateStats();
+
+        }
+
+
+        init();
+
+    </script>
+
+</body>
+
+</html>
