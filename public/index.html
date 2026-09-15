@@ -3,6 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
+    <meta name="version" content="bloom-auth-fixed-2026-09-15">
 
     <meta name="viewport" content="width=device-width,
     initial-scale=1.0,
@@ -472,6 +473,18 @@
 
                 </button>
 
+                <button class="card" onclick="showPage('shop')">
+                    <div class="icon">🛒</div>
+                    <h3>Flower Shop</h3>
+                    <p>Beli bunga pakai coins</p>
+                </button>
+
+                <button class="card" onclick="showPage('received')">
+                    <div class="icon">💌</div>
+                    <h3>Received</h3>
+                    <p>Lihat bouquet dari teman</p>
+                </button>
+
 
                 <button class="card" onclick="dailyReward()">
 
@@ -595,6 +608,23 @@
         </section>
 
 
+        <!-- SHOP -->
+
+        <section id="shop" class="page">
+            <button class="back" onclick="showPage('home')">← Kembali</button>
+            <div class="section-title">🛒 Flower Shop</div>
+            <p style="color:#777;margin-top:-6px">Beli bunga tertentu kalau tidak mau menunggu hasil tanam.</p>
+            <div id="shopList" class="grid"></div>
+        </section>
+
+        <!-- RECEIVED -->
+
+        <section id="received" class="page">
+            <button class="back" onclick="showPage('home')">← Kembali</button>
+            <div class="section-title">💌 Received Bouquets</div>
+            <div id="receivedList"></div>
+        </section>
+
         <!-- COLLECTION -->
 
         <section id="collection" class="page">
@@ -639,15 +669,16 @@
 
     <script>
 
-        const tg =
-            window.Telegram?.WebApp;
+        const tg = window.Telegram?.WebApp || null;
 
-
+        // Telegram must initialize the Mini App context before API calls.
         if (tg) {
-
             tg.ready();
             tg.expand();
+        }
 
+        function getTelegramInitData() {
+            return tg?.initData || "";
         }
 
 
@@ -664,8 +695,9 @@
           https://api.bloomgame.com
         */
 
-        const API_URL =
-            "";
+        // Bloom frontend and backend are deployed together on Vercel.
+        // Empty string = use the current origin, e.g. https://bloom-one-dusky.vercel.app
+        const API_URL = "";
 
 
         let state = {
@@ -684,49 +716,45 @@
             options = {}
         ) {
 
+            const initData = getTelegramInitData();
+
+            if (!initData) {
+                throw new Error(
+                    "Telegram initData tidak tersedia. Buka Bloom dari tombol Web App di Telegram."
+                );
+            }
+
             const headers = {
-                "Content-Type":
-                    "application/json"
+                "Content-Type": "application/json",
+                "Authorization": `tma ${initData}`
             };
 
-
-            if (tg?.initData) {
-
-                headers.Authorization =
-                    `tma ${tg.initData}`;
-
-            }
-
-
-            const response =
-                await fetch(
-                    API_URL + endpoint,
-                    {
-                        ...options,
-                        headers: {
-                            ...headers,
-                            ...(options.headers || {})
-                        }
+            const response = await fetch(
+                API_URL + endpoint,
+                {
+                    ...options,
+                    headers: {
+                        ...headers,
+                        ...(options.headers || {})
                     }
-                );
+                }
+            );
 
+            const contentType =
+                response.headers.get("content-type") || "";
 
-            const data =
-                await response.json();
-
+            const data = contentType.includes("application/json")
+                ? await response.json()
+                : {};
 
             if (!response.ok) {
-
                 throw new Error(
                     data.error ||
-                    "Terjadi kesalahan"
+                    `Request gagal (${response.status})`
                 );
-
             }
 
-
             return data;
-
         }
 
 
@@ -820,9 +848,15 @@
 
 
             if (id === "collection") {
-
                 loadCollection();
+            }
 
+            if (id === "shop") {
+                loadShop();
+            }
+
+            if (id === "received") {
+                loadReceived();
             }
 
 
@@ -835,32 +869,35 @@
 
             try {
 
-                if (!tg?.initData) {
-
-                    /*
-                      Untuk testing browser biasa.
-                      Telegram authentication
-                      hanya bekerja di Mini App.
-                    */
-
+                if (!tg) {
                     toast(
-                        "Buka Bloom dari Telegram 🌷"
+                        "Bloom harus dibuka sebagai Mini App dari Telegram 🌷"
                     );
-
+                    console.warn("Telegram WebApp SDK tidak terdeteksi.");
                     return false;
-
                 }
 
+                // Ask Telegram to finish initializing the Mini App.
+                tg.ready();
+
+                const initData = getTelegramInitData();
+
+                if (!initData) {
+                    toast(
+                        "Telegram belum mengirim initData. Buka Bloom lewat tombol Web App di bot."
+                    );
+                    console.warn(
+                        "Telegram WebApp terdeteksi, tetapi initData kosong."
+                    );
+                    return false;
+                }
 
                 state.user = await api("/api/user");
 
-
                 updateStats();
-
 
                 const firstName =
                     state.user.first_name;
-
 
                 if (firstName) {
 
@@ -871,14 +908,14 @@
 
                 }
 
-
                 return true;
 
             } catch (error) {
 
-                console.error(error);
+                console.error("Bloom login error:", error);
 
                 toast(
+                    error.message ||
                     "Login Telegram gagal"
                 );
 
@@ -887,7 +924,6 @@
             }
 
         }
-
 
         async function loadFlowers() {
 
@@ -1164,33 +1200,16 @@
 
 
         function initBouquet() {
+            const select = document.getElementById("flowerSelect");
+            select.innerHTML = state.flowers.map(flower => {
+                const qty = getQuantity(flower.id);
+                return `<option value="${flower.id}" ${qty < 1 ? "disabled" : ""}>${flower.emoji} ${flower.name} — Punya: ${qty}</option>`;
+            }).join("");
 
-            const select =
-                document.getElementById(
-                    "flowerSelect"
-                );
-
-
-            select.innerHTML =
-                state.flowers
-                    .map(flower => `
-
-          <option
-            value="${flower.id}"
-          >
-            ${flower.emoji}
-            ${flower.name}
-            — ${getQuantity(flower.id)}
-          </option>
-
-        `)
-                    .join("");
-
-
+            const firstOwned = state.flowers.find(f => getQuantity(f.id) > 0);
+            if (firstOwned) select.value = firstOwned.id;
             updateBouquet();
-
         }
-
 
         function updateBouquet() {
 
@@ -1227,6 +1246,56 @@
         }
 
 
+        async function loadShop() {
+            try {
+                const items = await api("/api/shop");
+                document.getElementById("shopList").innerHTML = items.map(f => `
+                    <div class="flower" style="margin-bottom:10px">
+                        <div class="flower-icon">${f.emoji}</div>
+                        <div class="flower-info">
+                            <div class="flower-name">${f.name}</div>
+                            <div class="rarity">${f.rarity} • ${getQuantity(f.id)} owned</div>
+                        </div>
+                        <button class="primary" style="width:auto;padding:9px 12px" onclick="buyFlower(${f.id})">${f.price} 🪙</button>
+                    </div>`).join("");
+            } catch (e) { toast(e.message); }
+        }
+
+        async function buyFlower(flowerId) {
+            try {
+                const result = await api("/api/shop/buy", {method:"POST", body:JSON.stringify({flowerId, quantity:1})});
+                state.user = await api("/api/user");
+                updateStats();
+                await loadCollection();
+                initBouquet();
+                await loadShop();
+                toast(`${result.flower.emoji} ${result.flower.name} berhasil dibeli!`);
+            } catch (e) { toast(e.message); }
+        }
+
+        async function loadReceived() {
+            try {
+                const items = await api("/api/bouquets/received");
+                const el = document.getElementById("receivedList");
+                if (!items.length) {
+                    el.innerHTML = `<div class="empty">Belum ada bouquet masuk 💌<br>Minta teman mengirim bouquet ke Telegram ID kamu.</div>`;
+                    return;
+                }
+                el.innerHTML = items.map(b => {
+                    const sender = b.sender_first_name || b.sender_username || "Teman";
+                    const itemText = (b.items || []).map(x => {
+                        const f = state.flowers.find(y => Number(y.id) === Number(x.flowerId));
+                        return f ? `${f.emoji} ${f.name} ×${x.quantity}` : `🌷 ×${x.quantity}`;
+                    }).join(" • ");
+                    return `<div class="flower" style="margin-bottom:12px;display:block">
+                        <div style="font-size:18px;font-weight:700">💌 Dari ${sender}</div>
+                        <div style="margin:8px 0">${itemText}</div>
+                        <div style="color:#666">${b.message || "Untukmu, dengan sayang 🌷"}</div>
+                    </div>`;
+                }).join("");
+            } catch (e) { toast(e.message); }
+        }
+
         async function sendBouquet() {
 
             const flowerId =
@@ -1256,13 +1325,13 @@
 
 
             if (!receiverName) {
-
-                toast(
-                    "Isi nama penerima dulu 💌"
-                );
-
+                toast("Isi nama penerima dulu 💌");
                 return;
+            }
 
+            if (!receiverTelegramId) {
+                toast("Masukkan Telegram ID penerima 📱");
+                return;
             }
 
 
@@ -1314,7 +1383,9 @@
                 await loadCollection();
 
                 toast(
-                    `💌 Bouquet untuk ${receiverName} berhasil dibuat!`
+                    result.notification?.sent
+                        ? `💌 Terkirim ke ${receiverName}! Cek Telegram mereka.`
+                        : `💌 Bouquet tersimpan, tapi notifikasi Telegram belum terkirim.`
                 );
 
 
@@ -1364,9 +1435,8 @@
 
 
             await loadFlowers();
-
             await loadCollection();
-
+            initBouquet();
             updateStats();
 
         }

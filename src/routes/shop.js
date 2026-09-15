@@ -1,0 +1,34 @@
+import { Router } from 'express';
+import { pool } from '../db.js';
+const router = Router();
+
+router.get('/', async (_req, res) => {
+  const r = await pool.query(`SELECT id,name,emoji,rarity,sell_value,
+    CASE rarity WHEN 'common' THEN 15 WHEN 'rare' THEN 40 WHEN 'epic' THEN 100 WHEN 'legendary' THEN 500 END AS price
+    FROM flowers ORDER BY id`);
+  res.json(r.rows);
+});
+
+router.post('/buy', async (req, res) => {
+  const flowerId = Number(req.body?.flowerId);
+  const quantity = Math.max(1, Math.min(99, Number(req.body?.quantity || 1)));
+  if (!Number.isInteger(flowerId)) return res.status(400).json({ error: 'Invalid flower' });
+  const client = await pool.connect();
+  try {
+    await client.query('BEGIN');
+    const flower = (await client.query(`SELECT * FROM flowers WHERE id=$1`, [flowerId])).rows[0];
+    if (!flower) throw new Error('Flower not found');
+    const price = ({common:15, rare:40, epic:100, legendary:500})[flower.rarity];
+    const u = (await client.query('SELECT * FROM users WHERE id=$1 FOR UPDATE', [req.user.id])).rows[0];
+    const total = price * quantity;
+    if (u.coins < total) throw new Error(`Coins tidak cukup. Butuh ${total} coins.`);
+    await client.query('UPDATE users SET coins=coins-$1 WHERE id=$2', [total, u.id]);
+    await client.query(`INSERT INTO user_flowers(user_id,flower_id,quantity) VALUES($1,$2,$3)
+      ON CONFLICT(user_id,flower_id) DO UPDATE SET quantity=user_flowers.quantity+EXCLUDED.quantity`, [u.id, flowerId, quantity]);
+    await client.query('COMMIT');
+    res.json({ flower, quantity, price, total });
+  } catch (e) {
+    await client.query('ROLLBACK'); res.status(400).json({ error: e.message });
+  } finally { client.release(); }
+});
+export default router;
