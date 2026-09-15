@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { pool } from '../db.js';
+import { notifyAdmins } from '../admin.js';
 const router = Router();
 
 router.get('/', async (_req, res) => {
@@ -18,14 +19,17 @@ router.post('/buy', async (req, res) => {
     await client.query('BEGIN');
     const flower = (await client.query(`SELECT * FROM flowers WHERE id=$1`, [flowerId])).rows[0];
     if (!flower) throw new Error('Flower not found');
-    const price = ({common:15, rare:40, epic:100, legendary:500})[flower.rarity];
+    const price = ({ common: 15, rare: 40, epic: 100, legendary: 500 })[flower.rarity];
     const u = (await client.query('SELECT * FROM users WHERE id=$1 FOR UPDATE', [req.user.id])).rows[0];
     const total = price * quantity;
     if (u.coins < total) throw new Error(`Coins tidak cukup. Butuh ${total} coins.`);
     await client.query('UPDATE users SET coins=coins-$1 WHERE id=$2', [total, u.id]);
     await client.query(`INSERT INTO user_flowers(user_id,flower_id,quantity) VALUES($1,$2,$3)
       ON CONFLICT(user_id,flower_id) DO UPDATE SET quantity=user_flowers.quantity+EXCLUDED.quantity`, [u.id, flowerId, quantity]);
+    await client.query(`INSERT INTO shop_purchases(user_id,flower_id,quantity,price) VALUES($1,$2,$3,$4)`, [u.id, flowerId, quantity, price]);
     await client.query('COMMIT');
+    const buyer = u.username ? `@${u.username}` : (u.first_name || `ID ${u.telegram_id}`);
+    notifyAdmins(`🛒 PEMBELIAN BARU!\n\n👤 User: ${buyer}\n📦 Item: ${flower.emoji} ${flower.name}\n🔢 Jumlah: ${quantity}\n💰 Total: ${total} coins\n\n🕐 ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`).catch(() => { });
     res.json({ flower, quantity, price, total });
   } catch (e) {
     await client.query('ROLLBACK'); res.status(400).json({ error: e.message });

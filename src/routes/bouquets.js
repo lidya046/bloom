@@ -1,5 +1,6 @@
 import { Router } from 'express';
 import { pool } from '../db.js';
+import { notifyAdmins } from '../admin.js';
 const router = Router();
 
 async function notifyTelegram(telegramId, bouquet, sender) {
@@ -51,6 +52,14 @@ router.post('/', async (req, res) => {
     await client.query('COMMIT');
     let notification = { sent: false };
     try { notification = await notifyTelegram(receiver.telegram_id, b, u); } catch (e) { notification = { sent: false, reason: e.message }; }
+    const senderLabel = u.username ? `@${u.username}` : (u.first_name || `ID ${u.telegram_id}`);
+    const receiverLabel = receiver.username ? `@${receiver.username}` : (receiver.first_name || `ID ${receiver.telegram_id}`);
+    let flowerSummary = [];
+    try {
+      const rows = await pool.query(`SELECT f.emoji, f.name, bi.quantity FROM bouquet_items bi JOIN flowers f ON f.id=bi.flower_id WHERE bi.bouquet_id=$1 ORDER BY f.id`, [b.id]);
+      flowerSummary = rows.rows.map(x => `${x.emoji} ${x.name} ×${x.quantity}`);
+    } catch (_) { }
+    notifyAdmins(`💐 BOUQUET TERKIRIM!\n\n👤 Pengirim: ${senderLabel}\n👤 Penerima: ${receiverLabel}\n\n${flowerSummary.join('\n') || '🌸 Bouquet'}\n\n💌 ${message || 'Tanpa pesan'}\n🕐 ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`).catch(() => { });
     res.json({ bouquet: b, cost, xp: 15, receiver: { username: receiver.username, first_name: receiver.first_name }, notification });
   } catch (e) { await client.query('ROLLBACK'); res.status(400).json({ error: e.message }); } finally { client.release(); }
 });
