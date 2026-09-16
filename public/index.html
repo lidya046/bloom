@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="version" content="bloom-special-flowers-2026-09-16">
+    <meta name="version" content="bloom-admin-secure-2026-09-16">
 
     <meta name="viewport" content="width=device-width,
     initial-scale=1.0,
@@ -938,7 +938,7 @@
                 </button>
 
 
-                <button id="adminHomeCard" class="card" onclick="showPage('admin')">
+                <button id="adminHomeCard" class="card" style="display:none" onclick="showPage('admin')">
                     <div class="icon">🔐</div>
                     <h3>Admin</h3>
                     <p>Kelola user & balance</p>
@@ -1090,7 +1090,7 @@
 
 
         <!-- ADMIN (visible only to configured Telegram admins) -->
-        <section id="admin" class="page">
+        <section id="admin" class="page" style="display:none">
             <button class="back" onclick="showPage('home')">← Kembali</button>
             <div class="section-title">🔐 Admin Panel</div>
             <div class="admin-page">
@@ -1106,22 +1106,19 @@
                 </div>
                 <div class="admin-box">
                     <div style="font-weight:800">💰 Ubah Balance</div>
-                    <div style="font-size:12px;color:#8b7c91;margin-top:5px">Ketik jumlah yang mau diberikan. Gunakan
-                        angka negatif untuk mengurangi.</div>
-                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
-                        <label style="font-size:12px;font-weight:700">🪙 Coins
-                            <input id="adminCoinsDelta" type="number" step="1" value="0" placeholder="Contoh: 1000"
-                                inputmode="numeric">
+                    <div style="display:grid;gap:8px;margin-top:10px">
+                        <label style="font-size:12px">🪙 Coins (+ / -)
+                            <input id="adminCoinsDelta" type="number" step="1" value="0"
+                                placeholder="Contoh: 500 atau -100">
                         </label>
-                        <label style="font-size:12px;font-weight:700">🌱 Seeds
-                            <input id="adminSeedsDelta" type="number" step="1" value="0" placeholder="Contoh: 10"
-                                inputmode="numeric">
+                        <label style="font-size:12px">🌱 Seeds (+ / -)
+                            <input id="adminSeedsDelta" type="number" step="1" value="0"
+                                placeholder="Contoh: 20 atau -5">
                         </label>
                     </div>
                     <button class="admin-primary" onclick="adminApplyBalance()">💾 Terapkan Perubahan</button>
-                    <div style="font-size:11px;color:#999;margin-top:8px">Cari user terlebih dahulu. Contoh: Coins
-                        <b>5000</b> dan Seeds <b>20</b> untuk menambahkan keduanya sekaligus.
-                    </div>
+                    <div style="font-size:11px;color:#999;margin-top:8px">Cari user terlebih dahulu. Angka positif
+                        menambah, angka negatif mengurangi.</div>
                 </div>
             </div>
         </section>
@@ -1165,7 +1162,7 @@
             Collection
         </button>
 
-        <button id="nav-admin" onclick="showPage('admin')">
+        <button id="nav-admin" style="display:none" onclick="showPage('admin')">
             🔐<br>Admin
         </button>
 
@@ -1306,6 +1303,11 @@
 
 
         function showPage(id) {
+            if (id === 'admin' && !isAdmin) {
+                toast('Akses admin ditolak 🔒');
+                return;
+            }
+
 
             document
                 .querySelectorAll(".page")
@@ -1937,27 +1939,27 @@
         let adminTarget = null;
 
         async function initAdmin() {
-            // UI is visible, but every admin API endpoint is still protected by the backend.
-            // This avoids the Admin menu disappearing when /api/admin/me fails silently.
             const nav = document.getElementById('nav-admin');
             const card = document.getElementById('adminHomeCard');
-            if (nav) nav.style.display = 'block';
-            if (card) card.style.display = 'block';
+            const page = document.getElementById('admin');
+
+            // Admin UI stays hidden until the server confirms this Telegram ID is an admin.
+            if (nav) nav.style.display = 'none';
+            if (card) card.style.display = 'none';
+            if (page) page.style.display = 'none';
+            isAdmin = false;
 
             try {
                 const me = await api('/api/admin/me');
-                isAdmin = Boolean(me.isAdmin);
-                if (isAdmin) {
-                    await loadAdminStats();
-                } else {
-                    document.getElementById('adminStats').textContent = 'Akun ini bukan admin.';
-                }
+                if (!me || me.isAdmin !== true) return;
+
+                isAdmin = true;
+                if (nav) nav.style.display = 'block';
+                if (card) card.style.display = 'block';
+                if (page) page.style.display = '';
+                await loadAdminStats();
             } catch (e) {
                 isAdmin = false;
-                const stats = document.getElementById('adminStats');
-                if (stats) {
-                    stats.innerHTML = '<div style="font-weight:800">🔒 Akses Admin</div><div style="font-size:12px;color:#8b7c91;margin-top:5px">Akses admin ditolak oleh server. Pastikan Telegram ID kamu sudah ada di <b>ADMIN_TELEGRAM_IDS</b> di Vercel.</div>';
-                }
             }
         }
 
@@ -1994,7 +1996,25 @@
             }
         }
 
+        async function adminAdjust(type, amount) {
+            if (!adminTarget?.username) { toast('Cari user dulu 👤'); return; }
+            const body = { username: adminTarget.username, coinsDelta: type === 'coins' ? amount : 0, seedsDelta: type === 'seeds' ? amount : 0 };
+            try {
+                const result = await api('/api/admin/balance', { method: 'POST', body: JSON.stringify(body) });
+                adminTarget = result.user;
+                document.getElementById('adminUserResult').innerHTML = `
+                    <div style="font-weight:800">@${adminTarget.username || '-'}</div>
+                    <div>👤 ${adminTarget.first_name || '-'}</div>
+                    <div>🪙 Coins: <b>${adminTarget.coins}</b> · 🌱 Seeds: <b>${adminTarget.seeds}</b></div>`;
+                toast(result.message + ' ✅');
+            } catch (e) { toast(e.message); }
+        }
+
         async function adminApplyBalance() {
+            if (!isAdmin) {
+                toast('Akses admin ditolak 🔒');
+                return;
+            }
             if (!adminTarget?.username) {
                 toast('Cari user dulu 👤');
                 return;
@@ -2004,37 +2024,26 @@
             const seedsDelta = Number(document.getElementById('adminSeedsDelta')?.value || 0);
 
             if (!Number.isInteger(coinsDelta) || !Number.isInteger(seedsDelta)) {
-                toast('Coins dan Seeds harus berupa bilangan bulat');
+                toast('Coins dan seeds harus bilangan bulat');
                 return;
             }
-
             if (coinsDelta === 0 && seedsDelta === 0) {
-                toast('Isi jumlah Coins atau Seeds dulu');
+                toast('Isi perubahan coins atau seeds');
                 return;
             }
-
-            const body = {
-                username: adminTarget.username,
-                coinsDelta,
-                seedsDelta
-            };
 
             try {
                 const result = await api('/api/admin/balance', {
                     method: 'POST',
-                    body: JSON.stringify(body)
+                    body: JSON.stringify({ username: adminTarget.username, coinsDelta, seedsDelta })
                 });
-
                 adminTarget = result.user;
                 document.getElementById('adminUserResult').innerHTML = `
                     <div style="font-weight:800">@${adminTarget.username || '-'}</div>
                     <div>👤 ${adminTarget.first_name || '-'}</div>
-                    <div>🪙 Coins: <b>${adminTarget.coins}</b> · 🌱 Seeds: <b>${adminTarget.seeds}</b></div>
-                    <div style="margin-top:4px;color:#7041c7">Perubahan: Coins ${coinsDelta >= 0 ? '+' : ''}${coinsDelta} · Seeds ${seedsDelta >= 0 ? '+' : ''}${seedsDelta}</div>`;
-
+                    <div>🪙 Coins: <b>${adminTarget.coins}</b> · 🌱 Seeds: <b>${adminTarget.seeds}</b></div>`;
                 document.getElementById('adminCoinsDelta').value = '0';
                 document.getElementById('adminSeedsDelta').value = '0';
-                updateStats();
                 toast(result.message + ' ✅');
             } catch (e) {
                 toast(e.message);
