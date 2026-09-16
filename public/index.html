@@ -1106,14 +1106,22 @@
                 </div>
                 <div class="admin-box">
                     <div style="font-weight:800">💰 Ubah Balance</div>
-                    <div class="admin-actions">
-                        <button onclick="adminAdjust('coins',100)">🪙 +100 Coins</button>
-                        <button onclick="adminAdjust('coins',-100)">🪙 -100 Coins</button>
-                        <button onclick="adminAdjust('seeds',1)">🌱 +1 Seed</button>
-                        <button onclick="adminAdjust('seeds',-1)">🌱 -1 Seed</button>
+                    <div style="font-size:12px;color:#8b7c91;margin-top:5px">Ketik jumlah yang mau diberikan. Gunakan
+                        angka negatif untuk mengurangi.</div>
+                    <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+                        <label style="font-size:12px;font-weight:700">🪙 Coins
+                            <input id="adminCoinsDelta" type="number" step="1" value="0" placeholder="Contoh: 1000"
+                                inputmode="numeric">
+                        </label>
+                        <label style="font-size:12px;font-weight:700">🌱 Seeds
+                            <input id="adminSeedsDelta" type="number" step="1" value="0" placeholder="Contoh: 10"
+                                inputmode="numeric">
+                        </label>
                     </div>
-                    <div style="font-size:11px;color:#999;margin-top:8px">Cari user terlebih dahulu, lalu pilih
-                        perubahan balance.</div>
+                    <button class="admin-primary" onclick="adminApplyBalance()">💾 Terapkan Perubahan</button>
+                    <div style="font-size:11px;color:#999;margin-top:8px">Cari user terlebih dahulu. Contoh: Coins
+                        <b>5000</b> dan Seeds <b>20</b> untuk menambahkan keduanya sekaligus.
+                    </div>
                 </div>
             </div>
         </section>
@@ -1986,18 +1994,51 @@
             }
         }
 
-        async function adminAdjust(type, amount) {
-            if (!adminTarget?.username) { toast('Cari user dulu 👤'); return; }
-            const body = { username: adminTarget.username, coinsDelta: type === 'coins' ? amount : 0, seedsDelta: type === 'seeds' ? amount : 0 };
+        async function adminApplyBalance() {
+            if (!adminTarget?.username) {
+                toast('Cari user dulu 👤');
+                return;
+            }
+
+            const coinsDelta = Number(document.getElementById('adminCoinsDelta')?.value || 0);
+            const seedsDelta = Number(document.getElementById('adminSeedsDelta')?.value || 0);
+
+            if (!Number.isInteger(coinsDelta) || !Number.isInteger(seedsDelta)) {
+                toast('Coins dan Seeds harus berupa bilangan bulat');
+                return;
+            }
+
+            if (coinsDelta === 0 && seedsDelta === 0) {
+                toast('Isi jumlah Coins atau Seeds dulu');
+                return;
+            }
+
+            const body = {
+                username: adminTarget.username,
+                coinsDelta,
+                seedsDelta
+            };
+
             try {
-                const result = await api('/api/admin/balance', { method: 'POST', body: JSON.stringify(body) });
+                const result = await api('/api/admin/balance', {
+                    method: 'POST',
+                    body: JSON.stringify(body)
+                });
+
                 adminTarget = result.user;
                 document.getElementById('adminUserResult').innerHTML = `
                     <div style="font-weight:800">@${adminTarget.username || '-'}</div>
                     <div>👤 ${adminTarget.first_name || '-'}</div>
-                    <div>🪙 Coins: <b>${adminTarget.coins}</b> · 🌱 Seeds: <b>${adminTarget.seeds}</b></div>`;
+                    <div>🪙 Coins: <b>${adminTarget.coins}</b> · 🌱 Seeds: <b>${adminTarget.seeds}</b></div>
+                    <div style="margin-top:4px;color:#7041c7">Perubahan: Coins ${coinsDelta >= 0 ? '+' : ''}${coinsDelta} · Seeds ${seedsDelta >= 0 ? '+' : ''}${seedsDelta}</div>`;
+
+                document.getElementById('adminCoinsDelta').value = '0';
+                document.getElementById('adminSeedsDelta').value = '0';
+                updateStats();
                 toast(result.message + ' ✅');
-            } catch (e) { toast(e.message); }
+            } catch (e) {
+                toast(e.message);
+            }
         }
 
         async function init() {

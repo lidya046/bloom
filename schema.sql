@@ -23,9 +23,6 @@ CREATE TABLE IF NOT EXISTS flowers (
   shop_price INTEGER
 );
 
-ALTER TABLE flowers ADD COLUMN IF NOT EXISTS is_special BOOLEAN NOT NULL DEFAULT FALSE;
-ALTER TABLE flowers ADD COLUMN IF NOT EXISTS shop_price INTEGER;
-
 CREATE TABLE IF NOT EXISTS user_flowers (
   user_id BIGINT REFERENCES users(id) ON DELETE CASCADE,
   flower_id INTEGER REFERENCES flowers(id) ON DELETE CASCADE,
@@ -67,6 +64,10 @@ INSERT INTO flowers (name, emoji, rarity, sell_value) VALUES
 ('Black Rose','🥀','legendary',60),('Golden Flower','🌟','legendary',100)
 ON CONFLICT (name) DO NOTHING;
 
+CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username_lower ON users (LOWER(username)) WHERE username IS NOT NULL;
+
+
+-- Special flowers
 INSERT INTO flowers (name, emoji, rarity, sell_value, is_special, shop_price) VALUES
 ('Moonlit Lotus','🪷','legendary',180,TRUE,5000),
 ('Crystal Rose','🌹','legendary',220,TRUE,7500),
@@ -78,5 +79,3 @@ ON CONFLICT (name) DO UPDATE SET
   sell_value = EXCLUDED.sell_value,
   is_special = EXCLUDED.is_special,
   shop_price = EXCLUDED.shop_price;
-
-CREATE UNIQUE INDEX IF NOT EXISTS idx_users_username_lower ON users (LOWER(username)) WHERE username IS NOT NULL;
