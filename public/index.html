@@ -485,6 +485,12 @@
                     <p>Lihat bouquet dari teman</p>
                 </button>
 
+                <button id="adminCard" class="card" style="display:none" onclick="showPage('admin')">
+                    <div class="icon">🛠️</div>
+                    <h3>Admin</h3>
+                    <p>Kelola coins & seeds user</p>
+                </button>
+
 
                 <button class="card" onclick="dailyReward()">
 
@@ -503,6 +509,55 @@
                 </button>
 
             </div>
+
+        </section>
+
+
+
+        <!-- ADMIN -->
+
+        <section id="admin" class="page">
+
+            <button class="back" onclick="showPage('home')">
+                ← Kembali
+            </button>
+
+            <div class="section-title">
+                🛠️ Admin — Balance User
+            </div>
+
+            <div class="hero">
+                <h1>Kelola saldo user</h1>
+                <p>
+                    Cari user berdasarkan username Telegram, lalu tambah atau kurangi coins dan seeds.
+                    Gunakan angka negatif untuk mengurangi.
+                </p>
+            </div>
+
+            <label>
+                Username Telegram
+                <input id="adminUsername" placeholder="@username">
+            </label>
+
+            <button class="primary" onclick="lookupAdminUser()">
+                🔎 Cek User
+            </button>
+
+            <div id="adminUserInfo" style="margin-top:14px"></div>
+
+            <label>
+                Perubahan Coins
+                <input id="adminCoinsDelta" type="number" step="1" value="0" placeholder="Contoh: 100 atau -50">
+            </label>
+
+            <label>
+                Perubahan Seeds
+                <input id="adminSeedsDelta" type="number" step="1" value="0" placeholder="Contoh: 10 atau -5">
+            </label>
+
+            <button class="primary" onclick="changeAdminBalance()">
+                💰 Simpan Perubahan
+            </button>
 
         </section>
 
@@ -899,6 +954,7 @@
                 state.user = await api("/api/user");
 
                 updateStats();
+                await checkAdminAccess();
 
                 const firstName =
                     state.user.first_name;
@@ -1419,6 +1475,90 @@
 
         }
 
+
+
+        function renderAdminUser(user) {
+            const el = document.getElementById("adminUserInfo");
+            if (!user) {
+                el.innerHTML = "";
+                return;
+            }
+
+            el.innerHTML = `
+                <div class="flower" style="display:block">
+                    <div style="font-size:17px;font-weight:800">
+                        👤 ${user.first_name || "User"} ${user.username ? `(@${user.username})` : ""}
+                    </div>
+                    <div style="margin-top:8px">
+                        🪙 Coins: <b>${user.coins}</b>
+                        &nbsp; • &nbsp;
+                        🌱 Seeds: <b>${user.seeds}</b>
+                    </div>
+                    <div style="margin-top:5px;color:#8b7c91;font-size:12px">
+                        Telegram ID: ${user.telegram_id}
+                    </div>
+                </div>`;
+        }
+
+        async function checkAdminAccess() {
+            try {
+                await api("/api/admin/me");
+                document.getElementById("adminCard").style.display = "";
+                return true;
+            } catch (_) {
+                return false;
+            }
+        }
+
+        async function lookupAdminUser() {
+            const username = document.getElementById("adminUsername").value.trim();
+            if (!username) {
+                toast("Masukkan username user dulu");
+                return;
+            }
+
+            try {
+                const user = await api(`/api/admin/user?username=${encodeURIComponent(username)}`);
+                renderAdminUser(user);
+            } catch (e) {
+                renderAdminUser(null);
+                toast(e.message);
+            }
+        }
+
+        async function changeAdminBalance() {
+            const username = document.getElementById("adminUsername").value.trim();
+            const coinsDelta = Number(document.getElementById("adminCoinsDelta").value || 0);
+            const seedsDelta = Number(document.getElementById("adminSeedsDelta").value || 0);
+
+            if (!username) {
+                toast("Masukkan username user dulu");
+                return;
+            }
+            if (!Number.isInteger(coinsDelta) || !Number.isInteger(seedsDelta)) {
+                toast("Coins dan seeds harus angka bulat");
+                return;
+            }
+            if (coinsDelta === 0 && seedsDelta === 0) {
+                toast("Isi perubahan coins atau seeds");
+                return;
+            }
+
+            try {
+                const result = await api("/api/admin/balance", {
+                    method: "POST",
+                    body: JSON.stringify({ username, coinsDelta, seedsDelta })
+                });
+
+                renderAdminUser(result.user);
+                document.getElementById("adminCoinsDelta").value = "0";
+                document.getElementById("adminSeedsDelta").value = "0";
+
+                toast(`✅ @${result.user.username} berhasil diubah`);
+            } catch (e) {
+                toast(e.message);
+            }
+        }
 
         async function init() {
 
