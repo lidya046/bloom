@@ -758,6 +758,58 @@
                 opacity: 1;
             }
         }
+
+        /* Final mobile layout polish */
+        body {
+            overflow-x: hidden;
+        }
+
+        .app {
+            width: 100%;
+        }
+
+        .nav {
+            grid-template-columns: repeat(4, minmax(0, 1fr));
+        }
+
+        .nav button {
+            min-width: 0;
+            white-space: nowrap;
+        }
+
+        .admin-page {
+            overflow: hidden;
+        }
+
+        @media (max-width: 430px) {
+            .app {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .grid {
+                grid-template-columns: 1fr;
+                gap: 12px;
+            }
+
+            #shopList {
+                grid-template-columns: 1fr;
+            }
+
+            .nav {
+                width: calc(100% - 16px);
+                bottom: 8px;
+            }
+
+            .nav button {
+                font-size: 11px;
+                padding: 8px 2px;
+            }
+
+            .admin-grid {
+                grid-template-columns: 1fr 1fr;
+            }
+        }
     </style>
 </head>
 
@@ -885,6 +937,12 @@
                     <p>Lihat bouquet dari teman</p>
                 </button>
 
+
+                <button id="adminHomeCard" class="card" onclick="showPage('admin')">
+                    <div class="icon">🔐</div>
+                    <h3>Admin</h3>
+                    <p>Kelola user & balance</p>
+                </button>
 
                 <button class="card" onclick="dailyReward()">
 
@@ -1099,7 +1157,7 @@
             Collection
         </button>
 
-        <button id="nav-admin" style="display:none" onclick="showPage('admin')">
+        <button id="nav-admin" onclick="showPage('admin')">
             🔐<br>Admin
         </button>
 
@@ -1296,6 +1354,10 @@
 
             if (id === "received") {
                 loadReceived();
+            }
+
+            if (id === "admin") {
+                initAdmin();
             }
 
 
@@ -1867,16 +1929,27 @@
         let adminTarget = null;
 
         async function initAdmin() {
+            // UI is visible, but every admin API endpoint is still protected by the backend.
+            // This avoids the Admin menu disappearing when /api/admin/me fails silently.
+            const nav = document.getElementById('nav-admin');
+            const card = document.getElementById('adminHomeCard');
+            if (nav) nav.style.display = 'block';
+            if (card) card.style.display = 'block';
+
             try {
                 const me = await api('/api/admin/me');
                 isAdmin = Boolean(me.isAdmin);
-                const nav = document.getElementById('nav-admin');
-                if (isAdmin && nav) {
-                    nav.style.display = 'block';
+                if (isAdmin) {
                     await loadAdminStats();
+                } else {
+                    document.getElementById('adminStats').textContent = 'Akun ini bukan admin.';
                 }
             } catch (e) {
                 isAdmin = false;
+                const stats = document.getElementById('adminStats');
+                if (stats) {
+                    stats.innerHTML = '<div style="font-weight:800">🔒 Akses Admin</div><div style="font-size:12px;color:#8b7c91;margin-top:5px">Akses admin ditolak oleh server. Pastikan Telegram ID kamu sudah ada di <b>ADMIN_TELEGRAM_IDS</b> di Vercel.</div>';
+                }
             }
         }
 
