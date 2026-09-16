@@ -240,448 +240,6 @@
             letter-spacing: -10px;
         }
 
-        /* Multi-flower bouquet builder */
-        .bouquet-preview {
-            position: relative;
-            overflow: hidden;
-        }
-
-        .bouquet-canvas {
-            position: relative;
-            width: 100%;
-            min-height: 145px;
-            display: flex;
-            align-items: flex-end;
-            justify-content: center;
-            padding: 8px 8px 20px;
-        }
-
-        .bouquet-flower {
-            position: absolute;
-            width: 46px;
-            height: 46px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            font-size: 40px;
-            line-height: 1;
-            z-index: 2;
-            filter: drop-shadow(0 5px 4px rgba(80, 50, 90, .12));
-            animation: bouquetFloat 2.8s ease-in-out infinite;
-        }
-
-        .bouquet-flower:nth-child(2n) {
-            animation-delay: -.6s;
-        }
-
-        .bouquet-special {
-            animation: bouquetFloat 2.2s ease-in-out infinite, bouquetGlow 1.8s ease-in-out infinite;
-        }
-
-        .bouquet-special>span:not(.bouquet-stem) {
-            filter: drop-shadow(0 0 9px rgba(168, 85, 247, .7));
-        }
-
-        .bouquet-flower:nth-child(3n) {
-            animation-delay: -1.1s;
-        }
-
-        .bouquet-stem {
-            position: absolute;
-            width: 3px;
-            height: 42px;
-            bottom: -30px;
-            left: 50%;
-            transform: translateX(-50%) rotate(var(--stem-rotate, 0deg));
-            transform-origin: top center;
-            background: #79a86f;
-            border-radius: 99px;
-            opacity: .75;
-            z-index: 0;
-        }
-
-        .bouquet-wrap {
-            position: absolute;
-            bottom: 0;
-            left: 50%;
-            transform: translateX(-50%);
-            width: 118px;
-            height: 48px;
-            background: linear-gradient(135deg, #ffd5e6, #f4b8d2);
-            clip-path: polygon(12% 0, 88% 0, 72% 100%, 28% 100%);
-            border-radius: 6px 6px 16px 16px;
-            z-index: 4;
-            box-shadow: 0 6px 12px rgba(90, 50, 80, .12);
-        }
-
-        .bouquet-ribbon {
-            position: absolute;
-            bottom: 7px;
-            left: 50%;
-            transform: translateX(-50%);
-            font-size: 24px;
-            z-index: 5;
-        }
-
-        .bouquet-spark {
-            position: absolute;
-            font-size: 13px;
-            z-index: 6;
-            animation: bouquetSparkle 1.6s ease-in-out infinite;
-        }
-
-        .bouquet-spark.one {
-            top: 5px;
-            left: 20%;
-        }
-
-        .bouquet-spark.two {
-            top: 25px;
-            right: 18%;
-            animation-delay: .5s;
-        }
-
-        .bouquet-spark.three {
-            top: 55px;
-            left: 30%;
-            animation-delay: .9s;
-        }
-
-        .bouquet-controls {
-            background: rgba(255, 255, 255, .78);
-            border: 1px solid #eadff0;
-            border-radius: 18px;
-            padding: 10px;
-            margin-bottom: 12px;
-        }
-
-        .bouquet-controls-title {
-            font-size: 13px;
-            font-weight: 800;
-            margin-bottom: 8px;
-        }
-
-        .bouquet-flower-row {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            padding: 9px 2px;
-            border-bottom: 1px solid #f0e9f4;
-        }
-
-        .bouquet-flower-row:last-child {
-            border-bottom: 0;
-        }
-
-        .bouquet-flower-icon {
-            font-size: 28px;
-            width: 34px;
-            text-align: center;
-        }
-
-        .bouquet-flower-info {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .bouquet-flower-info b {
-            display: block;
-            font-size: 13px;
-        }
-
-        .bouquet-flower-info span {
-            color: #8b7c91;
-            font-size: 11px;
-        }
-
-        .qty-control {
-            display: flex;
-            align-items: center;
-            gap: 7px;
-        }
-
-        .qty-control button {
-            width: 30px;
-            height: 30px;
-            padding: 0;
-            border-radius: 10px;
-            background: #f1e9ff;
-            color: #7041c7;
-            font-size: 18px;
-            font-weight: 800;
-        }
-
-        .qty-control button:disabled {
-            opacity: .35;
-        }
-
-        .qty-value {
-            min-width: 20px;
-            text-align: center;
-            font-weight: 800;
-        }
-
-        .bouquet-total {
-            margin-top: 8px;
-            text-align: right;
-            color: #6e6075;
-            font-size: 12px;
-            font-weight: 700;
-        }
-
-        .bouquet-empty {
-            color: #918394;
-            font-size: 13px;
-            text-align: center;
-            padding: 30px 10px;
-        }
-
-        @keyframes bouquetFloat {
-
-            0%,
-            100% {
-                transform: translateY(0) rotate(-1deg);
-            }
-
-            50% {
-                transform: translateY(-4px) rotate(1deg);
-            }
-        }
-
-        @keyframes bouquetGlow {
-
-            0%,
-            100% {
-                filter: drop-shadow(0 5px 4px rgba(80, 50, 90, .12));
-            }
-
-            50% {
-                filter: drop-shadow(0 0 12px rgba(168, 85, 247, .55));
-            }
-        }
-
-        @keyframes bouquetSparkle {
-
-            0%,
-            100% {
-                opacity: .2;
-                transform: scale(.7);
-            }
-
-            50% {
-                opacity: 1;
-                transform: scale(1.25);
-            }
-        }
-
-        /* Received bouquet cards + gift popup */
-        .received-card {
-            background: rgba(255, 255, 255, .94);
-            border: 1px solid #eadff0;
-            border-radius: 22px;
-            padding: 14px;
-            margin-bottom: 12px;
-            box-shadow: 0 8px 24px rgba(80, 50, 90, .08);
-            cursor: pointer;
-            transition: transform .18s, box-shadow .18s;
-        }
-
-        .received-card:active {
-            transform: scale(.985);
-        }
-
-        .received-card-top {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .received-avatar {
-            width: 42px;
-            height: 42px;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #ffe2ef, #eee3ff);
-            font-size: 22px;
-            flex: 0 0 auto;
-        }
-
-        .received-sender {
-            flex: 1;
-            min-width: 0;
-        }
-
-        .received-sender b {
-            display: block;
-            font-size: 17px;
-        }
-
-        .received-hint {
-            color: #8b7c91;
-            font-size: 11px;
-            margin-top: 2px;
-        }
-
-        .received-new {
-            background: #7145c8;
-            color: #fff;
-            font-size: 10px;
-            font-weight: 800;
-            border-radius: 999px;
-            padding: 4px 8px;
-        }
-
-        .received-mini-bouquet {
-            position: relative;
-            height: 108px;
-            margin: 10px 0 7px;
-            border-radius: 18px;
-            overflow: hidden;
-            background: linear-gradient(135deg, #fff, #fbf1ff);
-        }
-
-        .received-mini-bouquet .bouquet-flower {
-            transform: scale(.72);
-            transform-origin: center;
-        }
-
-        .received-message {
-            color: #62566a;
-            font-size: 13px;
-            line-height: 1.45;
-        }
-
-        .gift-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(40, 27, 46, .62);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 18px;
-            z-index: 50;
-            backdrop-filter: blur(5px);
-        }
-
-        .gift-overlay.show {
-            display: flex;
-            animation: giftFade .2s ease-out;
-        }
-
-        .gift-modal {
-            width: min(440px, 100%);
-            max-height: calc(100vh - 36px);
-            overflow: auto;
-            background: linear-gradient(180deg, #fff, #fff8fd);
-            border-radius: 28px;
-            padding: 18px;
-            box-shadow: 0 22px 70px rgba(30, 15, 40, .35);
-            animation: giftPop .28s cubic-bezier(.2, .8, .2, 1);
-        }
-
-        .gift-close {
-            float: right;
-            width: 34px;
-            height: 34px;
-            border-radius: 50%;
-            background: #f3ebf7;
-            color: #66556d;
-            font-size: 20px;
-            padding: 0;
-        }
-
-        .gift-title {
-            text-align: center;
-            font-size: 20px;
-            font-weight: 900;
-            color: #392b40;
-            padding: 4px 30px 0;
-        }
-
-        .gift-from {
-            text-align: center;
-            color: #806c88;
-            font-size: 13px;
-            margin-top: 4px;
-        }
-
-        .gift-bouquet-stage {
-            position: relative;
-            height: 260px;
-            margin: 14px 0;
-            overflow: hidden;
-            border-radius: 24px;
-            background: linear-gradient(135deg, #fff0f7, #f4efff);
-        }
-
-        .gift-bouquet-stage .bouquet-canvas {
-            height: 100%;
-            min-height: 0;
-            padding-bottom: 28px;
-        }
-
-        .gift-bouquet-stage .bouquet-flower {
-            width: 58px;
-            height: 58px;
-            font-size: 48px;
-        }
-
-        .gift-bouquet-stage .bouquet-stem {
-            height: 68px;
-            bottom: -46px;
-        }
-
-        .gift-message {
-            background: #fff;
-            border: 1px solid #eee2f2;
-            border-radius: 17px;
-            padding: 12px 14px;
-            color: #4e4354;
-            line-height: 1.5;
-            font-size: 14px;
-            margin-bottom: 12px;
-        }
-
-        .gift-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            justify-content: center;
-            color: #786a7d;
-            font-size: 12px;
-            margin-bottom: 12px;
-        }
-
-        .gift-item-pill {
-            background: #f5edf8;
-            border-radius: 999px;
-            padding: 5px 9px;
-        }
-
-        @keyframes giftPop {
-            from {
-                opacity: 0;
-                transform: scale(.9) translateY(10px);
-            }
-
-            to {
-                opacity: 1;
-                transform: scale(1) translateY(0);
-            }
-        }
-
-        @keyframes giftFade {
-            from {
-                opacity: 0;
-            }
-
-            to {
-                opacity: 1;
-            }
-        }
-
         input,
         textarea,
         select {
@@ -1252,25 +810,278 @@
                 grid-template-columns: 1fr 1fr;
             }
         }
+
+        /* RESPONSIVE USER UI — preserve existing Bloom design */
+        html,
+        body {
+            width: 100%;
+            max-width: 100%;
+            overflow-x: hidden;
+        }
+
+        *,
+        *::before,
+        *::after {
+            box-sizing: border-box;
+        }
+
+        img,
+        svg,
+        video,
+        canvas {
+            max-width: 100%;
+            height: auto;
+        }
+
+        input,
+        textarea,
+        select,
+        button {
+            max-width: 100%;
+            font: inherit;
+        }
+
+        .app {
+            width: min(100%, 520px);
+            margin: 0 auto;
+        }
+
+        .header {
+            gap: 12px;
+        }
+
+        .header>* {
+            min-width: 0;
+        }
+
+        .stats {
+            flex-wrap: wrap;
+            justify-content: flex-end;
+        }
+
+        .page {
+            width: 100%;
+            min-width: 0;
+        }
+
+        .hero,
+        .card,
+        .section-title,
+        .form-card,
+        .collection-card,
+        .garden-card,
+        .bouquet-card {
+            min-width: 0;
+        }
+
+        .grid,
+        .shop-grid,
+        .admin-grid {
+            width: 100%;
+        }
+
+        .card h3,
+        .card p,
+        .flower-name,
+        .rarity,
+        .section-title {
+            overflow-wrap: anywhere;
+        }
+
+        .nav {
+            max-width: 520px;
+        }
+
+        @media (max-width: 600px) {
+            body {
+                padding-bottom: 82px;
+            }
+
+            .app {
+                padding-left: 14px;
+                padding-right: 14px;
+            }
+
+            .header {
+                align-items: flex-start;
+            }
+
+            .logo {
+                font-size: 22px;
+            }
+
+            .subtitle {
+                font-size: 12px;
+            }
+
+            .stats {
+                gap: 6px;
+            }
+
+            .stat {
+                padding: 7px 9px;
+                font-size: 12px;
+            }
+
+            .hero {
+                padding: 20px 16px;
+            }
+
+            .hero h1 {
+                font-size: clamp(22px, 6vw, 30px);
+                line-height: 1.15;
+            }
+
+            .hero p {
+                font-size: 13px;
+            }
+
+            .grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 10px;
+            }
+
+            .card {
+                padding: 16px 10px;
+                min-height: 125px;
+            }
+
+            .card .icon {
+                font-size: 30px;
+            }
+
+            .card h3 {
+                font-size: 14px;
+            }
+
+            .card p {
+                font-size: 11px;
+            }
+
+            .nav {
+                left: 8px;
+                right: 8px;
+                width: auto;
+                bottom: 8px;
+            }
+
+            .nav button {
+                min-width: 0;
+                padding: 8px 3px;
+                font-size: 10px;
+            }
+
+            .nav button span {
+                max-width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+            }
+
+            .shop-grid {
+                grid-template-columns: repeat(2, minmax(0, 1fr));
+                gap: 9px;
+            }
+
+            .shop-item {
+                padding: 11px;
+                min-height: 190px;
+            }
+
+            .shop-item .shop-top {
+                gap: 7px;
+            }
+
+            .shop-item .shop-top .special-icon,
+            .shop-item .shop-top .flower-icon {
+                flex-basis: 36px;
+                width: 36px;
+                height: 36px;
+                font-size: 29px;
+            }
+
+            .shop-item .flower-name {
+                font-size: 13px;
+            }
+
+            .shop-item .rarity {
+                font-size: 10px;
+            }
+
+            .shop-bottom {
+                flex-wrap: wrap;
+            }
+
+            .shop-buy {
+                width: 100% !important;
+            }
+
+            .admin-actions {
+                grid-template-columns: 1fr;
+            }
+
+            textarea {
+                min-height: 90px;
+            }
+        }
+
+        @media (max-width: 380px) {
+            .app {
+                padding-left: 10px;
+                padding-right: 10px;
+            }
+
+            .header {
+                gap: 8px;
+            }
+
+            .logo {
+                font-size: 20px;
+            }
+
+            .stats {
+                gap: 4px;
+            }
+
+            .stat {
+                padding: 6px 7px;
+                font-size: 11px;
+            }
+
+            .grid,
+            .shop-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .card {
+                min-height: 105px;
+                display: grid;
+                grid-template-columns: 42px 1fr;
+                column-gap: 10px;
+                align-items: center;
+                text-align: left;
+            }
+
+            .card .icon {
+                grid-row: span 2;
+            }
+
+            .nav button {
+                font-size: 9px;
+            }
+        }
+
+        @media (min-width: 601px) {
+            .app {
+                padding-left: 18px;
+                padding-right: 18px;
+            }
+        }
     </style>
 </head>
 
 <body>
 
     <div id="toast" class="toast"></div>
-
-    <div id="giftOverlay" class="gift-overlay" onclick="closeGiftPopup(event)">
-        <div class="gift-modal" onclick="event.stopPropagation()">
-            <button class="gift-close" type="button" onclick="closeGiftPopup()">×</button>
-            <div class="gift-title">💌 Kamu menerima bouquet!</div>
-            <div id="giftFrom" class="gift-from">Seseorang mengirim bunga untukmu</div>
-            <div id="giftBouquetStage" class="gift-bouquet-stage"></div>
-            <div id="giftItems" class="gift-items"></div>
-            <div id="giftMessage" class="gift-message"></div>
-            <button class="primary" type="button" onclick="closeGiftPopup(); showPage('received')">💐 Lihat di
-                Received</button>
-        </div>
-    </div>
 
     <div class="app">
 
@@ -1467,15 +1278,24 @@
             </div>
 
             <div class="bouquet-preview">
-                <div id="bouquetEmoji" class="bouquet-canvas"></div>
-                <b id="bouquetText">Bouquet kosong — pilih bunga di bawah 🌷</b>
+
+                <div id="bouquetEmoji" class="bouquet">
+                    🌷
+                </div>
+
+                <b id="bouquetText">
+                    Bouquet untuk seseorang spesial
+                </b>
+
             </div>
 
-            <div class="bouquet-controls">
-                <div class="bouquet-controls-title">🌸 Pilih bunga & jumlah</div>
-                <div id="bouquetFlowerList"></div>
-                <div id="bouquetTotal" class="bouquet-total">0 bunga dipilih</div>
-            </div>
+
+            <label>
+                Pilih bunga
+
+                <select id="flowerSelect" onchange="updateBouquet()"></select>
+
+            </label>
 
 
             <label>
@@ -1536,7 +1356,7 @@
 
 
         <!-- ADMIN (visible only to configured Telegram admins) -->
-        <section id="admin" class="page">
+        <section id="admin" class="page" style="display:none">
             <button class="back" onclick="showPage('home')">← Kembali</button>
             <div class="section-title">🔐 Admin Panel</div>
             <div class="admin-page">
@@ -1551,15 +1371,27 @@
                     <div id="adminUserResult" class="admin-user"></div>
                 </div>
                 <div class="admin-box">
-                    <div style="font-weight:800">💰 Ubah Balance</div>
-                    <div class="admin-actions">
-                        <button onclick="adminAdjust('coins',100)">🪙 +100 Coins</button>
-                        <button onclick="adminAdjust('coins',-100)">🪙 -100 Coins</button>
-                        <button onclick="adminAdjust('seeds',1)">🌱 +1 Seed</button>
-                        <button onclick="adminAdjust('seeds',-1)">🌱 -1 Seed</button>
+                    <div style="font-weight:800">💰 Tambah Balance</div>
+
+                    <div style="margin-top:12px">
+                        <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px">🪙 Jumlah
+                            Coins</label>
+                        <input id="adminCoinsAmount" type="number" min="1" step="1" inputmode="numeric"
+                            placeholder="Contoh: 500" style="width:100%;box-sizing:border-box">
+                        <button class="admin-primary" onclick="adminAddCustom('coins')">🪙 Tambah Coins</button>
                     </div>
-                    <div style="font-size:11px;color:#999;margin-top:8px">Cari user terlebih dahulu, lalu pilih
-                        perubahan balance.</div>
+
+                    <div style="margin-top:14px">
+                        <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px">🌱 Jumlah
+                            Seeds</label>
+                        <input id="adminSeedsAmount" type="number" min="1" step="1" inputmode="numeric"
+                            placeholder="Contoh: 10" style="width:100%;box-sizing:border-box">
+                        <button class="admin-primary" onclick="adminAddCustom('seeds')">🌱 Tambah Seeds</button>
+                    </div>
+
+                    <div style="font-size:11px;color:#999;margin-top:10px">
+                        Cari user terlebih dahulu, lalu isi sendiri jumlah yang ingin ditambahkan.
+                    </div>
                 </div>
             </div>
         </section>
@@ -1603,7 +1435,7 @@
             Collection
         </button>
 
-        <button id="nav-admin" style="display:none" onclick="showPage('admin')">
+        <button id="nav-admin" onclick="showPage('admin')">
             🔐<br>Admin
         </button>
 
@@ -1744,12 +1576,6 @@
 
 
         function showPage(id) {
-
-            // Admin page is inaccessible unless the server has confirmed this Telegram user is an admin.
-            if (id === "admin" && !isAdmin) {
-                toast("🔒 Halaman Admin hanya untuk admin.");
-                return;
-            }
 
             document
                 .querySelectorAll(".page")
@@ -2132,128 +1958,54 @@
         }
 
 
-        let bouquetItems = {};
-        const MAX_BOUQUET_FLOWERS = 12;
-
-        function getBouquetTotal() {
-            return Object.values(bouquetItems).reduce((sum, qty) => sum + Number(qty || 0), 0);
-        }
-
-        function getBouquetQty(flowerId) {
-            return Number(bouquetItems[Number(flowerId)] || 0);
-        }
-
-        function setBouquetQty(flowerId, nextQty) {
-            const flower = state.flowers.find(f => Number(f.id) === Number(flowerId));
-            if (!flower) return;
-            const owned = getQuantity(flower.id);
-            const current = getBouquetQty(flower.id);
-            const qty = Math.max(0, Math.min(Number(nextQty), owned, MAX_BOUQUET_FLOWERS - getBouquetTotal() + current));
-            if (qty > 0) bouquetItems[Number(flower.id)] = qty;
-            else delete bouquetItems[Number(flower.id)];
-            renderBouquetBuilder();
-        }
-
-        function changeBouquetQty(flowerId, delta) {
-            setBouquetQty(flowerId, getBouquetQty(flowerId) + delta);
-        }
-
         function initBouquet() {
-            bouquetItems = {};
-            renderBouquetBuilder();
-        }
+            const select = document.getElementById("flowerSelect");
+            select.innerHTML = state.flowers.map(flower => {
+                const qty = getQuantity(flower.id);
+                return `<option value="${flower.id}" ${qty < 1 ? "disabled" : ""}>${flower.emoji} ${flower.name} — Punya: ${qty}</option>`;
+            }).join("");
 
-        function renderBouquetBuilder() {
-            const list = document.getElementById('bouquetFlowerList');
-            if (!list) return;
-
-            const ownedFlowers = state.flowers.filter(f => getQuantity(f.id) > 0);
-            if (!ownedFlowers.length) {
-                list.innerHTML = '<div class="bouquet-empty">Belum punya bunga 🌱<br>Beli bunga di Shop atau dapatkan dari Garden.</div>';
-            } else {
-                list.innerHTML = ownedFlowers.map(flower => {
-                    const owned = getQuantity(flower.id);
-                    const qty = getBouquetQty(flower.id);
-                    const atMax = getBouquetTotal() >= MAX_BOUQUET_FLOWERS && qty === 0;
-                    const special = Boolean(flower.is_special);
-                    return `
-                        <div class="bouquet-flower-row">
-                            <div class="bouquet-flower-icon ${special ? `special-${specialClass(flower)}` : ''}">${flower.emoji}</div>
-                            <div class="bouquet-flower-info">
-                                <b>${flower.name}${special ? ' ✨' : ''}</b>
-                                <span>Punya: ${owned}</span>
-                            </div>
-                            <div class="qty-control">
-                                <button type="button" onclick="changeBouquetQty(${flower.id}, -1)" ${qty <= 0 ? 'disabled' : ''}>−</button>
-                                <div class="qty-value">${qty}</div>
-                                <button type="button" onclick="changeBouquetQty(${flower.id}, 1)" ${qty >= owned || atMax ? 'disabled' : ''}>+</button>
-                            </div>
-                        </div>`;
-                }).join('');
-            }
-
-            renderBouquetPreview();
-        }
-
-        function buildBouquetFlowers() {
-            const selected = [];
-            Object.entries(bouquetItems).forEach(([id, qty]) => {
-                const flower = state.flowers.find(f => Number(f.id) === Number(id));
-                if (!flower) return;
-                for (let i = 0; i < Number(qty); i++) selected.push(flower);
-            });
-            return selected;
-        }
-
-        function getBouquetPositions(count) {
-            const layouts = {
-                1: [[50, 28, 0]],
-                2: [[42, 31, -8], [58, 31, 8]],
-                3: [[50, 18, 0], [39, 39, -10], [61, 39, 10]],
-                4: [[42, 20, -8], [58, 20, 8], [35, 43, -12], [65, 43, 12]],
-                5: [[50, 12, 0], [39, 29, -9], [61, 29, 9], [32, 48, -14], [68, 48, 14]],
-                6: [[43, 12, -7], [57, 12, 7], [34, 31, -12], [50, 28, 0], [66, 31, 12], [50, 49, 0]],
-                7: [[50, 8, 0], [39, 24, -10], [61, 24, 10], [31, 42, -15], [50, 38, 0], [69, 42, 15], [50, 56, 0]],
-                8: [[43, 8, -7], [57, 8, 7], [33, 25, -12], [50, 22, 0], [67, 25, 12], [29, 46, -16], [50, 43, 0], [71, 46, 16]],
-                9: [[50, 5, 0], [39, 20, -10], [61, 20, 10], [30, 37, -16], [45, 34, -5], [55, 34, 5], [70, 37, 16], [39, 54, -8], [61, 54, 8]]
-            };
-            if (layouts[count]) return layouts[count];
-            const result = [];
-            for (let i = 0; i < count; i++) {
-                const row = Math.floor(i / 3);
-                const col = i % 3;
-                result.push([32 + col * 18 + (row % 2 ? 9 : 0), 6 + row * 17, (col - 1) * 8]);
-            }
-            return result;
-        }
-
-        function renderBouquetPreview() {
-            const preview = document.getElementById('bouquetEmoji');
-            const text = document.getElementById('bouquetText');
-            if (!preview || !text) return;
-            const flowers = buildBouquetFlowers();
-            const total = flowers.length;
-
-            if (!total) {
-                preview.innerHTML = '<div class="bouquet-empty">Pilih minimal 1 bunga untuk mulai merangkai 💐</div>';
-                text.textContent = 'Bouquet kosong — pilih bunga di bawah 🌷';
-                return;
-            }
-
-            const positions = getBouquetPositions(Math.min(total, 12));
-            preview.innerHTML = positions.map((pos, index) => {
-                const flower = flowers[index % flowers.length];
-                const special = Boolean(flower.is_special);
-                const spark = special ? '<span class="bouquet-spark one">✦</span>' : '';
-                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}<span>${flower.emoji}</span><span class="bouquet-stem"></span></div>`;
-            }).join('') + '<div class="bouquet-wrap"></div><div class="bouquet-ribbon">🎀</div><span class="bouquet-spark two">✦</span><span class="bouquet-spark three">✧</span>';
-
-            text.textContent = `${total} bunga dalam bouquet`;
+            const firstOwned = state.flowers.find(f => getQuantity(f.id) > 0);
+            if (firstOwned) select.value = firstOwned.id;
+            updateBouquet();
         }
 
         function updateBouquet() {
-            renderBouquetBuilder();
+
+            const select =
+                document.getElementById(
+                    "flowerSelect"
+                );
+
+
+            const flower =
+                state.flowers.find(
+                    x =>
+                        Number(x.id) ===
+                        Number(select.value)
+                );
+
+
+            if (!flower) {
+                return;
+            }
+
+
+            const preview = document.getElementById('bouquetEmoji');
+            preview.textContent = flower.emoji;
+            preview.className = flower.is_special ? `bouquet special-preview special-${specialClass(flower)}` : 'bouquet';
+            preview.innerHTML = flower.is_special
+                ? `<span class="spark s1">✦</span><span class="spark s2">✧</span><span class="spark s3">✦</span><span>${flower.emoji}</span>`
+                : flower.emoji;
+
+
+            document.getElementById(
+                "bouquetText"
+            ).textContent =
+                `Bouquet ${flower.name}`;
+
         }
+
 
         async function loadShop() {
             try {
@@ -2307,181 +2059,149 @@
             } catch (e) { toast(e.message); }
         }
 
-        let receivedBouquets = [];
-        let receivedPollingStarted = false;
-
-        function receivedStorageKey() {
-            return `bloom_last_received_id_${state.user?.telegram_id || 'guest'}`;
-        }
-
-        function receivedFlowerList(items) {
-            return (items || []).map(x => {
-                const f = state.flowers.find(y => Number(y.id) === Number(x.flowerId));
-                return { flower: f, quantity: Number(x.quantity || 1) };
-            }).filter(x => x.flower);
-        }
-
-        function renderReceivedMiniBouquet(items) {
-            const flowers = [];
-            receivedFlowerList(items).forEach(({ flower, quantity }) => {
-                for (let i = 0; i < Math.min(quantity, 12); i++) flowers.push(flower);
-            });
-            if (!flowers.length) return '<div class="bouquet-empty">💐 Bouquet</div>';
-
-            const positions = getBouquetPositions(Math.min(flowers.length, 12));
-            return `<div class="bouquet-canvas">${positions.map((pos, index) => {
-                const flower = flowers[index % flowers.length];
-                const special = Boolean(flower.is_special);
-                const spark = special ? '<span class="bouquet-spark one">✦</span>' : '';
-                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}<span>${flower.emoji}</span><span class="bouquet-stem"></span></div>`;
-            }).join('')}<div class="bouquet-wrap"></div><div class="bouquet-ribbon">🎀</div><span class="bouquet-spark two">✦</span><span class="bouquet-spark three">✧</span></div>`;
-        }
-
-        function openReceivedBouquet(bouquetId) {
-            const b = receivedBouquets.find(x => Number(x.id) === Number(bouquetId));
-            if (!b) return;
-            const sender = b.sender_first_name || (b.sender_username ? `@${b.sender_username}` : 'Teman');
-            document.getElementById('giftFrom').textContent = `Dari ${sender} 💕`;
-            document.getElementById('giftBouquetStage').innerHTML = renderReceivedMiniBouquet(b.items || []);
-            document.getElementById('giftItems').innerHTML = receivedFlowerList(b.items || []).map(({ flower, quantity }) =>
-                `<span class="gift-item-pill">${flower.emoji} ${flower.name} ×${quantity}</span>`
-            ).join('');
-            document.getElementById('giftMessage').textContent = b.message || 'Untukmu, dengan sayang 🌷';
-            document.getElementById('giftOverlay').classList.add('show');
-            document.body.style.overflow = 'hidden';
-            try { localStorage.setItem(receivedStorageKey(), String(Math.max(Number(localStorage.getItem(receivedStorageKey()) || 0), Number(b.id) || 0))); } catch (_) { }
-        }
-
-        function closeGiftPopup(event) {
-            if (event && event.target && event.target.id !== 'giftOverlay') return;
-            const overlay = document.getElementById('giftOverlay');
-            if (overlay) overlay.classList.remove('show');
-            document.body.style.overflow = '';
-        }
-
-        function maybePopupNewBouquet(items, options = {}) {
-            if (!items.length) return;
-            const newest = items.reduce((a, b) => Number(b.id) > Number(a.id) ? b : a);
-            const newestId = Number(newest.id || 0);
-            if (!newestId) return;
-            let lastSeen = 0;
-            try { lastSeen = Number(localStorage.getItem(receivedStorageKey()) || 0); } catch (_) { }
-
-            if (options.initial) {
-                if (!lastSeen) {
-                    try { localStorage.setItem(receivedStorageKey(), String(newestId)); } catch (_) { }
-                }
-                return;
-            }
-
-            if (newestId > lastSeen) {
-                try { localStorage.setItem(receivedStorageKey(), String(newestId)); } catch (_) { }
-                openReceivedBouquet(newestId);
-                toast('💌 Ada bouquet baru untukmu!');
-            }
-        }
-
-        async function fetchReceived({ popup = false } = {}) {
-            const items = await api('/api/bouquets/received');
-            receivedBouquets = Array.isArray(items) ? items : [];
-            renderReceivedList();
-            maybePopupNewBouquet(receivedBouquets, { initial: !popup });
-            return receivedBouquets;
-        }
-
-        function renderReceivedList() {
-            const el = document.getElementById('receivedList');
-            if (!el) return;
-            if (!receivedBouquets.length) {
-                el.innerHTML = `<div class="empty">Belum ada bouquet masuk 💌<br>Minta teman mengirim bouquet ke username Telegram kamu.</div>`;
-                return;
-            }
-            let lastSeen = 0;
-            try { lastSeen = Number(localStorage.getItem(receivedStorageKey()) || 0); } catch (_) { }
-            el.innerHTML = receivedBouquets.map(b => {
-                const sender = b.sender_first_name || (b.sender_username ? `@${b.sender_username}` : 'Teman');
-                const total = (b.items || []).reduce((sum, x) => sum + Number(x.quantity || 0), 0);
-                const isNew = Number(b.id) > lastSeen;
-                return `<div class="received-card" onclick="openReceivedBouquet(${Number(b.id)})">
-                    <div class="received-card-top">
-                        <div class="received-avatar">💌</div>
-                        <div class="received-sender"><b>Dari ${sender}</b><div class="received-hint">${total} bunga • Ketuk untuk membuka bouquet ✨</div></div>
-                        ${isNew ? '<span class="received-new">BARU</span>' : ''}
-                    </div>
-                    <div class="received-mini-bouquet">${renderReceivedMiniBouquet(b.items || [])}</div>
-                    <div class="received-message">${b.message || 'Untukmu, dengan sayang 🌷'}</div>
-                </div>`;
-            }).join('');
-        }
-
         async function loadReceived() {
             try {
-                await fetchReceived({ popup: false });
+                const items = await api("/api/bouquets/received");
+                const el = document.getElementById("receivedList");
+                if (!items.length) {
+                    el.innerHTML = `<div class="empty">Belum ada bouquet masuk 💌<br>Minta teman mengirim bouquet ke Telegram ID kamu.</div>`;
+                    return;
+                }
+                el.innerHTML = items.map(b => {
+                    const sender = b.sender_first_name || b.sender_username || "Teman";
+                    const itemText = (b.items || []).map(x => {
+                        const f = state.flowers.find(y => Number(y.id) === Number(x.flowerId));
+                        return f ? `${f.emoji} ${f.name} ×${x.quantity}` : `🌷 ×${x.quantity}`;
+                    }).join(" • ");
+                    return `<div class="flower" style="margin-bottom:12px;display:block">
+                        <div style="font-size:18px;font-weight:700">💌 Dari ${sender}</div>
+                        <div style="margin:8px 0">${itemText}</div>
+                        <div style="color:#666">${b.message || "Untukmu, dengan sayang 🌷"}</div>
+                    </div>`;
+                }).join("");
             } catch (e) { toast(e.message); }
         }
 
-        function startReceivedPolling() {
-            if (receivedPollingStarted) return;
-            receivedPollingStarted = true;
-            setInterval(async () => {
-                if (!state.user) return;
-                try { await fetchReceived({ popup: true }); } catch (_) { }
-            }, 8000);
-        }
-
         async function sendBouquet() {
-            const receiverName = document.getElementById('receiver').value.trim();
-            const receiverUsername = document.getElementById('receiverUsername').value.trim();
-            const message = document.getElementById('message').value.trim();
-            const total = getBouquetTotal();
+
+            const flowerId =
+                Number(
+                    document.getElementById(
+                        "flowerSelect"
+                    ).value
+                );
+
+
+            const receiverName =
+                document.getElementById(
+                    "receiver"
+                ).value.trim();
+
+
+            const receiverUsername =
+                document.getElementById(
+                    "receiverUsername"
+                ).value.trim();
+
+
+            const message =
+                document.getElementById(
+                    "message"
+                ).value.trim();
+
 
             if (!receiverName) {
-                toast('Isi nama penerima dulu 💌');
-                return;
-            }
-            if (!receiverUsername) {
-                toast('Masukkan username Telegram penerima 📱');
-                return;
-            }
-            if (!total) {
-                toast('Pilih minimal 1 bunga untuk bouquet 💐');
+                toast("Isi nama penerima dulu 💌");
                 return;
             }
 
-            const items = Object.entries(bouquetItems)
-                .filter(([, quantity]) => Number(quantity) > 0)
-                .map(([flowerId, quantity]) => ({ flowerId: Number(flowerId), quantity: Number(quantity) }));
+            if (!receiverUsername) {
+                toast("Masukkan username Telegram penerima 📱");
+                return;
+            }
+
+
+            if (
+                getQuantity(flowerId) < 1
+            ) {
+
+                toast(
+                    "Kamu belum punya bunga ini 🌱"
+                );
+
+                return;
+
+            }
+
 
             try {
-                const result = await api('/api/bouquets', {
-                    method: 'POST',
-                    body: JSON.stringify({
-                        items,
-                        receiverUsername,
-                        message,
-                        wrapping: 'pink'
-                    })
-                });
 
-                state.user = await api('/api/user');
+                const result =
+                    await api(
+                        "/api/bouquets",
+                        {
+                            method: "POST",
+
+                            body: JSON.stringify({
+
+                                items: [{ flowerId, quantity: 1 }],
+
+                                receiverUsername: receiverUsername,
+
+                                message,
+
+                                wrapping: "pink"
+
+                            })
+                        }
+                    );
+
+
+                state.user = await api("/api/user");
                 updateStats();
                 await loadCollection();
 
-                toast(result.notification?.sent
-                    ? `💌 Bouquet ${total} bunga terkirim ke ${receiverName}!`
-                    : '💌 Bouquet tersimpan, tapi notifikasi Telegram belum terkirim.');
+                toast(
+                    result.notification?.sent
+                        ? `💌 Terkirim ke ${receiverName}! Cek Telegram mereka.`
+                        : `💌 Bouquet tersimpan, tapi notifikasi Telegram belum terkirim.`
+                );
 
-                document.getElementById('receiver').value = '';
-                document.getElementById('receiverUsername').value = '';
-                document.getElementById('message').value = '';
-                bouquetItems = {};
-                renderBouquetBuilder();
-                showPage('collection');
+
+                document.getElementById(
+                    "receiver"
+                ).value = "";
+
+
+                document.getElementById(
+                    "receiverUsername"
+                ).value = "";
+
+
+                document.getElementById(
+                    "message"
+                ).value = "";
+
+
+                await loadCollection();
+
+
+                showPage(
+                    "collection"
+                );
+
+
             } catch (error) {
+
                 console.error(error);
+
                 toast(error.message);
+
             }
+
         }
+
+
 
         let isAdmin = false;
         let adminTarget = null;
@@ -2489,29 +2209,37 @@
         async function initAdmin() {
             const nav = document.getElementById('nav-admin');
             const card = document.getElementById('adminHomeCard');
+            const page = document.getElementById('admin');
 
-            // Default: completely hidden for everyone.
             if (nav) nav.style.display = 'none';
             if (card) card.style.display = 'none';
+            if (page) {
+                page.style.display = 'none';
+                page.classList.remove('active');
+            }
+
             isAdmin = false;
 
             try {
-                // The backend is the source of truth for admin status.
                 const me = await api('/api/admin/me');
-                isAdmin = Boolean(me.isAdmin);
+                isAdmin = Boolean(me && me.isAdmin);
 
                 if (!isAdmin) return;
 
-                // Only reveal Admin UI after the server confirms admin access.
                 if (nav) nav.style.display = 'block';
                 if (card) card.style.display = 'block';
+                if (page) page.style.display = '';
 
                 await loadAdminStats();
             } catch (e) {
-                // Keep Admin completely invisible if access is denied or the check fails.
                 isAdmin = false;
                 if (nav) nav.style.display = 'none';
                 if (card) card.style.display = 'none';
+                if (page) {
+                    page.style.display = 'none';
+                    page.classList.remove('active');
+                }
+                console.error('Admin check failed:', e);
             }
         }
 
@@ -2562,6 +2290,52 @@
             } catch (e) { toast(e.message); }
         }
 
+        async function adminAddCustom(type) {
+            if (!adminTarget?.username) {
+                toast('Cari user dulu 👤');
+                return;
+            }
+
+            const inputId = type === 'coins'
+                ? 'adminCoinsAmount'
+                : 'adminSeedsAmount';
+
+            const input = document.getElementById(inputId);
+            const amount = Number(input?.value);
+
+            if (!Number.isInteger(amount) || amount <= 0) {
+                toast('Masukkan jumlah lebih dari 0');
+                input?.focus();
+                return;
+            }
+
+            const body = {
+                username: adminTarget.username,
+                coinsDelta: type === 'coins' ? amount : 0,
+                seedsDelta: type === 'seeds' ? amount : 0
+            };
+
+            try {
+                const result = await api('/api/admin/balance', {
+                    method: 'POST',
+                    body: JSON.stringify(body)
+                });
+
+                adminTarget = result.user;
+
+                document.getElementById('adminUserResult').innerHTML = `
+                    <div style="font-weight:800">@${adminTarget.username || '-'}</div>
+                    <div>👤 ${adminTarget.first_name || '-'}</div>
+                    <div>🪙 Coins: <b>${adminTarget.coins}</b> · 🌱 Seeds: <b>${adminTarget.seeds}</b></div>`;
+
+                input.value = '';
+                toast(result.message + ' ✅');
+            } catch (e) {
+                toast(e.message);
+            }
+        }
+
+
         async function init() {
 
             const loggedIn =
@@ -2578,8 +2352,6 @@
             initBouquet();
             updateStats();
             await initAdmin();
-            await loadReceived();
-            startReceivedPolling();
 
         }
 
