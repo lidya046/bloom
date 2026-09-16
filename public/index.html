@@ -1076,6 +1076,25 @@
                 padding-right: 18px;
             }
         }
+
+        /* FINAL ADMIN NAV FIX — keep the bottom navbar as a 4-column grid */
+        .nav {
+            display: grid !important;
+            grid-template-columns: repeat(4, minmax(0, 1fr)) !important;
+            width: min(490px, calc(100% - 16px)) !important;
+            left: 50% !important;
+            right: auto !important;
+            transform: translateX(-50%) !important;
+        }
+
+        @media (max-width: 600px) {
+            .nav {
+                left: 8px !important;
+                right: 8px !important;
+                width: auto !important;
+                transform: none !important;
+            }
+        }
     </style>
 </head>
 
@@ -1576,6 +1595,16 @@
 
 
         function showPage(id) {
+
+            if (id === "admin" && !isAdmin) {
+                toast("Akses Admin ditolak 🔒");
+                return;
+            }
+
+            if (id === "admin") {
+                const adminPage = document.getElementById("admin");
+                if (adminPage) adminPage.style.display = "block";
+            }
 
             document
                 .querySelectorAll(".page")
@@ -2226,9 +2255,9 @@
 
                 if (!isAdmin) return;
 
-                if (nav) nav.style.display = 'block';
+                if (nav) nav.style.display = 'grid';
                 if (card) card.style.display = 'block';
-                if (page) page.style.display = '';
+                if (page) page.style.display = 'block';
 
                 await loadAdminStats();
             } catch (e) {
