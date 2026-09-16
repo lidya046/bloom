@@ -4,9 +4,9 @@ import { notifyAdmins } from '../admin.js';
 const router = Router();
 
 router.get('/', async (_req, res) => {
-  const r = await pool.query(`SELECT id,name,emoji,rarity,sell_value,
-    CASE rarity WHEN 'common' THEN 15 WHEN 'rare' THEN 40 WHEN 'epic' THEN 100 WHEN 'legendary' THEN 500 END AS price
-    FROM flowers ORDER BY id`);
+  const r = await pool.query(`SELECT id,name,emoji,rarity,sell_value,is_special,shop_price,
+    COALESCE(shop_price, CASE rarity WHEN 'common' THEN 15 WHEN 'rare' THEN 40 WHEN 'epic' THEN 100 WHEN 'legendary' THEN 500 END) AS price
+    FROM flowers ORDER BY is_special DESC, id`);
   res.json(r.rows);
 });
 
@@ -19,7 +19,7 @@ router.post('/buy', async (req, res) => {
     await client.query('BEGIN');
     const flower = (await client.query(`SELECT * FROM flowers WHERE id=$1`, [flowerId])).rows[0];
     if (!flower) throw new Error('Flower not found');
-    const price = ({ common: 15, rare: 40, epic: 100, legendary: 500 })[flower.rarity];
+    const price = Number(flower.shop_price ?? ({ common: 15, rare: 40, epic: 100, legendary: 500 })[flower.rarity]);
     const u = (await client.query('SELECT * FROM users WHERE id=$1 FOR UPDATE', [req.user.id])).rows[0];
     const total = price * quantity;
     if (u.coins < total) throw new Error(`Coins tidak cukup. Butuh ${total} coins.`);

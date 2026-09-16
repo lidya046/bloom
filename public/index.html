@@ -3,7 +3,7 @@
 
 <head>
     <meta charset="UTF-8">
-    <meta name="version" content="bloom-auth-fixed-2026-09-15">
+    <meta name="version" content="bloom-special-flowers-2026-09-16">
 
     <meta name="viewport" content="width=device-width,
     initial-scale=1.0,
@@ -358,6 +358,185 @@
             opacity: .6;
             pointer-events: none;
         }
+
+        .special-flower {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(139, 92, 246, .22);
+            background: linear-gradient(135deg, #fff, #fbf7ff 55%, #fff7fb);
+        }
+
+        .special-flower::before {
+            content: '';
+            position: absolute;
+            inset: -60%;
+            background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, .85), transparent 28%);
+            animation: specialSweep 4s linear infinite;
+            pointer-events: none;
+        }
+
+        .special-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .special-icon {
+            font-size: 38px;
+            filter: drop-shadow(0 0 10px rgba(168, 85, 247, .55));
+            animation: specialFloat 2.8s ease-in-out infinite;
+        }
+
+        .special-badge {
+            display: inline-block;
+            margin-top: 4px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            background: #f1e7ff;
+            color: #7541c8;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+
+        .special-price {
+            font-weight: 900;
+            color: #7041c7;
+            white-space: nowrap;
+        }
+
+        .special-moonlit .special-icon {
+            animation: moonGlow 2.6s ease-in-out infinite;
+        }
+
+        .special-crystal .special-icon {
+            animation: crystalPulse 1.9s ease-in-out infinite;
+        }
+
+        .special-aurora .special-icon {
+            animation: auroraFloat 3s ease-in-out infinite;
+        }
+
+        .special-eternal .special-icon {
+            animation: eternalGlow 2s ease-in-out infinite;
+        }
+
+        @keyframes specialFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-2deg);
+            }
+
+            50% {
+                transform: translateY(-7px) rotate(2deg);
+            }
+        }
+
+        @keyframes specialSweep {
+            to {
+                transform: rotate(360deg);
+            }
+        }
+
+        @keyframes moonGlow {
+
+            0%,
+            100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 6px rgba(139, 92, 246, .35));
+            }
+
+            50% {
+                transform: scale(1.1);
+                filter: drop-shadow(0 0 18px rgba(139, 92, 246, .9));
+            }
+        }
+
+        @keyframes crystalPulse {
+
+            0%,
+            100% {
+                transform: translateY(0) scale(1);
+            }
+
+            50% {
+                transform: translateY(-5px) scale(1.12);
+            }
+        }
+
+        @keyframes auroraFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-4deg);
+            }
+
+            50% {
+                transform: translateY(-8px) rotate(4deg);
+            }
+        }
+
+        @keyframes eternalGlow {
+
+            0%,
+            100% {
+                transform: scale(1);
+                filter: drop-shadow(0 0 8px rgba(234, 179, 8, .35));
+            }
+
+            50% {
+                transform: scale(1.14);
+                filter: drop-shadow(0 0 22px rgba(234, 179, 8, .95));
+            }
+        }
+
+        .special-preview {
+            position: relative;
+            display: inline-block;
+            padding: 12px 28px;
+            border-radius: 24px;
+            background: radial-gradient(circle, rgba(255, 255, 255, .95), rgba(246, 237, 255, .7));
+            box-shadow: 0 0 30px rgba(139, 92, 246, .12);
+        }
+
+        .special-preview .spark {
+            position: absolute;
+            font-size: 13px;
+            animation: sparkle 1.8s ease-in-out infinite;
+            opacity: .8;
+        }
+
+        .special-preview .s1 {
+            top: 2px;
+            left: 10px;
+        }
+
+        .special-preview .s2 {
+            right: 8px;
+            top: 18px;
+            animation-delay: .6s;
+        }
+
+        .special-preview .s3 {
+            left: 18px;
+            bottom: 2px;
+            animation-delay: 1s;
+        }
+
+        @keyframes sparkle {
+
+            0%,
+            100% {
+                transform: scale(.7) rotate(0deg);
+                opacity: .25;
+            }
+
+            50% {
+                transform: scale(1.35) rotate(18deg);
+                opacity: 1;
+            }
+        }
     </style>
 </head>
 
@@ -485,12 +664,6 @@
                     <p>Lihat bouquet dari teman</p>
                 </button>
 
-                <button id="adminCard" class="card" style="display:none" onclick="showPage('admin')">
-                    <div class="icon">🛠️</div>
-                    <h3>Admin</h3>
-                    <p>Kelola coins & seeds user</p>
-                </button>
-
 
                 <button class="card" onclick="dailyReward()">
 
@@ -509,55 +682,6 @@
                 </button>
 
             </div>
-
-        </section>
-
-
-
-        <!-- ADMIN -->
-
-        <section id="admin" class="page">
-
-            <button class="back" onclick="showPage('home')">
-                ← Kembali
-            </button>
-
-            <div class="section-title">
-                🛠️ Admin — Balance User
-            </div>
-
-            <div class="hero">
-                <h1>Kelola saldo user</h1>
-                <p>
-                    Cari user berdasarkan username Telegram, lalu tambah atau kurangi coins dan seeds.
-                    Gunakan angka negatif untuk mengurangi.
-                </p>
-            </div>
-
-            <label>
-                Username Telegram
-                <input id="adminUsername" placeholder="@username">
-            </label>
-
-            <button class="primary" onclick="lookupAdminUser()">
-                🔎 Cek User
-            </button>
-
-            <div id="adminUserInfo" style="margin-top:14px"></div>
-
-            <label>
-                Perubahan Coins
-                <input id="adminCoinsDelta" type="number" step="1" value="0" placeholder="Contoh: 100 atau -50">
-            </label>
-
-            <label>
-                Perubahan Seeds
-                <input id="adminSeedsDelta" type="number" step="1" value="0" placeholder="Contoh: 10 atau -5">
-            </label>
-
-            <button class="primary" onclick="changeAdminBalance()">
-                💰 Simpan Perubahan
-            </button>
 
         </section>
 
@@ -672,7 +796,8 @@
         <section id="shop" class="page">
             <button class="back" onclick="showPage('home')">← Kembali</button>
             <div class="section-title">🛒 Flower Shop</div>
-            <p style="color:#777;margin-top:-6px">Beli bunga tertentu kalau tidak mau menunggu hasil tanam.</p>
+            <p style="color:#777;margin-top:-6px">Bunga special tidak muncul dari Garden. Koleksi premium ini punya
+                animasi khusus ✨</p>
             <div id="shopList" class="grid"></div>
         </section>
 
@@ -954,7 +1079,6 @@
                 state.user = await api("/api/user");
 
                 updateStats();
-                await checkAdminAccess();
 
                 const firstName =
                     state.user.first_name;
@@ -1062,6 +1186,15 @@
         }
 
 
+        function specialClass(flower) {
+            const n = String(flower.name || '').toLowerCase();
+            if (n.includes('moonlit')) return 'moonlit';
+            if (n.includes('crystal')) return 'crystal';
+            if (n.includes('aurora')) return 'aurora';
+            if (n.includes('eternal')) return 'eternal';
+            return 'special';
+        }
+
         function renderGarden() {
 
             const el =
@@ -1086,28 +1219,15 @@
                 state.flowers
                     .map(flower => `
 
-          <div class="flower">
-
-            <div class="flower-icon">
-              ${flower.emoji}
-            </div>
-
-            <div class="flower-info">
-
-              <div class="flower-name">
-                ${flower.name}
+          <div class="flower ${flower.is_special ? `special-flower special-${specialClass(flower)}` : ''}">
+            <div class="special-content" style="display:flex;align-items:center;gap:10px;width:100%">
+              <div class="${flower.is_special ? 'special-icon' : 'flower-icon'}">${flower.emoji}</div>
+              <div class="flower-info">
+                <div class="flower-name">${flower.name}</div>
+                <div class="rarity">${flower.rarity}${flower.is_special ? ' ✨ SPECIAL' : ''}</div>
               </div>
-
-              <div class="rarity">
-                ${flower.rarity}
-              </div>
-
+              <div class="qty">${getQuantity(flower.id)}</div>
             </div>
-
-            <div class="qty">
-              ${getQuantity(flower.id)}
-            </div>
-
           </div>
 
         `)
@@ -1149,31 +1269,15 @@
                 state.collection
                     .map(flower => `
 
-          <div
-            class="flower"
-            style="margin-bottom:10px"
-          >
-
-            <div class="flower-icon">
-              ${flower.emoji}
-            </div>
-
-            <div class="flower-info">
-
-              <div class="flower-name">
-                ${flower.name}
+          <div class="flower ${flower.is_special ? `special-flower special-${specialClass(flower)}` : ''}" style="margin-bottom:10px">
+            <div class="special-content" style="display:flex;align-items:center;gap:10px;width:100%">
+              <div class="${flower.is_special ? 'special-icon' : 'flower-icon'}">${flower.emoji}</div>
+              <div class="flower-info">
+                <div class="flower-name">${flower.name}</div>
+                <div class="rarity">${flower.rarity}${flower.is_special ? ' ✨ SPECIAL' : ''}</div>
               </div>
-
-              <div class="rarity">
-                ${flower.rarity}
-              </div>
-
+              <div class="qty">×${flower.quantity}</div>
             </div>
-
-            <div class="qty">
-              ×${flower.quantity}
-            </div>
-
           </div>
 
         `)
@@ -1292,10 +1396,12 @@
             }
 
 
-            document.getElementById(
-                "bouquetEmoji"
-            ).textContent =
-                flower.emoji;
+            const preview = document.getElementById('bouquetEmoji');
+            preview.textContent = flower.emoji;
+            preview.className = flower.is_special ? `bouquet special-preview special-${specialClass(flower)}` : 'bouquet';
+            preview.innerHTML = flower.is_special
+                ? `<span class="spark s1">✦</span><span class="spark s2">✧</span><span class="spark s3">✦</span><span>${flower.emoji}</span>`
+                : flower.emoji;
 
 
             document.getElementById(
@@ -1308,16 +1414,25 @@
 
         async function loadShop() {
             try {
-                const items = await api("/api/shop");
-                document.getElementById("shopList").innerHTML = items.map(f => `
-                    <div class="flower" style="margin-bottom:10px">
-                        <div class="flower-icon">${f.emoji}</div>
-                        <div class="flower-info">
-                            <div class="flower-name">${f.name}</div>
-                            <div class="rarity">${f.rarity} • ${getQuantity(f.id)} owned</div>
+                const items = await api('/api/shop');
+                document.getElementById('shopList').innerHTML = items.map(f => {
+                    const special = Boolean(f.is_special);
+                    return `
+                    <div class="flower ${special ? `special-flower special-${specialClass(f)}` : ''}" style="margin-bottom:10px">
+                        <div class="special-content" style="display:flex;align-items:center;gap:10px;width:100%">
+                            <div class="${special ? 'special-icon' : 'flower-icon'}">${f.emoji}</div>
+                            <div class="flower-info">
+                                <div class="flower-name">${f.name}</div>
+                                <div class="rarity">${f.rarity}${special ? ' ✨ SPECIAL' : ''} • ${getQuantity(f.id)} owned</div>
+                                ${special ? '<span class="special-badge">Animated Collection</span>' : ''}
+                            </div>
+                            <div style="text-align:right">
+                                <div class="special-price">${Number(f.price).toLocaleString('id-ID')} 🪙</div>
+                                <button class="primary" style="width:auto;padding:8px 11px" onclick="buyFlower(${f.id})">Beli</button>
+                            </div>
                         </div>
-                        <button class="primary" style="width:auto;padding:9px 12px" onclick="buyFlower(${f.id})">${f.price} 🪙</button>
-                    </div>`).join("");
+                    </div>`;
+                }).join('');
             } catch (e) { toast(e.message); }
         }
 
@@ -1475,90 +1590,6 @@
 
         }
 
-
-
-        function renderAdminUser(user) {
-            const el = document.getElementById("adminUserInfo");
-            if (!user) {
-                el.innerHTML = "";
-                return;
-            }
-
-            el.innerHTML = `
-                <div class="flower" style="display:block">
-                    <div style="font-size:17px;font-weight:800">
-                        👤 ${user.first_name || "User"} ${user.username ? `(@${user.username})` : ""}
-                    </div>
-                    <div style="margin-top:8px">
-                        🪙 Coins: <b>${user.coins}</b>
-                        &nbsp; • &nbsp;
-                        🌱 Seeds: <b>${user.seeds}</b>
-                    </div>
-                    <div style="margin-top:5px;color:#8b7c91;font-size:12px">
-                        Telegram ID: ${user.telegram_id}
-                    </div>
-                </div>`;
-        }
-
-        async function checkAdminAccess() {
-            try {
-                await api("/api/admin/me");
-                document.getElementById("adminCard").style.display = "";
-                return true;
-            } catch (_) {
-                return false;
-            }
-        }
-
-        async function lookupAdminUser() {
-            const username = document.getElementById("adminUsername").value.trim();
-            if (!username) {
-                toast("Masukkan username user dulu");
-                return;
-            }
-
-            try {
-                const user = await api(`/api/admin/user?username=${encodeURIComponent(username)}`);
-                renderAdminUser(user);
-            } catch (e) {
-                renderAdminUser(null);
-                toast(e.message);
-            }
-        }
-
-        async function changeAdminBalance() {
-            const username = document.getElementById("adminUsername").value.trim();
-            const coinsDelta = Number(document.getElementById("adminCoinsDelta").value || 0);
-            const seedsDelta = Number(document.getElementById("adminSeedsDelta").value || 0);
-
-            if (!username) {
-                toast("Masukkan username user dulu");
-                return;
-            }
-            if (!Number.isInteger(coinsDelta) || !Number.isInteger(seedsDelta)) {
-                toast("Coins dan seeds harus angka bulat");
-                return;
-            }
-            if (coinsDelta === 0 && seedsDelta === 0) {
-                toast("Isi perubahan coins atau seeds");
-                return;
-            }
-
-            try {
-                const result = await api("/api/admin/balance", {
-                    method: "POST",
-                    body: JSON.stringify({ username, coinsDelta, seedsDelta })
-                });
-
-                renderAdminUser(result.user);
-                document.getElementById("adminCoinsDelta").value = "0";
-                document.getElementById("adminSeedsDelta").value = "0";
-
-                toast(`✅ @${result.user.username} berhasil diubah`);
-            } catch (e) {
-                toast(e.message);
-            }
-        }
 
         async function init() {
 

@@ -13,11 +13,14 @@ router.get('/collection', async (req, res) => {
         f.name,
         f.emoji,
         f.rarity,
+        f.is_special,
+        f.shop_price,
         uf.quantity
       FROM user_flowers uf
       JOIN flowers f ON f.id = uf.flower_id
       WHERE uf.user_id = $1
         AND uf.quantity > 0
+        AND f.is_special = FALSE
       ORDER BY
         CASE f.rarity
           WHEN 'legendary' THEN 4
@@ -75,6 +78,7 @@ router.post('/plant', async (req, res) => {
         SELECT *
         FROM flowers
         WHERE rarity = $1
+          AND is_special = FALSE
         ORDER BY random()
         LIMIT 1
         `,
