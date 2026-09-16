@@ -1393,7 +1393,7 @@
                 </button>
 
 
-                <button id="adminHomeCard" class="card" onclick="showPage('admin')">
+                <button id="adminHomeCard" class="card" style="display:none" onclick="showPage('admin')">
                     <div class="icon">🔐</div>
                     <h3>Admin</h3>
                     <p>Kelola user & balance</p>
@@ -1603,7 +1603,7 @@
             Collection
         </button>
 
-        <button id="nav-admin" onclick="showPage('admin')">
+        <button id="nav-admin" style="display:none" onclick="showPage('admin')">
             🔐<br>Admin
         </button>
 
@@ -1744,6 +1744,12 @@
 
 
         function showPage(id) {
+
+            // Admin page is inaccessible unless the server has confirmed this Telegram user is an admin.
+            if (id === "admin" && !isAdmin) {
+                toast("🔒 Halaman Admin hanya untuk admin.");
+                return;
+            }
 
             document
                 .querySelectorAll(".page")
@@ -2481,27 +2487,31 @@
         let adminTarget = null;
 
         async function initAdmin() {
-            // UI is visible, but every admin API endpoint is still protected by the backend.
-            // This avoids the Admin menu disappearing when /api/admin/me fails silently.
             const nav = document.getElementById('nav-admin');
             const card = document.getElementById('adminHomeCard');
-            if (nav) nav.style.display = 'block';
-            if (card) card.style.display = 'block';
+
+            // Default: completely hidden for everyone.
+            if (nav) nav.style.display = 'none';
+            if (card) card.style.display = 'none';
+            isAdmin = false;
 
             try {
+                // The backend is the source of truth for admin status.
                 const me = await api('/api/admin/me');
                 isAdmin = Boolean(me.isAdmin);
-                if (isAdmin) {
-                    await loadAdminStats();
-                } else {
-                    document.getElementById('adminStats').textContent = 'Akun ini bukan admin.';
-                }
+
+                if (!isAdmin) return;
+
+                // Only reveal Admin UI after the server confirms admin access.
+                if (nav) nav.style.display = 'block';
+                if (card) card.style.display = 'block';
+
+                await loadAdminStats();
             } catch (e) {
+                // Keep Admin completely invisible if access is denied or the check fails.
                 isAdmin = false;
-                const stats = document.getElementById('adminStats');
-                if (stats) {
-                    stats.innerHTML = '<div style="font-weight:800">🔒 Akses Admin</div><div style="font-size:12px;color:#8b7c91;margin-top:5px">Akses admin ditolak oleh server. Pastikan Telegram ID kamu sudah ada di <b>ADMIN_TELEGRAM_IDS</b> di Vercel.</div>';
-                }
+                if (nav) nav.style.display = 'none';
+                if (card) card.style.display = 'none';
             }
         }
 
