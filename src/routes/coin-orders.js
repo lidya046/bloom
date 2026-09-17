@@ -103,6 +103,13 @@ router.get('/latest', async (req, res) => {
 
 router.post('/', async (req, res) => {
     const packageId = String(req.body?.packageId || '').trim();
+    const proofImage = String(req.body?.proofImage || '').trim();
+    if (!proofImage.startsWith('data:image/')) {
+        return res.status(400).json({ error: 'Bukti pembayaran wajib diupload' });
+    }
+    if (proofImage.length > 12 * 1024 * 1024) {
+        return res.status(400).json({ error: 'Bukti pembayaran terlalu besar' });
+    }
     const packages = getPackages();
     const pkg = packages.find(p => p.id === packageId);
     if (!pkg) return res.status(400).json({ error: 'Paket coins tidak ditemukan' });
@@ -142,30 +149,37 @@ router.post('/', async (req, res) => {
         `📦 Paket: ${pkg.coins.toLocaleString('id-ID')} Coins`,
         `💵 Harga: ${formatRupiah(pkg.price)}`,
         `🧾 Order: ${order.order_code}`,
-        '⏳ Status: Menunggu pembayaran',
+        '⏳ Status: Menunggu pengecekan admin',
         '',
-        'User sudah menekan "Saya Sudah Bayar". Silakan cek transfer sebelum approve.'
+        '📸 User sudah mengirim bukti pembayaran. Silakan cek bukti dan pembayaran sebelum approve.'
     ].join('\n');
 
     const token = process.env.TELEGRAM_BOT_TOKEN;
     const adminIds = String(process.env.ADMIN_TELEGRAM_IDS || '').split(',').map(x => x.trim()).filter(Boolean);
     let notified = 0;
     if (token && adminIds.length) {
+        const comma = proofImage.indexOf(',');
+        const meta = comma >= 0 ? proofImage.slice(0, comma) : '';
+        const base64 = comma >= 0 ? proofImage.slice(comma + 1) : '';
+        const mime = (meta.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64$/) || [])[1] || 'image/jpeg';
+        const proofBuffer = Buffer.from(base64, 'base64');
+
         for (const chatId of adminIds) {
             try {
-                const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+                const form = new FormData();
+                form.append('chat_id', String(chatId));
+                form.append('photo', new Blob([proofBuffer], { type: mime }), 'bukti-pembayaran.jpg');
+                form.append('caption', text);
+                form.append('reply_markup', JSON.stringify({
+                    inline_keyboard: [[
+                        { text: '✅ Approve', callback_data: `coin:approve:${order.id}` },
+                        { text: '❌ Reject', callback_data: `coin:reject:${order.id}` }
+                    ]]
+                }));
+
+                const r = await fetch(`https://api.telegram.org/bot${token}/sendPhoto`, {
                     method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        chat_id: chatId,
-                        text,
-                        reply_markup: {
-                            inline_keyboard: [[
-                                { text: '✅ Approve', callback_data: `coin:approve:${order.id}` },
-                                { text: '❌ Reject', callback_data: `coin:reject:${order.id}` }
-                            ]]
-                        }
-                    })
+                    body: form
                 });
                 const data = await r.json().catch(() => ({}));
                 if (r.ok && data.ok) notified++;
