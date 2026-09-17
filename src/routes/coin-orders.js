@@ -8,13 +8,21 @@ function getPackages() {
     try {
         const parsed = JSON.parse(process.env.COIN_PACKAGES_JSON || '[]');
         if (!Array.isArray(parsed)) return [];
+
         return parsed
             .map((p, i) => ({
                 id: String(p.id ?? `coins_${i + 1}`),
                 coins: Number(p.coins),
                 price: Number(p.price)
             }))
-            .filter(p => p.id && Number.isInteger(p.coins) && p.coins > 0 && Number.isInteger(p.price) && p.price >= 0);
+            .filter(
+                p =>
+                    p.id &&
+                    Number.isInteger(p.coins) &&
+                    p.coins > 0 &&
+                    Number.isInteger(p.price) &&
+                    p.price >= 0
+            );
     } catch (_) {
         return [];
     }
@@ -29,19 +37,32 @@ function makeOrderCode(id, createdAt = new Date()) {
     const yyyy = d.getFullYear();
     const mm = String(d.getMonth() + 1).padStart(2, '0');
     const dd = String(d.getDate()).padStart(2, '0');
+
     return `BLM-${yyyy}${mm}${dd}-${String(id).padStart(6, '0')}`;
 }
 
 async function sendTelegram(chatId, text) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
+
     if (!token || !chatId) return false;
+
     try {
-        const r = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ chat_id: chatId, text })
-        });
+        const r = await fetch(
+            `https://api.telegram.org/bot${token}/sendMessage`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text
+                })
+            }
+        );
+
         const data = await r.json().catch(() => ({}));
+
         return Boolean(r.ok && data.ok);
     } catch (_) {
         return false;
@@ -50,63 +71,155 @@ async function sendTelegram(chatId, text) {
 
 async function answerCallback(callbackQueryId, text) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
+
     if (!token || !callbackQueryId) return;
+
     try {
-        await fetch(`https://api.telegram.org/bot${token}/answerCallbackQuery`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ callback_query_id: callbackQueryId, text })
-        });
+        await fetch(
+            `https://api.telegram.org/bot${token}/answerCallbackQuery`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    callback_query_id: callbackQueryId,
+                    text
+                })
+            }
+        );
     } catch (_) { }
 }
 
 /*
- * Pesan order awal dikirim sebagai foto bukti pembayaran.
- * Setelah Approve/Reject:
- * 1. Hapus pesan foto + tombol Approve/Reject.
- * 2. Kirim pesan hasil ke chat Telegram yang sama.
+ * Menghapus pesan foto bukti pembayaran,
+ * kemudian mengirim pesan hasil Approve / Reject
+ * ke chat Telegram yang sama.
+ *
+ * Ada retry 1x untuk deleteMessage agar lebih aman.
  */
 async function replaceTelegramOrderMessage(chatId, messageId, text) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
-    if (!token || !chatId || !messageId) return false;
+
+    if (!token || !chatId || !messageId) {
+        return false;
+    }
+
+    let deleted = false;
+
+    for (let attempt = 1; attempt <= 2; attempt++) {
+        try {
+            const deleteResponse = await fetch(
+                `https://api.telegram.org/bot${token}/deleteMessage`,
+                {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({
+                        chat_id: chatId,
+                        message_id: messageId
+                    })
+                }
+            );
+
+            const deleteData = await deleteResponse
+                .json()
+                .catch(() => ({}));
+
+            if (
+                deleteResponse.ok &&
+                deleteData.ok
+            ) {
+                deleted = true;
+                break;
+            }
+
+            console.error(
+                `Telegram deleteMessage gagal (attempt ${attempt}):`,
+                deleteData
+            );
+
+        } catch (e) {
+            console.error(
+                `Telegram deleteMessage error (attempt ${attempt}):`,
+                e
+            );
+        }
+
+        if (attempt === 1) {
+            await new Promise(resolve => setTimeout(resolve, 500));
+        }
+    }
+
+    /*
+     * Jangan kirim pesan hasil kalau pesan lama
+     * belum berhasil dihapus.
+     *
+     * Ini mencegah muncul:
+     * [pesan lama]
+     * [pesan hasil]
+     */
+    if (!deleted) {
+        return false;
+    }
 
     try {
-        const deleteResponse = await fetch(`https://api.telegram.org/bot${token}/deleteMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                message_id: messageId
-            })
-        });
+        const sendResponse = await fetch(
+            `https://api.telegram.org/bot${token}/sendMessage`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text
+                })
+            }
+        );
 
-        const deleteData = await deleteResponse.json().catch(() => ({}));
+        const sendData = await sendResponse
+            .json()
+            .catch(() => ({}));
 
-        if (!deleteResponse.ok || !deleteData.ok) {
+        if (
+            !sendResponse.ok ||
+            !sendData.ok
+        ) {
+            console.error(
+                'Telegram sendMessage gagal:',
+                sendData
+            );
+
             return false;
         }
 
-        const sendResponse = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({
-                chat_id: chatId,
-                text
-            })
-        });
+        return true;
 
-        const sendData = await sendResponse.json().catch(() => ({}));
+    } catch (e) {
+        console.error(
+            'Telegram sendMessage error:',
+            e
+        );
 
-        return Boolean(sendResponse.ok && sendData.ok);
-    } catch (_) {
         return false;
     }
 }
 
 function webhookAuthorized(req) {
-    const expected = String(process.env.TELEGRAM_WEBHOOK_SECRET || '').trim();
-    if (!expected || expected === '.') return true;
-    return req.headers['x-telegram-bot-api-secret-token'] === expected;
+    const expected = String(
+        process.env.TELEGRAM_WEBHOOK_SECRET || ''
+    ).trim();
+
+    if (!expected || expected === '.') {
+        return true;
+    }
+
+    return (
+        req.headers['x-telegram-bot-api-secret-token'] ===
+        expected
+    );
 }
 
 router.get('/config', async (_req, res) => {
@@ -123,7 +236,15 @@ router.get('/config', async (_req, res) => {
 
 router.get('/latest', async (req, res) => {
     const r = await pool.query(`
-        SELECT id, order_code, package_id, coins, price, status, created_at, updated_at
+        SELECT
+            id,
+            order_code,
+            package_id,
+            coins,
+            price,
+            status,
+            created_at,
+            updated_at
         FROM coin_orders
         WHERE user_id=$1
         ORDER BY id DESC
@@ -134,29 +255,53 @@ router.get('/latest', async (req, res) => {
 });
 
 router.post('/', async (req, res) => {
-    const packageId = String(req.body?.packageId || '').trim();
-    const proofImage = String(req.body?.proofImage || '').trim();
+    const packageId = String(
+        req.body?.packageId || ''
+    ).trim();
+
+    const proofImage = String(
+        req.body?.proofImage || ''
+    ).trim();
 
     if (!proofImage.startsWith('data:image/')) {
-        return res.status(400).json({ error: 'Bukti pembayaran wajib diupload' });
+        return res.status(400).json({
+            error: 'Bukti pembayaran wajib diupload'
+        });
     }
 
     if (proofImage.length > 12 * 1024 * 1024) {
-        return res.status(400).json({ error: 'Bukti pembayaran terlalu besar' });
+        return res.status(400).json({
+            error: 'Bukti pembayaran terlalu besar'
+        });
     }
 
     const packages = getPackages();
-    const pkg = packages.find(p => p.id === packageId);
+
+    const pkg = packages.find(
+        p => p.id === packageId
+    );
 
     if (!pkg) {
-        return res.status(400).json({ error: 'Paket coins tidak ditemukan' });
+        return res.status(400).json({
+            error: 'Paket coins tidak ditemukan'
+        });
     }
 
     const pending = await pool.query(`
-        SELECT id, order_code, package_id, coins, price, status, created_at, updated_at
+        SELECT
+            id,
+            order_code,
+            package_id,
+            coins,
+            price,
+            status,
+            created_at,
+            updated_at
         FROM coin_orders
-        WHERE user_id=$1 AND status='pending'
-        ORDER BY id DESC LIMIT 1
+        WHERE user_id=$1
+          AND status='pending'
+        ORDER BY id DESC
+        LIMIT 1
     `, [req.user.id]);
 
     if (pending.rows[0]) {
@@ -177,8 +322,25 @@ router.post('/', async (req, res) => {
             price,
             status
         )
-        VALUES ($1,$2,$3,$4,$5,$6,$7,'pending')
-        RETURNING id, order_code, package_id, coins, price, status, created_at, updated_at
+        VALUES (
+            $1,
+            $2,
+            $3,
+            $4,
+            $5,
+            $6,
+            $7,
+            'pending'
+        )
+        RETURNING
+            id,
+            order_code,
+            package_id,
+            coins,
+            price,
+            status,
+            created_at,
+            updated_at
     `, [
         req.user.id,
         req.user.telegram_id,
@@ -191,16 +353,25 @@ router.post('/', async (req, res) => {
 
     const order = inserted.rows[0];
 
-    order.order_code = makeOrderCode(order.id, order.created_at);
+    order.order_code = makeOrderCode(
+        order.id,
+        order.created_at
+    );
 
     await pool.query(
         `UPDATE coin_orders SET order_code=$1 WHERE id=$2`,
-        [order.order_code, order.id]
+        [
+            order.order_code,
+            order.id
+        ]
     );
 
     const buyer = req.user.username
         ? `@${req.user.username}`
-        : (req.user.first_name || `ID ${req.user.telegram_id}`);
+        : (
+            req.user.first_name ||
+            `ID ${req.user.telegram_id}`
+        );
 
     const text = [
         '💰 PEMBELIAN COINS BARU',
@@ -217,7 +388,9 @@ router.post('/', async (req, res) => {
 
     const token = process.env.TELEGRAM_BOT_TOKEN;
 
-    const adminIds = String(process.env.ADMIN_TELEGRAM_IDS || '')
+    const adminIds = String(
+        process.env.ADMIN_TELEGRAM_IDS || ''
+    )
         .split(',')
         .map(x => x.trim())
         .filter(Boolean);
@@ -226,14 +399,28 @@ router.post('/', async (req, res) => {
 
     if (token && adminIds.length) {
         const comma = proofImage.indexOf(',');
-        const meta = comma >= 0 ? proofImage.slice(0, comma) : '';
-        const base64 = comma >= 0 ? proofImage.slice(comma + 1) : '';
+
+        const meta =
+            comma >= 0
+                ? proofImage.slice(0, comma)
+                : '';
+
+        const base64 =
+            comma >= 0
+                ? proofImage.slice(comma + 1)
+                : '';
 
         const mime =
-            (meta.match(/^data:(image\/[a-zA-Z0-9.+-]+);base64$/) || [])[1]
-            || 'image/jpeg';
+            (
+                meta.match(
+                    /^data:(image\/[a-zA-Z0-9.+-]+);base64$/
+                ) || []
+            )[1] || 'image/jpeg';
 
-        const proofBuffer = Buffer.from(base64, 'base64');
+        const proofBuffer = Buffer.from(
+            base64,
+            'base64'
+        );
 
         for (const chatId of adminIds) {
             try {
@@ -246,7 +433,10 @@ router.post('/', async (req, res) => {
 
                 form.append(
                     'photo',
-                    new Blob([proofBuffer], { type: mime }),
+                    new Blob(
+                        [proofBuffer],
+                        { type: mime }
+                    ),
                     'bukti-pembayaran.jpg'
                 );
 
@@ -261,11 +451,13 @@ router.post('/', async (req, res) => {
                         inline_keyboard: [[
                             {
                                 text: '✅ Approve',
-                                callback_data: `coin:approve:${order.id}`
+                                callback_data:
+                                    `coin:approve:${order.id}`
                             },
                             {
                                 text: '❌ Reject',
-                                callback_data: `coin:reject:${order.id}`
+                                callback_data:
+                                    `coin:reject:${order.id}`
                             }
                         ]]
                     })
@@ -279,11 +471,14 @@ router.post('/', async (req, res) => {
                     }
                 );
 
-                const data = await r.json().catch(() => ({}));
+                const data = await r
+                    .json()
+                    .catch(() => ({}));
 
                 if (r.ok && data.ok) {
                     notified++;
                 }
+
             } catch (_) { }
         }
     }
@@ -307,23 +502,30 @@ router.post('/telegram', async (req, res) => {
     const cq = req.body?.callback_query;
 
     if (!cq?.data?.startsWith('coin:')) {
-        return res.json({ ok: true });
+        return res.json({
+            ok: true
+        });
     }
 
-    const parts = String(cq.data).split(':');
+    const parts = String(
+        cq.data
+    ).split(':');
+
     const action = parts[1];
     const orderId = Number(parts[2]);
 
     if (
-        !['approve', 'reject'].includes(action)
-        || !Number.isInteger(orderId)
+        !['approve', 'reject'].includes(action) ||
+        !Number.isInteger(orderId)
     ) {
         await answerCallback(
             cq.id,
             'Data order tidak valid'
         );
 
-        return res.json({ ok: true });
+        return res.json({
+            ok: true
+        });
     }
 
     if (!isAdminTelegramId(cq.from?.id)) {
@@ -332,7 +534,9 @@ router.post('/telegram', async (req, res) => {
             'Akses admin ditolak'
         );
 
-        return res.json({ ok: true });
+        return res.json({
+            ok: true
+        });
     }
 
     const client = await pool.connect();
@@ -355,7 +559,9 @@ router.post('/telegram', async (req, res) => {
                 'Order tidak ditemukan'
             );
 
-            return res.json({ ok: true });
+            return res.json({
+                ok: true
+            });
         }
 
         if (order.status !== 'pending') {
@@ -366,13 +572,18 @@ router.post('/telegram', async (req, res) => {
                 `Order sudah ${order.status}`
             );
 
-            return res.json({ ok: true });
+            return res.json({
+                ok: true
+            });
         }
 
         if (action === 'approve') {
             await client.query(
                 `UPDATE users SET coins=coins+$1 WHERE id=$2`,
-                [order.coins, order.user_id]
+                [
+                    order.coins,
+                    order.user_id
+                ]
             );
         }
 
@@ -408,7 +619,10 @@ router.post('/telegram', async (req, res) => {
             `🧾 Order: ${order.order_code}`,
             `👤 User: ${order.username
                 ? `@${order.username}`
-                : (order.first_name || `ID ${order.telegram_id}`)
+                : (
+                    order.first_name ||
+                    `ID ${order.telegram_id}`
+                )
             }`,
             `📦 Paket: ${Number(order.coins).toLocaleString('id-ID')} Coins`,
             `💵 Harga: ${formatRupiah(order.price)}`,
@@ -419,12 +633,19 @@ router.post('/telegram', async (req, res) => {
             }`
         ].join('\n');
 
-        // Ganti pesan foto + tombol menjadi hasil Approve/Reject
-        await replaceTelegramOrderMessage(
-            cq.message?.chat?.id,
-            cq.message?.message_id,
-            adminText
-        );
+        /*
+         * Hapus pesan foto + tombol,
+         * lalu kirim hasil Approve / Reject.
+         *
+         * Ini berlaku untuk KEDUANYA:
+         * approve dan reject.
+         */
+        const telegramUpdated =
+            await replaceTelegramOrderMessage(
+                cq.message?.chat?.id,
+                cq.message?.message_id,
+                adminText
+            );
 
         await answerCallback(
             cq.id,
@@ -447,7 +668,8 @@ router.post('/telegram', async (req, res) => {
 
         return res.json({
             ok: true,
-            status: result.status
+            status: result.status,
+            telegramUpdated
         });
 
     } catch (e) {
