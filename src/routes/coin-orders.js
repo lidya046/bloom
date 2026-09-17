@@ -74,7 +74,7 @@ async function editTelegramMessage(chatId, messageId, text) {
 
 function webhookAuthorized(req) {
     const expected = String(process.env.TELEGRAM_WEBHOOK_SECRET || '').trim();
-    if (!expected) return true;
+    if (!expected || expected === '.') return true;
     return req.headers['x-telegram-bot-api-secret-token'] === expected;
 }
 
