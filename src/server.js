@@ -23,6 +23,8 @@ app.use(express.json());
 app.use(express.static(publicDir));
 app.get('/', (_req, res) => res.sendFile(path.join(publicDir, 'index.html')));
 app.get('/health', (_req, res) => res.json({ ok: true, service: 'bloom-backend', version: '0.1.0' }));
+app.use('/api/coin-orders', coinOrders);
+
 app.use('/api', telegramAuth);
 app.use('/api/user', user);
 app.use('/api/flowers', flowers);
@@ -31,6 +33,5 @@ app.use('/api/rewards', rewards);
 app.use('/api/bouquets', bouquets);
 app.use('/api/shop', shop);
 app.use('/api/admin', admin);
-app.use('/api/coin-orders', coinOrders);
 const port = Number(process.env.PORT || 3000);
 app.listen(port, () => console.log(`Bloom backend running on http://localhost:${port}`));
