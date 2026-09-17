@@ -1603,10 +1603,20 @@
             background: linear-gradient(135deg, #fff3f8, #f5f0ff);
             font-size: 12px;
             line-height: 1.6;
+            text-align: center;
         }
 
         .coin-payment b {
             color: #4d3a55;
+        }
+
+        .coin-payment img {
+            display: block;
+            width: 100%;
+            max-width: 360px;
+            height: auto;
+            margin: 0 auto 10px;
+            border-radius: 12px;
         }
 
         .coin-order-status {
@@ -1906,7 +1916,7 @@
 
             <div class="coin-topup-box">
                 <div class="coin-topup-title">🪙 Beli Coins</div>
-                <div class="coin-topup-subtitle">Pilih paket, lakukan transfer manual sesuai nominal, lalu tekan
+                <div class="coin-topup-subtitle">Pilih paket, scan QRIS sesuai nominal, lalu tekan
                     <b>"Saya Sudah Bayar"</b>. Admin akan mengecek pembayaranmu.
                 </div>
                 <div id="coinPackageList" class="coin-package-grid"></div>
@@ -3079,16 +3089,12 @@
             }
             if (!selectedCoinPackage) return;
 
-            const p = coinTopupConfig.payment || {};
             if (payment) {
                 payment.style.display = '';
                 payment.innerHTML = `
-                    <b>💳 Cara Pembayaran</b><br>
-                    Metode: <b>${p.method || '-'}</b><br>
-                    Atas nama: <b>${p.name || '-'}</b><br>
-                    Nomor / Rekening: <b>${p.account || '-'}</b><br>
-                    Nominal transfer: <b>${formatCoinRupiah(selectedCoinPackage.price)}</b><br>
-                    ${p.note ? `Catatan: ${p.note}` : ''}`;
+                    <img src="/assets/bloom-qris.jpeg" alt="QRIS Bloom">
+                    <div><b>💳 Bayar dengan QRIS</b></div>
+                    <div style="margin-top:4px">Nominal: <b>${formatCoinRupiah(selectedCoinPackage.price)}</b></div>`;
             }
             if (paidButton) paidButton.style.display = '';
         }
