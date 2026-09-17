@@ -540,12 +540,82 @@
             border-radius: 18px;
             overflow: hidden;
             background: linear-gradient(135deg, #fff, #fbf1ff);
-            pointer-events: none;
         }
 
         .received-mini-bouquet .bouquet-flower {
             transform: scale(.72);
             transform-origin: center;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower {
+            opacity: 0;
+            transform: translateY(28px) scale(.35);
+            animation: receivedFlowerBloom .55s cubic-bezier(.2, .8, .2, 1) forwards;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(1) {
+            animation-delay: .05s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(2) {
+            animation-delay: .10s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(3) {
+            animation-delay: .15s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(4) {
+            animation-delay: .20s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(5) {
+            animation-delay: .25s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(6) {
+            animation-delay: .30s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(7) {
+            animation-delay: .35s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(8) {
+            animation-delay: .40s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(9) {
+            animation-delay: .45s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(10) {
+            animation-delay: .50s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(11) {
+            animation-delay: .55s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(12) {
+            animation-delay: .60s;
+        }
+
+        @keyframes receivedFlowerBloom {
+            0% {
+                opacity: 0;
+                transform: translateY(28px) scale(.35);
+            }
+
+            70% {
+                opacity: 1;
+                transform: translateY(-4px) scale(1.08);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .received-message {
@@ -2767,7 +2837,11 @@
             if (!b) return;
             const sender = b.sender_first_name || (b.sender_username ? `@${b.sender_username}` : 'Teman');
             document.getElementById('giftFrom').textContent = `Dari ${sender} 💕`;
-            document.getElementById('giftBouquetStage').innerHTML = renderReceivedMiniBouquet(b.items || []);
+            const giftStage = document.getElementById('giftBouquetStage');
+            giftStage.innerHTML = '';
+            requestAnimationFrame(() => {
+                giftStage.innerHTML = renderReceivedMiniBouquet(b.items || []);
+            });
             document.getElementById('giftItems').innerHTML = receivedFlowerList(b.items || []).map(({ flower, quantity }) =>
                 `<span class="gift-item-pill">${flower.emoji} ${flower.name} ×${quantity}</span>`
             ).join('');
@@ -2833,7 +2907,7 @@
                         <div class="received-sender"><b>Dari ${sender}</b><div class="received-hint">${total} bunga • Ketuk untuk membuka bouquet ✨</div></div>
                         ${isNew ? '<span class="received-new">BARU</span>' : ''}
                     </div>
-                    <div class="received-mini-bouquet">${renderReceivedMiniBouquet(b.items || [])}</div>
+                    <div class="received-mini-bouquet" onclick="openReceivedBouquet(${Number(b.id)})">${renderReceivedMiniBouquet(b.items || [])}</div>
                     <div class="received-message">${b.message || 'Untukmu, dengan sayang 🌷'}</div>
                 </div>`;
             }).join('');
