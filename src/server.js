@@ -11,6 +11,7 @@ import rewards from './routes/rewards.js';
 import bouquets from './routes/bouquets.js';
 import shop from './routes/shop.js';
 import admin from './routes/admin.js';
+import coinOrders from './routes/coin-orders.js';
 
 const app = express();
 const __filename = fileURLToPath(import.meta.url);
@@ -30,5 +31,6 @@ app.use('/api/rewards', rewards);
 app.use('/api/bouquets', bouquets);
 app.use('/api/shop', shop);
 app.use('/api/admin', admin);
+app.use('/api/coin-orders', coinOrders);
 const port = Number(process.env.PORT || 3000);
 app.listen(port, () => console.log(`Bloom backend running on http://localhost:${port}`));

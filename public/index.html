@@ -1538,6 +1538,97 @@
                 transform: none !important;
             }
         }
+
+
+        /* Manual Coins top-up additions */
+        .coin-topup-box {
+            margin-top: 14px;
+            padding: 14px;
+            border: 1px solid #eadff0;
+            border-radius: 20px;
+            background: rgba(255, 255, 255, .86);
+        }
+
+        .coin-topup-title {
+            font-size: 16px;
+            font-weight: 900;
+            margin-bottom: 4px;
+        }
+
+        .coin-topup-subtitle {
+            font-size: 12px;
+            color: #8b7c91;
+            line-height: 1.45;
+        }
+
+        .coin-package-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 8px;
+            margin-top: 10px;
+        }
+
+        .coin-package {
+            border: 1px solid #e7dced;
+            background: #fff;
+            border-radius: 15px;
+            padding: 11px;
+            text-align: left;
+            cursor: pointer;
+            color: inherit;
+        }
+
+        .coin-package.selected {
+            border: 2px solid #7145c8;
+            padding: 10px;
+            background: #faf5ff;
+        }
+
+        .coin-package b {
+            display: block;
+            font-size: 14px;
+        }
+
+        .coin-package span {
+            display: block;
+            font-size: 12px;
+            color: #806c88;
+            margin-top: 3px;
+        }
+
+        .coin-payment {
+            margin-top: 12px;
+            padding: 12px;
+            border-radius: 16px;
+            background: linear-gradient(135deg, #fff3f8, #f5f0ff);
+            font-size: 12px;
+            line-height: 1.6;
+        }
+
+        .coin-payment b {
+            color: #4d3a55;
+        }
+
+        .coin-order-status {
+            margin-top: 10px;
+            padding: 10px 12px;
+            border-radius: 14px;
+            background: #f7f2f9;
+            color: #66586d;
+            font-size: 12px;
+            line-height: 1.5;
+        }
+
+        .coin-buy-button {
+            width: 100%;
+            margin-top: 10px;
+        }
+
+        @media (max-width: 420px) {
+            .coin-package-grid {
+                grid-template-columns: 1fr;
+            }
+        }
     </style>
 </head>
 
@@ -1811,6 +1902,19 @@
             <p style="color:#777;margin-top:-6px">Bunga special tidak muncul dari Garden. Koleksi premium ini punya
                 animasi khusus ✨</p>
             <div id="shopList" class="grid"></div>
+
+
+            <div class="coin-topup-box">
+                <div class="coin-topup-title">🪙 Beli Coins</div>
+                <div class="coin-topup-subtitle">Pilih paket, lakukan transfer manual sesuai nominal, lalu tekan
+                    <b>"Saya Sudah Bayar"</b>. Admin akan mengecek pembayaranmu.
+                </div>
+                <div id="coinPackageList" class="coin-package-grid"></div>
+                <div id="coinPaymentInfo" class="coin-payment" style="display:none"></div>
+                <button id="coinPaidButton" class="primary coin-buy-button" type="button" onclick="submitCoinOrder()"
+                    style="display:none">💸 Saya Sudah Bayar</button>
+                <div id="coinOrderStatus" class="coin-order-status" style="display:none"></div>
+            </div>
         </section>
 
         <!-- RECEIVED -->
@@ -2105,6 +2209,10 @@
 
             if (id === "shop") {
                 loadShop();
+            }
+
+            if (id === "shop") {
+                loadCoinTopup();
             }
 
             if (id === "received") {
@@ -2919,6 +3027,110 @@
         }
 
 
+
+
+        // Manual Coins top-up — additive code only.
+        let coinTopupConfig = null;
+        let selectedCoinPackage = null;
+        let coinOrderPollingStarted = false;
+
+        function formatCoinRupiah(value) {
+            return `Rp${Number(value).toLocaleString('id-ID')}`;
+        }
+
+        async function loadCoinTopup() {
+            try {
+                const config = await api('/api/coin-orders/config');
+                coinTopupConfig = config;
+                const list = document.getElementById('coinPackageList');
+                if (!list) return;
+
+                if (!config.packages?.length) {
+                    list.innerHTML = '<div style="grid-column:1/-1;color:#8b7c91;font-size:12px">Paket Coins belum dikonfigurasi admin.</div>';
+                    return;
+                }
+
+                list.innerHTML = config.packages.map(pkg => `
+                    <button type="button" class="coin-package ${selectedCoinPackage?.id === pkg.id ? 'selected' : ''}" onclick="selectCoinPackage('${String(pkg.id).replace(/'/g, "\\'")}')">
+                        <b>🪙 ${Number(pkg.coins).toLocaleString('id-ID')} Coins</b>
+                        <span>${formatCoinRupiah(pkg.price)}</span>
+                    </button>
+                `).join('');
+
+                const latest = await api('/api/coin-orders/latest');
+                if (latest) renderCoinOrderStatus(latest);
+                if (!selectedCoinPackage) selectCoinPackage(config.packages[0].id, false);
+            } catch (e) {
+                const list = document.getElementById('coinPackageList');
+                if (list) list.innerHTML = `<div style="grid-column:1/-1;color:#a33;font-size:12px">${e.message}</div>`;
+            }
+        }
+
+        function selectCoinPackage(packageId, rerender = true) {
+            if (!coinTopupConfig?.packages) return;
+            selectedCoinPackage = coinTopupConfig.packages.find(p => p.id === String(packageId)) || null;
+            const list = document.getElementById('coinPackageList');
+            const payment = document.getElementById('coinPaymentInfo');
+            const paidButton = document.getElementById('coinPaidButton');
+            if (list && rerender) {
+                list.querySelectorAll('.coin-package').forEach((el, i) => {
+                    el.classList.toggle('selected', coinTopupConfig.packages[i]?.id === selectedCoinPackage?.id);
+                });
+            }
+            if (!selectedCoinPackage) return;
+
+            const p = coinTopupConfig.payment || {};
+            if (payment) {
+                payment.style.display = '';
+                payment.innerHTML = `
+                    <b>💳 Cara Pembayaran</b><br>
+                    Metode: <b>${p.method || '-'}</b><br>
+                    Atas nama: <b>${p.name || '-'}</b><br>
+                    Nomor / Rekening: <b>${p.account || '-'}</b><br>
+                    Nominal transfer: <b>${formatCoinRupiah(selectedCoinPackage.price)}</b><br>
+                    ${p.note ? `Catatan: ${p.note}` : ''}`;
+            }
+            if (paidButton) paidButton.style.display = '';
+        }
+
+        function renderCoinOrderStatus(order) {
+            const el = document.getElementById('coinOrderStatus');
+            if (!el || !order) return;
+            el.style.display = '';
+            const labels = { pending: '⏳ Menunggu pengecekan admin', approved: '✅ Pembayaran disetujui', rejected: '❌ Pembayaran ditolak' };
+            el.innerHTML = `<b>🧾 ${order.order_code || '-'}</b><br>${labels[order.status] || order.status}<br>${Number(order.coins).toLocaleString('id-ID')} Coins • ${formatCoinRupiah(order.price)}`;
+        }
+
+        async function submitCoinOrder() {
+            if (!selectedCoinPackage) { toast('Pilih paket Coins dulu 🪙'); return; }
+            try {
+                const result = await api('/api/coin-orders', {
+                    method: 'POST',
+                    body: JSON.stringify({ packageId: selectedCoinPackage.id })
+                });
+                renderCoinOrderStatus(result.order);
+                toast(result.existing ? 'Masih ada order yang menunggu admin.' : 'Order pembayaran berhasil dikirim ke admin 💸');
+            } catch (e) { toast(e.message); }
+        }
+
+        async function pollCoinOrder() {
+            if (!state.user) return;
+            try {
+                const order = await api('/api/coin-orders/latest');
+                if (order) renderCoinOrderStatus(order);
+                if (order?.status === 'approved') {
+                    state.user = await api('/api/user');
+                    updateStats();
+                }
+            } catch (_) { }
+        }
+
+        function startCoinOrderPolling() {
+            if (coinOrderPollingStarted) return;
+            coinOrderPollingStarted = true;
+            setInterval(pollCoinOrder, 10000);
+        }
+
         async function init() {
 
             const loggedIn =
@@ -2937,6 +3149,7 @@
             await initAdmin();
             await loadReceived();
             startReceivedPolling();
+            startCoinOrderPolling();
 
         }
 
