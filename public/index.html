@@ -275,11 +275,46 @@
         }
 
         .bouquet-special {
-            animation: bouquetFloat 2.2s ease-in-out infinite, bouquetGlow 1.8s ease-in-out infinite;
+            animation: premiumFlowerFloat 4.8s cubic-bezier(.45, 0, .25, 1) infinite, premiumFlowerGlow 2.4s ease-in-out infinite;
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+            isolation: isolate;
+        }
+
+        .bouquet-special::before {
+            content: '';
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(216, 180, 254, .52) 0%, rgba(216, 180, 254, .20) 34%, transparent 72%);
+            filter: blur(2px);
+            z-index: 0;
+            pointer-events: none;
+            animation: premiumHalo 2.4s ease-in-out infinite;
+        }
+
+        .bouquet-special::after {
+            content: '✦';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            font-size: 13px;
+            color: rgba(255, 255, 255, .95);
+            text-shadow: 0 0 8px rgba(168, 85, 247, .9);
+            opacity: 0;
+            z-index: 7;
+            pointer-events: none;
+            animation: premiumShimmer 2.4s ease-in-out infinite;
         }
 
         .bouquet-special>span:not(.bouquet-stem) {
-            filter: drop-shadow(0 0 9px rgba(168, 85, 247, .7));
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 0 5px rgba(168, 85, 247, .35)) drop-shadow(0 0 11px rgba(255, 255, 255, .35));
         }
 
         .bouquet-flower:nth-child(3n) {
@@ -457,6 +492,84 @@
 
             50% {
                 filter: drop-shadow(0 0 12px rgba(168, 85, 247, .55));
+            }
+        }
+
+        @keyframes premiumFlowerFloat {
+
+            0%,
+            100% {
+                transform: perspective(240px) translateY(0) rotateY(0deg) rotateZ(-2deg) scale(1);
+            }
+
+            18% {
+                transform: perspective(240px) translateY(-3px) rotateY(72deg) rotateZ(1deg) scale(1.02);
+            }
+
+            35% {
+                transform: perspective(240px) translateY(-5px) rotateY(145deg) rotateZ(2deg) scale(1.035);
+            }
+
+            50% {
+                transform: perspective(240px) translateY(-3px) rotateY(220deg) rotateZ(-1deg) scale(1.025);
+            }
+
+            68% {
+                transform: perspective(240px) translateY(-2px) rotateY(290deg) rotateZ(-1deg) scale(1.015);
+            }
+
+            85% {
+                transform: perspective(240px) translateY(-1px) rotateY(340deg) rotateZ(0deg) scale(1.01);
+            }
+        }
+
+        @keyframes premiumFlowerGlow {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 5px 4px rgba(80, 50, 90, .12));
+            }
+
+            45% {
+                filter: drop-shadow(0 0 8px rgba(168, 85, 247, .42)) drop-shadow(0 0 16px rgba(255, 255, 255, .28));
+            }
+
+            58% {
+                filter: drop-shadow(0 0 14px rgba(168, 85, 247, .7)) drop-shadow(0 0 22px rgba(255, 255, 255, .38));
+            }
+        }
+
+        @keyframes premiumHalo {
+
+            0%,
+            100% {
+                opacity: .35;
+                transform: translate(-50%, -50%) scale(.72);
+            }
+
+            50% {
+                opacity: .9;
+                transform: translate(-50%, -50%) scale(1.12);
+            }
+        }
+
+        @keyframes premiumShimmer {
+
+            0%,
+            18% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(.4) rotate(0deg);
+            }
+
+            35% {
+                opacity: 1;
+                transform: translate(18px, -24px) scale(1.15) rotate(90deg);
+            }
+
+            52%,
+            100% {
+                opacity: 0;
+                transform: translate(34px, -40px) scale(.55) rotate(180deg);
             }
         }
 
