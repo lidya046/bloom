@@ -69,6 +69,69 @@ async function sendTelegram(chatId, text) {
     }
 }
 
+/*
+ * Pesan /start
+ */
+async function sendStartMessage(chatId) {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+
+    if (!token || !chatId) return false;
+
+    const welcomeText = [
+        '🌷 Selamat datang di Bloom!',
+        '',
+        'Yuk mulai bermain, kumpulkan Coins & Seeds,',
+        'dan kirim bouquet untuk orang tersayang 💐',
+        '',
+        '🎮 Main Bloom sekarang!'
+    ].join('\n');
+
+    try {
+        const r = await fetch(
+            `https://api.telegram.org/bot${token}/sendMessage`,
+            {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    chat_id: chatId,
+                    text: welcomeText,
+                    reply_markup: {
+                        inline_keyboard: [[
+                            {
+                                text: '🌷 Buka Bloom',
+                                web_app: {
+                                    url: 'https://bloom-one-dusky.vercel.app/'
+                                }
+                            }
+                        ]]
+                    }
+                })
+            }
+        );
+
+        const data = await r.json().catch(() => ({}));
+
+        if (!r.ok || !data.ok) {
+            console.error(
+                'Telegram /start gagal:',
+                data
+            );
+            return false;
+        }
+
+        return true;
+    } catch (e) {
+        console.error(
+            'Telegram /start error:',
+            e
+        );
+
+        return false;
+    }
+}
+
 async function answerCallback(callbackQueryId, text) {
     const token = process.env.TELEGRAM_BOT_TOKEN;
 
@@ -148,17 +211,15 @@ async function replaceTelegramOrderMessage(chatId, messageId, text) {
         }
 
         if (attempt === 1) {
-            await new Promise(resolve => setTimeout(resolve, 500));
+            await new Promise(resolve =>
+                setTimeout(resolve, 500)
+            );
         }
     }
 
     /*
      * Jangan kirim pesan hasil kalau pesan lama
      * belum berhasil dihapus.
-     *
-     * Ini mencegah muncul:
-     * [pesan lama]
-     * [pesan hasil]
      */
     if (!deleted) {
         return false;
@@ -499,6 +560,37 @@ router.post('/telegram', async (req, res) => {
         });
     }
 
+    /*
+     * ============================
+     * COMMAND /START
+     * ============================
+     */
+    const message = req.body?.message;
+    const messageText = String(
+        message?.text || ''
+    ).trim();
+
+    if (
+        messageText === '/start' ||
+        messageText.startsWith('/start ')
+    ) {
+        const chatId = message?.chat?.id;
+
+        if (chatId) {
+            await sendStartMessage(chatId);
+        }
+
+        return res.json({
+            ok: true
+        });
+    }
+
+    /*
+     * ============================
+     * APPROVE / REJECT
+     * ============================
+     */
+
     const cq = req.body?.callback_query;
 
     if (!cq?.data?.startsWith('coin:')) {
@@ -636,9 +728,6 @@ router.post('/telegram', async (req, res) => {
         /*
          * Hapus pesan foto + tombol,
          * lalu kirim hasil Approve / Reject.
-         *
-         * Ini berlaku untuk KEDUANYA:
-         * approve dan reject.
          */
         const telegramUpdated =
             await replaceTelegramOrderMessage(
