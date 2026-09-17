@@ -2702,15 +2702,15 @@
 
         function getBouquetPositions(count) {
             const layouts = {
-                1: [[50, 28, 0]],
-                2: [[42, 31, -8], [58, 31, 8]],
-                3: [[50, 18, 0], [39, 39, -10], [61, 39, 10]],
-                4: [[42, 20, -8], [58, 20, 8], [35, 43, -12], [65, 43, 12]],
-                5: [[50, 12, 0], [39, 29, -9], [61, 29, 9], [32, 48, -14], [68, 48, 14]],
-                6: [[43, 12, -7], [57, 12, 7], [34, 31, -12], [50, 28, 0], [66, 31, 12], [50, 49, 0]],
-                7: [[50, 8, 0], [39, 24, -10], [61, 24, 10], [31, 42, -15], [50, 38, 0], [69, 42, 15], [50, 56, 0]],
-                8: [[43, 8, -7], [57, 8, 7], [33, 25, -12], [50, 22, 0], [67, 25, 12], [29, 46, -16], [50, 43, 0], [71, 46, 16]],
-                9: [[50, 5, 0], [39, 20, -10], [61, 20, 10], [30, 37, -16], [45, 34, -5], [55, 34, 5], [70, 37, 16], [39, 54, -8], [61, 54, 8]]
+                1: [[50, 30, 0]],
+                2: [[43, 22, -7], [57, 22, 7]],
+                3: [[50, 10, 0], [39, 29, -8], [61, 29, 8]],
+                4: [[50, 8, 0], [37, 25, -9], [63, 25, 9], [50, 43, 0]],
+                5: [[50, 6, 0], [38, 22, -8], [62, 22, 8], [32, 40, -12], [68, 40, 12]],
+                6: [[44, 6, -6], [56, 6, 6], [35, 24, -10], [65, 24, 10], [42, 43, -7], [58, 43, 7]],
+                7: [[50, 4, 0], [38, 18, -9], [62, 18, 9], [30, 34, -13], [50, 30, 0], [70, 34, 13], [50, 48, 0]],
+                8: [[43, 4, -6], [57, 4, 6], [33, 20, -10], [50, 16, 0], [67, 20, 10], [30, 37, -13], [50, 34, 0], [70, 37, 13]],
+                9: [[50, 3, 0], [39, 16, -8], [61, 16, 8], [31, 30, -12], [45, 27, -4], [55, 27, 4], [69, 30, 12], [39, 44, -8], [61, 44, 8]]
             };
             if (layouts[count]) return layouts[count];
             const result = [];
@@ -2901,24 +2901,17 @@
                 const sender = b.sender_first_name || (b.sender_username ? `@${b.sender_username}` : 'Teman');
                 const total = (b.items || []).reduce((sum, x) => sum + Number(x.quantity || 0), 0);
                 const isNew = Number(b.id) > lastSeen;
-                return `<div class="received-card" data-bouquet-id="${Number(b.id)}">
+                return `<div class="received-card" onclick="openReceivedBouquet(${Number(b.id)})">
                     <div class="received-card-top">
                         <div class="received-avatar">💌</div>
                         <div class="received-sender"><b>Dari ${sender}</b><div class="received-hint">${total} bunga • Ketuk untuk membuka bouquet ✨</div></div>
                         ${isNew ? '<span class="received-new">BARU</span>' : ''}
                     </div>
-                    <div class="received-mini-bouquet">${renderReceivedMiniBouquet(b.items || [])}</div>
+                    <div class="received-mini-bouquet" onclick="openReceivedBouquet(${Number(b.id)})">${renderReceivedMiniBouquet(b.items || [])}</div>
                     <div class="received-message">${b.message || 'Untukmu, dengan sayang 🌷'}</div>
                 </div>`;
             }).join('');
         }
-
-        document.getElementById('receivedList')?.addEventListener('click', event => {
-            const card = event.target.closest('.received-card');
-            if (!card) return;
-            const bouquetId = Number(card.dataset.bouquetId || 0);
-            if (bouquetId) openReceivedBouquet(bouquetId);
-        });
 
         async function loadReceived() {
             try {
