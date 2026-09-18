@@ -10,7 +10,7 @@ async function notifyTelegram(telegramId, bouquet, sender) {
   const text = `💐 Kamu menerima bouquet dari ${sender.first_name || sender.username || 'seseorang'}!\n\n${bouquet.message || 'Ada bunga untukmu 🌷'}\n\nBuka Bloom untuk melihat bouquet-mu 💌`;
   const payload = { chat_id: telegramId, text };
   if (process.env.WEB_APP_URL) {
-    payload.reply_markup = { inline_keyboard: [[{ text: '💌 Buka Bloom', web_app: { url: process.env.WEB_APP_URL } }]] };
+    payload.reply_markup = { inline_keyboard: [[{ text: '💌 Buka Bouquet', web_app: { url: `${process.env.WEB_APP_URL}?bouquet=${encodeURIComponent(bouquet.id)}` } }]] };
   }
   const r = await fetch(`https://api.telegram.org/bot${process.env.TELEGRAM_BOT_TOKEN}/sendMessage`, {
     method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(payload)
