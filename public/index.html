@@ -1205,6 +1205,70 @@
             animation: specialFloat 2.8s ease-in-out infinite;
         }
 
+        /* Celestial Bloom uses a transparent artwork asset instead of the square emoji. */
+        .celestial-visual {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 46px;
+            height: 46px;
+            flex: 0 0 46px;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, .55));
+            animation: celestialBloomFloat 3.2s ease-in-out infinite;
+        }
+
+        .celestial-visual img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .shop-item .shop-top .celestial-visual {
+            width: 52px;
+            height: 52px;
+            flex-basis: 52px;
+        }
+
+        .bouquet-flower-icon .celestial-visual {
+            width: 42px;
+            height: 42px;
+            margin: -4px auto;
+        }
+
+        .bouquet-flower .celestial-visual {
+            position: relative;
+            z-index: 2;
+            width: 62px;
+            height: 62px;
+        }
+
+        .gift-bouquet-stage .bouquet-flower .celestial-visual {
+            width: 76px;
+            height: 76px;
+        }
+
+        .gift-item-pill .celestial-visual {
+            width: 20px;
+            height: 20px;
+            flex-basis: 20px;
+            vertical-align: middle;
+            margin: -3px 2px -3px 0;
+            animation: none;
+        }
+
+        @keyframes celestialBloomFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-1deg);
+            }
+
+            50% {
+                transform: translateY(-4px) rotate(1deg) scale(1.03);
+            }
+        }
+
         .special-badge {
             display: inline-block;
             margin-top: 4px;
@@ -2850,6 +2914,14 @@
             return 'special';
         }
 
+        function flowerVisual(flower, extraClass = '') {
+            const name = String(flower?.name || '').toLowerCase();
+            if (name === 'celestial bloom') {
+                return `<span class="celestial-visual ${extraClass}"><img src="/assets/celestial-bloom.png" alt="Celestial Bloom"></span>`;
+            }
+            return flower?.emoji || '🌸';
+        }
+
         function renderGarden() {
 
             const el =
@@ -2876,7 +2948,7 @@
 
           <div class="flower ${flower.is_special ? `special-flower special-${specialClass(flower)}` : ''}">
             <div class="special-content" style="display:flex;align-items:center;gap:10px;width:100%">
-              <div class="${flower.is_special ? 'special-icon' : 'flower-icon'}">${flower.emoji}</div>
+              <div class="${flower.is_special ? 'special-icon' : 'flower-icon'}">${flowerVisual(flower)}</div>
               <div class="flower-info">
                 <div class="flower-name">${flower.name}</div>
                 <div class="rarity">${flower.rarity}${flower.is_special ? ' ✨ SPECIAL' : ''}</div>
@@ -2926,7 +2998,7 @@
 
           <div class="flower ${flower.is_special ? `special-flower special-${specialClass(flower)}` : ''}" style="margin-bottom:10px">
             <div class="special-content" style="display:flex;align-items:center;gap:10px;width:100%">
-              <div class="${flower.is_special ? 'special-icon' : 'flower-icon'}">${flower.emoji}</div>
+              <div class="${flower.is_special ? 'special-icon' : 'flower-icon'}">${flowerVisual(flower)}</div>
               <div class="flower-info">
                 <div class="flower-name">${flower.name}</div>
                 <div class="rarity">${flower.rarity}${flower.is_special ? ' ✨ SPECIAL' : ''}</div>
@@ -3112,7 +3184,7 @@
                     const special = Boolean(flower.is_special);
                     return `
                         <div class="bouquet-flower-row">
-                            <div class="bouquet-flower-icon ${special ? `special-${specialClass(flower)}` : ''}">${flower.emoji}</div>
+                            <div class="bouquet-flower-icon ${special ? `special-${specialClass(flower)}` : ''}">${flowerVisual(flower)}</div>
                             <div class="bouquet-flower-info">
                                 <b>${flower.name}${special ? ' ✨' : ''}</b>
                                 <span>Punya: ${owned}</span>
@@ -3188,8 +3260,11 @@
             preview.innerHTML = positions.map((pos, index) => {
                 const flower = flowers[index % flowers.length];
                 const special = Boolean(flower.is_special);
+                const celestial = String(flower.name || '').toLowerCase() === 'celestial bloom';
                 const spark = special ? '<span class="bouquet-spark one">✦</span>' : '';
-                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}<span>${flower.emoji}</span><span class="bouquet-stem"></span></div>`;
+                const visual = flowerVisual(flower, celestial ? 'bouquet-celestial-visual' : '');
+                const stem = celestial ? '' : '<span class="bouquet-stem"></span>';
+                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
             }).join('') + `<div class="${wrapClass}"></div><div class="bouquet-ribbon">${bouquetCustom.ribbon}</div>${decoration}`;
 
             text.textContent = `${total} bunga dalam bouquet`;
@@ -3211,7 +3286,7 @@
                     <div class="flower shop-item ${special ? `special-flower special-${specialClass(f)}` : ''}">
                         <div class="special-content">
                             <div class="shop-top">
-                                <div class="${special ? 'special-icon' : 'flower-icon'}">${f.emoji}</div>
+                                <div class="${special ? 'special-icon' : 'flower-icon'}">${flowerVisual(f)}</div>
 
                                 <div class="flower-info">
                                     <div class="flower-name">${f.name}</div>
@@ -3287,8 +3362,11 @@
             return `<div class="bouquet-canvas">${positions.map((pos, index) => {
                 const flower = flowers[index % flowers.length];
                 const special = Boolean(flower.is_special);
+                const celestial = String(flower.name || '').toLowerCase() === 'celestial bloom';
                 const spark = special ? '<span class="bouquet-spark one">✦</span>' : '';
-                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}<span>${flower.emoji}</span><span class="bouquet-stem"></span></div>`;
+                const visual = flowerVisual(flower, celestial ? 'bouquet-celestial-visual' : '');
+                const stem = celestial ? '' : '<span class="bouquet-stem"></span>';
+                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
             }).join('')}<div class="bouquet-wrap bouquet-wrap-${wrapping}"></div><div class="bouquet-ribbon">${ribbon}</div>${decoration}</div>`;
         }
 
@@ -3303,7 +3381,7 @@
                 giftStage.innerHTML = renderReceivedMiniBouquet(b.items || [], b);
             });
             document.getElementById('giftItems').innerHTML = receivedFlowerList(b.items || []).map(({ flower, quantity }) =>
-                `<span class="gift-item-pill">${flower.emoji} ${flower.name} ×${quantity}</span>`
+                `<span class="gift-item-pill">${flowerVisual(flower)} ${flower.name} ×${quantity}</span>`
             ).join('');
             document.getElementById('giftMessage').textContent = b.message || 'Untukmu, dengan sayang 🌷';
             document.getElementById('giftOverlay').classList.add('show');
