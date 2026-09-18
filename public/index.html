@@ -275,11 +275,46 @@
         }
 
         .bouquet-special {
-            animation: bouquetFloat 2.2s ease-in-out infinite, bouquetGlow 1.8s ease-in-out infinite;
+            animation: premiumFlowerFloat 4.8s cubic-bezier(.45, 0, .25, 1) infinite, premiumFlowerGlow 2.4s ease-in-out infinite;
+            transform-style: preserve-3d;
+            backface-visibility: visible;
+            isolation: isolate;
+        }
+
+        .bouquet-special::before {
+            content: '';
+            position: absolute;
+            width: 64px;
+            height: 64px;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+            border-radius: 50%;
+            background: radial-gradient(circle, rgba(216, 180, 254, .52) 0%, rgba(216, 180, 254, .20) 34%, transparent 72%);
+            filter: blur(2px);
+            z-index: 0;
+            pointer-events: none;
+            animation: premiumHalo 2.4s ease-in-out infinite;
+        }
+
+        .bouquet-special::after {
+            content: '✦';
+            position: absolute;
+            left: 50%;
+            top: 50%;
+            font-size: 13px;
+            color: rgba(255, 255, 255, .95);
+            text-shadow: 0 0 8px rgba(168, 85, 247, .9);
+            opacity: 0;
+            z-index: 7;
+            pointer-events: none;
+            animation: premiumShimmer 2.4s ease-in-out infinite;
         }
 
         .bouquet-special>span:not(.bouquet-stem) {
-            filter: drop-shadow(0 0 9px rgba(168, 85, 247, .7));
+            position: relative;
+            z-index: 2;
+            filter: drop-shadow(0 0 5px rgba(168, 85, 247, .35)) drop-shadow(0 0 11px rgba(255, 255, 255, .35));
         }
 
         .bouquet-flower:nth-child(3n) {
@@ -314,6 +349,14 @@
             box-shadow: 0 6px 12px rgba(90, 50, 80, .12);
         }
 
+        .bouquet-wrap-purple {
+            background: linear-gradient(135deg, #e7d8ff, #cbb0f5);
+        }
+
+        .bouquet-wrap-cream {
+            background: linear-gradient(135deg, #fff8df, #eadfbf);
+        }
+
         .bouquet-ribbon {
             position: absolute;
             bottom: 7px;
@@ -345,6 +388,189 @@
             top: 55px;
             left: 30%;
             animation-delay: .9s;
+        }
+
+        .player-progress-card {
+            background: linear-gradient(135deg, #fff, #f7edff);
+            border: 1px solid #eadff0;
+            border-radius: 20px;
+            padding: 14px;
+            margin-bottom: 16px;
+            box-shadow: 0 6px 20px rgba(80, 50, 90, .08);
+        }
+
+        .player-progress-top {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            gap: 10px;
+        }
+
+        .player-level-label {
+            color: #8b7c91;
+            font-size: 10px;
+            font-weight: 800;
+            letter-spacing: .7px;
+        }
+
+        .player-level-value {
+            margin-top: 2px;
+            font-size: 20px;
+            font-weight: 900;
+            color: #7041c7;
+        }
+
+        .player-xp-value {
+            color: #765a84;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .player-xp-track {
+            height: 9px;
+            margin-top: 10px;
+            background: #eee5f6;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .player-xp-bar {
+            height: 100%;
+            background: linear-gradient(90deg, #c084fc, #8b5cf6);
+            border-radius: 99px;
+            transition: width .35s ease;
+        }
+
+        .player-xp-next {
+            margin-top: 6px;
+            color: #8b7c91;
+            font-size: 10px;
+            text-align: right;
+        }
+
+        .bouquet-custom-controls {
+            background: rgba(255, 255, 255, .78);
+            border: 1px solid #eadff0;
+            border-radius: 18px;
+            padding: 10px;
+            margin-bottom: 12px;
+        }
+
+        .custom-option-group+.custom-option-group {
+            margin-top: 10px;
+        }
+
+        .custom-option-label {
+            font-size: 11px;
+            font-weight: 800;
+            color: #765a84;
+            margin-bottom: 6px;
+        }
+
+        .custom-option-row {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .custom-option {
+            width: auto;
+            padding: 7px 10px;
+            border-radius: 11px;
+            background: #f7f1fb;
+            color: #765a84;
+            border: 1px solid #eadff0;
+            font-size: 11px;
+            font-weight: 800;
+        }
+
+        .custom-option.selected {
+            background: #eee2ff;
+            border-color: #c8a7f7;
+            color: #7041c7;
+        }
+
+        .achievement-summary {
+            background: linear-gradient(135deg, #fff, #f7edff);
+            border: 1px solid #eadff0;
+            border-radius: 18px;
+            padding: 13px;
+            margin-bottom: 12px;
+            font-size: 12px;
+            font-weight: 800;
+            color: #765a84;
+        }
+
+        .achievement-card {
+            background: white;
+            border: 1px solid #eadff0;
+            border-radius: 18px;
+            padding: 13px;
+            margin-bottom: 10px;
+            box-shadow: 0 4px 16px rgba(80, 50, 90, .06);
+        }
+
+        .achievement-card.unlocked {
+            border-color: #d7c0fa;
+            background: linear-gradient(135deg, #fff, #fbf7ff);
+        }
+
+        .achievement-top {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .achievement-icon {
+            font-size: 30px;
+            width: 38px;
+            text-align: center;
+        }
+
+        .achievement-info {
+            flex: 1;
+        }
+
+        .achievement-name {
+            font-size: 14px;
+            font-weight: 850;
+        }
+
+        .achievement-description {
+            margin-top: 2px;
+            color: #8b7c91;
+            font-size: 11px;
+        }
+
+        .achievement-status {
+            font-size: 10px;
+            font-weight: 900;
+            color: #9b8aa2;
+        }
+
+        .achievement-card.unlocked .achievement-status {
+            color: #7041c7;
+        }
+
+        .achievement-progress-track {
+            height: 7px;
+            margin-top: 9px;
+            background: #f0e9f4;
+            border-radius: 99px;
+            overflow: hidden;
+        }
+
+        .achievement-progress-bar {
+            height: 100%;
+            background: #b084e8;
+            border-radius: 99px;
+        }
+
+        .achievement-progress-text {
+            margin-top: 4px;
+            color: #9b8aa2;
+            font-size: 10px;
+            text-align: right;
         }
 
         .bouquet-controls {
@@ -460,6 +686,84 @@
             }
         }
 
+        @keyframes premiumFlowerFloat {
+
+            0%,
+            100% {
+                transform: perspective(240px) translateY(0) rotateY(0deg) rotateZ(-2deg) scale(1);
+            }
+
+            18% {
+                transform: perspective(240px) translateY(-3px) rotateY(72deg) rotateZ(1deg) scale(1.02);
+            }
+
+            35% {
+                transform: perspective(240px) translateY(-5px) rotateY(145deg) rotateZ(2deg) scale(1.035);
+            }
+
+            50% {
+                transform: perspective(240px) translateY(-3px) rotateY(220deg) rotateZ(-1deg) scale(1.025);
+            }
+
+            68% {
+                transform: perspective(240px) translateY(-2px) rotateY(290deg) rotateZ(-1deg) scale(1.015);
+            }
+
+            85% {
+                transform: perspective(240px) translateY(-1px) rotateY(340deg) rotateZ(0deg) scale(1.01);
+            }
+        }
+
+        @keyframes premiumFlowerGlow {
+
+            0%,
+            100% {
+                filter: drop-shadow(0 5px 4px rgba(80, 50, 90, .12));
+            }
+
+            45% {
+                filter: drop-shadow(0 0 8px rgba(168, 85, 247, .42)) drop-shadow(0 0 16px rgba(255, 255, 255, .28));
+            }
+
+            58% {
+                filter: drop-shadow(0 0 14px rgba(168, 85, 247, .7)) drop-shadow(0 0 22px rgba(255, 255, 255, .38));
+            }
+        }
+
+        @keyframes premiumHalo {
+
+            0%,
+            100% {
+                opacity: .35;
+                transform: translate(-50%, -50%) scale(.72);
+            }
+
+            50% {
+                opacity: .9;
+                transform: translate(-50%, -50%) scale(1.12);
+            }
+        }
+
+        @keyframes premiumShimmer {
+
+            0%,
+            18% {
+                opacity: 0;
+                transform: translate(-50%, -50%) scale(.4) rotate(0deg);
+            }
+
+            35% {
+                opacity: 1;
+                transform: translate(18px, -24px) scale(1.15) rotate(90deg);
+            }
+
+            52%,
+            100% {
+                opacity: 0;
+                transform: translate(34px, -40px) scale(.55) rotate(180deg);
+            }
+        }
+
         @keyframes bouquetSparkle {
 
             0%,
@@ -545,6 +849,77 @@
         .received-mini-bouquet .bouquet-flower {
             transform: scale(.72);
             transform-origin: center;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower {
+            opacity: 0;
+            transform: translateY(28px) scale(.35);
+            animation: receivedFlowerBloom .55s cubic-bezier(.2, .8, .2, 1) forwards;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(1) {
+            animation-delay: .05s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(2) {
+            animation-delay: .10s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(3) {
+            animation-delay: .15s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(4) {
+            animation-delay: .20s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(5) {
+            animation-delay: .25s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(6) {
+            animation-delay: .30s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(7) {
+            animation-delay: .35s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(8) {
+            animation-delay: .40s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(9) {
+            animation-delay: .45s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(10) {
+            animation-delay: .50s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(11) {
+            animation-delay: .55s;
+        }
+
+        #giftOverlay.show #giftBouquetStage .bouquet-flower:nth-child(12) {
+            animation-delay: .60s;
+        }
+
+        @keyframes receivedFlowerBloom {
+            0% {
+                opacity: 0;
+                transform: translateY(28px) scale(.35);
+            }
+
+            70% {
+                opacity: 1;
+                transform: translateY(-4px) scale(1.08);
+            }
+
+            100% {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         .received-message {
@@ -1711,6 +2086,20 @@
             </div>
 
 
+            <div class="player-progress-card" id="playerProgressCard">
+                <div class="player-progress-top">
+                    <div>
+                        <div class="player-level-label">🌟 PLAYER LEVEL</div>
+                        <div class="player-level-value" id="playerLevelValue">Level 1</div>
+                    </div>
+                    <div class="player-xp-value" id="playerXpValue">0 / 100 XP</div>
+                </div>
+                <div class="player-xp-track">
+                    <div id="playerXpBar" class="player-xp-bar" style="width:0%"></div>
+                </div>
+                <div class="player-xp-next" id="playerXpNext">100 XP menuju Level 2</div>
+            </div>
+
             <div class="section-title">
                 Apa yang mau kamu lakukan?
             </div>
@@ -1766,6 +2155,12 @@
                         Lihat bunga kamu
                     </p>
 
+                </button>
+
+                <button class="card" onclick="showPage('achievements')">
+                    <div class="icon">🏆</div>
+                    <h3>Achievements</h3>
+                    <p>Lihat pencapaian kamu</p>
                 </button>
 
                 <button class="card" onclick="showPage('shop')">
@@ -1863,6 +2258,43 @@
                 <div class="bouquet-controls-title">🌸 Pilih bunga & jumlah</div>
                 <div id="bouquetFlowerList"></div>
                 <div id="bouquetTotal" class="bouquet-total">0 bunga dipilih</div>
+            </div>
+
+            <div class="bouquet-custom-controls">
+                <div class="bouquet-controls-title">🎨 Custom Bouquet</div>
+                <div class="custom-option-group">
+                    <div class="custom-option-label">Wrapping</div>
+                    <div class="custom-option-row" id="bouquetWrappingOptions">
+                        <button type="button" class="custom-option selected" data-value="pink"
+                            onclick="selectBouquetCustom('wrapping','pink')">🌸 Pink</button>
+                        <button type="button" class="custom-option" data-value="purple"
+                            onclick="selectBouquetCustom('wrapping','purple')">💜 Purple</button>
+                        <button type="button" class="custom-option" data-value="cream"
+                            onclick="selectBouquetCustom('wrapping','cream')">🤍 Cream</button>
+                    </div>
+                </div>
+                <div class="custom-option-group">
+                    <div class="custom-option-label">Ribbon</div>
+                    <div class="custom-option-row" id="bouquetRibbonOptions">
+                        <button type="button" class="custom-option selected" data-value="🎀"
+                            onclick="selectBouquetCustom('ribbon','🎀')">🎀</button>
+                        <button type="button" class="custom-option" data-value="💜"
+                            onclick="selectBouquetCustom('ribbon','💜')">💜</button>
+                        <button type="button" class="custom-option" data-value="✨"
+                            onclick="selectBouquetCustom('ribbon','✨')">✨</button>
+                    </div>
+                </div>
+                <div class="custom-option-group">
+                    <div class="custom-option-label">Decoration</div>
+                    <div class="custom-option-row" id="bouquetDecorationOptions">
+                        <button type="button" class="custom-option selected" data-value="sparkle"
+                            onclick="selectBouquetCustom('decoration','sparkle')">✦ Sparkle</button>
+                        <button type="button" class="custom-option" data-value="heart"
+                            onclick="selectBouquetCustom('decoration','heart')">💕 Heart</button>
+                        <button type="button" class="custom-option" data-value="none"
+                            onclick="selectBouquetCustom('decoration','none')">○ None</button>
+                    </div>
+                </div>
             </div>
 
 
@@ -1978,6 +2410,15 @@
                     </div>
                 </div>
             </div>
+        </section>
+
+        <!-- ACHIEVEMENTS -->
+
+        <section id="achievements" class="page">
+            <button class="back" onclick="showPage('home')">← Kembali</button>
+            <div class="section-title">🏆 Achievements</div>
+            <div id="achievementSummary" class="achievement-summary"></div>
+            <div id="achievementList"></div>
         </section>
 
         <!-- COLLECTION -->
@@ -2156,6 +2597,23 @@
             ).textContent =
                 state.user.seeds;
 
+            renderPlayerProgress();
+
+        }
+
+        function renderPlayerProgress() {
+            if (!state.user) return;
+            const level = Math.max(1, Number(state.user.level || 1));
+            const xp = Math.max(0, Number(state.user.xp || 0));
+            const current = xp % 100;
+            const bar = document.getElementById('playerXpBar');
+            const levelEl = document.getElementById('playerLevelValue');
+            const xpEl = document.getElementById('playerXpValue');
+            const nextEl = document.getElementById('playerXpNext');
+            if (levelEl) levelEl.textContent = `Level ${level}`;
+            if (xpEl) xpEl.textContent = `${current} / 100 XP`;
+            if (bar) bar.style.width = `${current}%`;
+            if (nextEl) nextEl.textContent = `${100 - current} XP menuju Level ${level + 1}`;
         }
 
 
@@ -2218,6 +2676,10 @@
 
             if (id === "collection") {
                 loadCollection();
+            }
+
+            if (id === "achievements") {
+                loadAchievements();
             }
 
             if (id === "shop") {
@@ -2557,6 +3019,7 @@
 
 
         let bouquetItems = {};
+        let bouquetCustom = { wrapping: 'pink', ribbon: '🎀', decoration: 'sparkle' };
         const MAX_BOUQUET_FLOWERS = 12;
 
         function getBouquetTotal() {
@@ -2584,7 +3047,31 @@
 
         function initBouquet() {
             bouquetItems = {};
+            bouquetCustom = { wrapping: 'pink', ribbon: '🎀', decoration: 'sparkle' };
             renderBouquetBuilder();
+            renderBouquetCustomOptions();
+        }
+
+        function selectBouquetCustom(type, value) {
+            if (!['wrapping', 'ribbon', 'decoration'].includes(type)) return;
+            bouquetCustom[type] = value;
+            renderBouquetCustomOptions();
+            renderBouquetPreview();
+        }
+
+        function renderBouquetCustomOptions() {
+            const groups = {
+                wrapping: 'bouquetWrappingOptions',
+                ribbon: 'bouquetRibbonOptions',
+                decoration: 'bouquetDecorationOptions'
+            };
+            Object.entries(groups).forEach(([type, id]) => {
+                const el = document.getElementById(id);
+                if (!el) return;
+                el.querySelectorAll('.custom-option').forEach(btn => {
+                    btn.classList.toggle('selected', btn.dataset.value === bouquetCustom[type]);
+                });
+            });
         }
 
         function renderBouquetBuilder() {
@@ -2631,15 +3118,15 @@
 
         function getBouquetPositions(count) {
             const layouts = {
-                1: [[50, 28, 0]],
-                2: [[42, 31, -8], [58, 31, 8]],
-                3: [[50, 18, 0], [39, 39, -10], [61, 39, 10]],
-                4: [[42, 20, -8], [58, 20, 8], [35, 43, -12], [65, 43, 12]],
-                5: [[50, 12, 0], [39, 29, -9], [61, 29, 9], [32, 48, -14], [68, 48, 14]],
-                6: [[43, 12, -7], [57, 12, 7], [34, 31, -12], [50, 28, 0], [66, 31, 12], [50, 49, 0]],
-                7: [[50, 8, 0], [39, 24, -10], [61, 24, 10], [31, 42, -15], [50, 38, 0], [69, 42, 15], [50, 56, 0]],
-                8: [[43, 8, -7], [57, 8, 7], [33, 25, -12], [50, 22, 0], [67, 25, 12], [29, 46, -16], [50, 43, 0], [71, 46, 16]],
-                9: [[50, 5, 0], [39, 20, -10], [61, 20, 10], [30, 37, -16], [45, 34, -5], [55, 34, 5], [70, 37, 16], [39, 54, -8], [61, 54, 8]]
+                1: [[50, 30, 0]],
+                2: [[43, 22, -7], [57, 22, 7]],
+                3: [[50, 10, 0], [39, 29, -8], [61, 29, 8]],
+                4: [[50, 8, 0], [37, 25, -9], [63, 25, 9], [50, 43, 0]],
+                5: [[50, 6, 0], [38, 22, -8], [62, 22, 8], [32, 40, -12], [68, 40, 12]],
+                6: [[44, 6, -6], [56, 6, 6], [35, 24, -10], [65, 24, 10], [42, 43, -7], [58, 43, 7]],
+                7: [[50, 4, 0], [38, 18, -9], [62, 18, 9], [30, 34, -13], [50, 30, 0], [70, 34, 13], [50, 48, 0]],
+                8: [[43, 4, -6], [57, 4, 6], [33, 20, -10], [50, 16, 0], [67, 20, 10], [30, 37, -13], [50, 34, 0], [70, 37, 13]],
+                9: [[50, 3, 0], [39, 16, -8], [61, 16, 8], [31, 30, -12], [45, 27, -4], [55, 27, 4], [69, 30, 12], [39, 44, -8], [61, 44, 8]]
             };
             if (layouts[count]) return layouts[count];
             const result = [];
@@ -2665,12 +3152,18 @@
             }
 
             const positions = getBouquetPositions(Math.min(total, 12));
+            const wrapClass = `bouquet-wrap bouquet-wrap-${bouquetCustom.wrapping}`;
+            const decoration = bouquetCustom.decoration === 'heart'
+                ? '<span class="bouquet-spark two">💕</span><span class="bouquet-spark three">💗</span>'
+                : bouquetCustom.decoration === 'none'
+                    ? ''
+                    : '<span class="bouquet-spark two">✦</span><span class="bouquet-spark three">✧</span>';
             preview.innerHTML = positions.map((pos, index) => {
                 const flower = flowers[index % flowers.length];
                 const special = Boolean(flower.is_special);
                 const spark = special ? '<span class="bouquet-spark one">✦</span>' : '';
                 return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}<span>${flower.emoji}</span><span class="bouquet-stem"></span></div>`;
-            }).join('') + '<div class="bouquet-wrap"></div><div class="bouquet-ribbon">🎀</div><span class="bouquet-spark two">✦</span><span class="bouquet-spark three">✧</span>';
+            }).join('') + `<div class="${wrapClass}"></div><div class="bouquet-ribbon">${bouquetCustom.ribbon}</div>${decoration}`;
 
             text.textContent = `${total} bunga dalam bouquet`;
         }
@@ -2745,7 +3238,7 @@
             }).filter(x => x.flower);
         }
 
-        function renderReceivedMiniBouquet(items) {
+        function renderReceivedMiniBouquet(items, custom = {}) {
             const flowers = [];
             receivedFlowerList(items).forEach(({ flower, quantity }) => {
                 for (let i = 0; i < Math.min(quantity, 12); i++) flowers.push(flower);
@@ -2753,12 +3246,19 @@
             if (!flowers.length) return '<div class="bouquet-empty">💐 Bouquet</div>';
 
             const positions = getBouquetPositions(Math.min(flowers.length, 12));
+            const wrapping = ['pink', 'purple', 'cream'].includes(custom.wrapping) ? custom.wrapping : 'pink';
+            const ribbon = ['🎀', '💜', '✨'].includes(custom.ribbon) ? custom.ribbon : '🎀';
+            const decoration = custom.decoration === 'heart'
+                ? '<span class="bouquet-spark two">💕</span><span class="bouquet-spark three">💗</span>'
+                : custom.decoration === 'none'
+                    ? ''
+                    : '<span class="bouquet-spark two">✦</span><span class="bouquet-spark three">✧</span>';
             return `<div class="bouquet-canvas">${positions.map((pos, index) => {
                 const flower = flowers[index % flowers.length];
                 const special = Boolean(flower.is_special);
                 const spark = special ? '<span class="bouquet-spark one">✦</span>' : '';
                 return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}<span>${flower.emoji}</span><span class="bouquet-stem"></span></div>`;
-            }).join('')}<div class="bouquet-wrap"></div><div class="bouquet-ribbon">🎀</div><span class="bouquet-spark two">✦</span><span class="bouquet-spark three">✧</span></div>`;
+            }).join('')}<div class="bouquet-wrap bouquet-wrap-${wrapping}"></div><div class="bouquet-ribbon">${ribbon}</div>${decoration}</div>`;
         }
 
         function openReceivedBouquet(bouquetId) {
@@ -2766,7 +3266,11 @@
             if (!b) return;
             const sender = b.sender_first_name || (b.sender_username ? `@${b.sender_username}` : 'Teman');
             document.getElementById('giftFrom').textContent = `Dari ${sender} 💕`;
-            document.getElementById('giftBouquetStage').innerHTML = renderReceivedMiniBouquet(b.items || []);
+            const giftStage = document.getElementById('giftBouquetStage');
+            giftStage.innerHTML = '';
+            requestAnimationFrame(() => {
+                giftStage.innerHTML = renderReceivedMiniBouquet(b.items || [], b);
+            });
             document.getElementById('giftItems').innerHTML = receivedFlowerList(b.items || []).map(({ flower, quantity }) =>
                 `<span class="gift-item-pill">${flower.emoji} ${flower.name} ×${quantity}</span>`
             ).join('');
@@ -2826,26 +3330,16 @@
                 const sender = b.sender_first_name || (b.sender_username ? `@${b.sender_username}` : 'Teman');
                 const total = (b.items || []).reduce((sum, x) => sum + Number(x.quantity || 0), 0);
                 const isNew = Number(b.id) > lastSeen;
-                return `<div class="received-card" data-bouquet-id="${Number(b.id)}">
+                return `<div class="received-card" onclick="openReceivedBouquet(${Number(b.id)})">
                     <div class="received-card-top">
                         <div class="received-avatar">💌</div>
                         <div class="received-sender"><b>Dari ${sender}</b><div class="received-hint">${total} bunga • Ketuk untuk membuka bouquet ✨</div></div>
                         ${isNew ? '<span class="received-new">BARU</span>' : ''}
                     </div>
-                    <div class="received-mini-bouquet">${renderReceivedMiniBouquet(b.items || [])}</div>
+                    <div class="received-mini-bouquet" onclick="openReceivedBouquet(${Number(b.id)})">${renderReceivedMiniBouquet(b.items || [], b)}</div>
                     <div class="received-message">${b.message || 'Untukmu, dengan sayang 🌷'}</div>
                 </div>`;
             }).join('');
-
-            // Fix click interaction for dynamically rendered Received cards
-            el.querySelectorAll('.received-card').forEach(card => {
-                card.addEventListener('click', () => {
-                    const bouquetId = Number(card.dataset.bouquetId);
-                    if (bouquetId) {
-                        openReceivedBouquet(bouquetId);
-                    }
-                });
-            });
         }
 
         async function loadReceived() {
@@ -2893,7 +3387,9 @@
                         items,
                         receiverUsername,
                         message,
-                        wrapping: 'pink'
+                        wrapping: bouquetCustom.wrapping,
+                        ribbon: bouquetCustom.ribbon,
+                        decoration: bouquetCustom.decoration
                     })
                 });
 
@@ -2914,6 +3410,49 @@
             } catch (error) {
                 console.error(error);
                 toast(error.message);
+            }
+        }
+
+        async function loadAchievements() {
+            try {
+                const result = await api('/api/achievements');
+                const list = document.getElementById('achievementList');
+                const summary = document.getElementById('achievementSummary');
+                const achievements = Array.isArray(result.achievements) ? result.achievements : [];
+                const unlocked = achievements.filter(a => a.unlocked).length;
+
+                if (result.masterReward?.claimed) {
+                    toast('🎉 BLOOM MASTER! +500 Coins & +10 Seeds');
+                }
+
+                if (summary) {
+                    summary.textContent = `🏆 ${unlocked} / ${achievements.length} achievement terbuka`;
+
+                    if (result.masterReward?.claimed || result.masterReward?.alreadyClaimed) {
+                        summary.textContent += ' • 🌟 BLOOM MASTER';
+                    }
+                }
+                if (!list) return;
+                list.innerHTML = achievements.map(a => {
+                    const progress = Math.min(Number(a.progress || 0), Number(a.target || 1));
+                    const target = Number(a.target || 1);
+                    const percent = Math.round((progress / target) * 100);
+                    return `<div class="achievement-card ${a.unlocked ? 'unlocked' : ''}">
+                        <div class="achievement-top">
+                            <div class="achievement-icon">${a.icon}</div>
+                            <div class="achievement-info">
+                                <div class="achievement-name">${a.name}</div>
+                                <div class="achievement-description">${a.description}</div>
+                            </div>
+                            <div class="achievement-status">${a.unlocked ? '✓ UNLOCKED' : `${progress}/${target}`}</div>
+                        </div>
+                        <div class="achievement-progress-track"><div class="achievement-progress-bar" style="width:${percent}%"></div></div>
+                        <div class="achievement-progress-text">${a.unlocked ? 'Pencapaian terbuka ✨' : `${progress} / ${target}`}</div>
+                    </div>`;
+                }).join('');
+            } catch (e) {
+                const list = document.getElementById('achievementList');
+                if (list) list.innerHTML = `<div class="empty">Gagal memuat achievement: ${e.message}</div>`;
             }
         }
 
