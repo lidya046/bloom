@@ -3420,7 +3420,18 @@
                 const summary = document.getElementById('achievementSummary');
                 const achievements = Array.isArray(result.achievements) ? result.achievements : [];
                 const unlocked = achievements.filter(a => a.unlocked).length;
-                if (summary) summary.textContent = `🏆 ${unlocked} / ${achievements.length} achievement terbuka`;
+
+                if (result.masterReward?.claimed) {
+                    toast('🎉 BLOOM MASTER! +500 Coins & +10 Seeds');
+                }
+
+                if (summary) {
+                    summary.textContent = `🏆 ${unlocked} / ${achievements.length} achievement terbuka`;
+
+                    if (result.masterReward?.claimed || result.masterReward?.alreadyClaimed) {
+                        summary.textContent += ' • 🌟 BLOOM MASTER';
+                    }
+                }
                 if (!list) return;
                 list.innerHTML = achievements.map(a => {
                     const progress = Math.min(Number(a.progress || 0), Number(a.target || 1));
