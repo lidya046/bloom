@@ -1,7 +1,18 @@
 import { Router } from 'express';
 import { pool } from '../db.js';
 const router = Router();
-router.get('/', async (req, res) => { const r = await pool.query('SELECT id,telegram_id,username,first_name,coins,seeds,level,xp,created_at FROM users WHERE id=$1', [req.user.id]); res.json(r.rows[0]); });
+router.get('/', async (req, res) => {
+    const r = await pool.query('SELECT id,telegram_id,username,first_name,coins,seeds,level,xp,created_at FROM users WHERE id=$1', [req.user.id]);
+    const user = r.rows[0];
+    if (user) {
+        const normalizedLevel = Math.max(1, Math.floor(Math.max(0, Number(user.xp || 0)) / 100) + 1);
+        if (Number(user.level) !== normalizedLevel) {
+            const fixed = await pool.query('UPDATE users SET level=$1 WHERE id=$2 RETURNING id,telegram_id,username,first_name,coins,seeds,level,xp,created_at', [normalizedLevel, req.user.id]);
+            return res.json(fixed.rows[0]);
+        }
+    }
+    res.json(user);
+});
 router.get('/lookup', async (req, res) => {
     const raw = String(req.query.username || '').trim().replace(/^@/, '');
     if (!raw) return res.status(400).json({ error: 'Username wajib diisi' });

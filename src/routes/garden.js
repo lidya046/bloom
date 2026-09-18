@@ -1,5 +1,7 @@
 import { Router } from 'express';
 import { pool } from '../db.js';
+import { addXp } from '../progress.js';
+import { incrementAchievement, setAchievementProgress } from '../achievements.js';
 
 const router = Router();
 
@@ -83,17 +85,13 @@ router.post('/plant', async (req, res) => {
       )
     ).rows[0];
 
+    const xpResult = await addXp(client, u.id, 5);
     await client.query(
-      `
-      UPDATE users
-      SET
-        seeds = seeds - 1,
-        coins = coins + 5,
-        xp = xp + 5
-      WHERE id = $1
-      `,
+      `UPDATE users SET seeds=seeds-1, coins=coins+5 WHERE id=$1`,
       [u.id]
     );
+
+    await incrementAchievement(client, u.id, 'first_bloom', 1);
 
     await client.query(
       `
@@ -110,6 +108,14 @@ router.post('/plant', async (req, res) => {
       [u.id, f.id]
     );
 
+    const distinct = (await client.query(
+      'SELECT COUNT(*)::int AS count FROM user_flowers WHERE user_id=$1 AND quantity>0',
+      [u.id]
+    )).rows[0].count;
+    await setAchievementProgress(client, u.id, 'collector', distinct);
+    if (f.is_special) await incrementAchievement(client, u.id, 'special_collector', 1);
+    if (xpResult.leveledUp && xpResult.level >= 5) await setAchievementProgress(client, u.id, 'level_5', xpResult.level);
+
     await client.query('COMMIT');
 
     res.json({
@@ -117,7 +123,9 @@ router.post('/plant', async (req, res) => {
       reward: {
         coins: 5,
         xp: 5
-      }
+      },
+      level: xpResult.level,
+      leveledUp: xpResult.leveledUp
     });
 
   } catch (e) {

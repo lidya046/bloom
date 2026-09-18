@@ -14,6 +14,7 @@ import bouquets from './routes/bouquets.js';
 import shop from './routes/shop.js';
 import admin from './routes/admin.js';
 import coinOrders from './routes/coin-orders.js';
+import achievements from './routes/achievements.js';
 
 const app = express();
 
@@ -50,6 +51,7 @@ app.use('/api/bouquets', bouquets);
 app.use('/api/shop', shop);
 app.use('/api/admin', admin);
 app.use('/api/coin-orders', coinOrders);
+app.use('/api/achievements', achievements);
 
 const port = Number(process.env.PORT || 3000);
 

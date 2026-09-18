@@ -1,6 +1,8 @@
 import { Router } from 'express';
 import { pool } from '../db.js';
 import { notifyAdmins } from '../admin.js';
+import { addXp } from '../progress.js';
+import { incrementAchievement, setAchievementProgress } from '../achievements.js';
 const router = Router();
 
 router.get('/', async (_req, res) => {
@@ -30,11 +32,16 @@ router.post('/buy', async (req, res) => {
     await client.query(`INSERT INTO user_flowers(user_id,flower_id,quantity) VALUES($1,$2,$3)
       ON CONFLICT(user_id,flower_id) DO UPDATE SET quantity=user_flowers.quantity+EXCLUDED.quantity`, [u.id, flowerId, quantity]);
     await client.query(`INSERT INTO shop_purchases(user_id,flower_id,quantity,price) VALUES($1,$2,$3,$4)`, [u.id, flowerId, quantity, price]);
+    const xpResult = await addXp(client, u.id, 3 * quantity);
+    const distinct = (await client.query('SELECT COUNT(*)::int AS count FROM user_flowers WHERE user_id=$1 AND quantity>0', [u.id])).rows[0].count;
+    await setAchievementProgress(client, u.id, 'collector', distinct);
+    if (flower.is_special) await incrementAchievement(client, u.id, 'special_collector', 1);
+    if (xpResult.level >= 5) await setAchievementProgress(client, u.id, 'level_5', xpResult.level);
     await client.query('COMMIT');
 
     const buyer = u.username ? `@${u.username}` : (u.first_name || `ID ${u.telegram_id}`);
     notifyAdmins(`🛒 PEMBELIAN BARU!\n\n👤 User: ${buyer}\n📦 Item: ${flower.emoji} ${flower.name}\n🔢 Jumlah: ${quantity}\n💰 Total: ${total} coins\n\n🕐 ${new Date().toLocaleString('id-ID', { timeZone: 'Asia/Jakarta' })}`).catch(() => { });
-    res.json({ flower, quantity, price, total });
+    res.json({ flower, quantity, price, total, xp: 3 * quantity, level: xpResult.level, leveledUp: xpResult.leveledUp });
   } catch (e) {
     await client.query('ROLLBACK'); res.status(400).json({ error: e.message });
   } finally { client.release(); }
