@@ -16,6 +16,7 @@ router.get('/collection', async (req, res) => {
         f.emoji,
         f.rarity,
         f.is_special,
+        f.is_full_bouquet,
         uf.quantity
       FROM user_flowers uf
       JOIN flowers f ON f.id = uf.flower_id
