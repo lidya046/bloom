@@ -3451,9 +3451,40 @@
             }).join('');
         }
 
+        async function openBouquetFromDeepLink() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const bouquetId = params.get('bouquet');
+                if (!bouquetId || !/^\\d+$/.test(bouquetId)) return;
+
+                const bouquet = receivedBouquets.find(
+                    x => Number(x.id) === Number(bouquetId)
+                );
+
+                if (!bouquet) {
+                    toast('Bouquet tidak ditemukan atau bukan bouquet untukmu 💌');
+                    return;
+                }
+
+                try {
+                    localStorage.setItem(receivedStorageKey(), String(bouquet.id));
+                } catch (_) { }
+
+                openReceivedBouquet(bouquet.id);
+
+                // Bersihkan query dari address bar setelah bouquet dibuka,
+                // tanpa reload atau mengubah halaman Bloom.
+                try {
+                    const cleanUrl = window.location.pathname + window.location.hash;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                } catch (_) { }
+            } catch (_) { }
+        }
+
         async function loadReceived() {
             try {
                 await fetchReceived({ popup: false });
+                await openBouquetFromDeepLink();
             } catch (e) { toast(e.message); }
         }
 
