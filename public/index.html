@@ -3042,7 +3042,26 @@
         }
 
         function changeBouquetQty(flowerId, delta) {
-            setBouquetQty(flowerId, getBouquetQty(flowerId) + delta);
+            const flower = state.flowers.find(f => Number(f.id) === Number(flowerId));
+            const nextQty = getBouquetQty(flowerId) + delta;
+
+            if (delta > 0 && flower && isFullBouquetFlower(flower)) {
+                bouquetItems = {};
+                setBouquetQty(flowerId, Math.min(1, nextQty));
+                renderBouquetBuilder();
+                return;
+            }
+
+            if (delta > 0 && flower && Object.entries(bouquetItems).some(([id, qty]) => {
+                if (Number(id) === Number(flowerId) || Number(qty) <= 0) return false;
+                const selectedFlower = state.flowers.find(f => Number(f.id) === Number(id));
+                return isFullBouquetFlower(selectedFlower);
+            })) {
+                toast('Celestial Bloom dikirim sebagai bouquet khusus 🌌');
+                return;
+            }
+
+            setBouquetQty(flowerId, nextQty);
         }
 
         function initBouquet() {
@@ -3072,6 +3091,10 @@
                     btn.classList.toggle('selected', btn.dataset.value === bouquetCustom[type]);
                 });
             });
+        }
+
+        function isFullBouquetFlower(flower) {
+            return Boolean(flower?.is_full_bouquet);
         }
 
         function renderBouquetBuilder() {
@@ -3142,7 +3165,11 @@
             const preview = document.getElementById('bouquetEmoji');
             const text = document.getElementById('bouquetText');
             if (!preview || !text) return;
-            const flowers = buildBouquetFlowers();
+            let flowers = buildBouquetFlowers();
+            const fullBouquetFlower = flowers.find(isFullBouquetFlower);
+            if (fullBouquetFlower) {
+                flowers = Array.from({ length: 12 }, () => fullBouquetFlower);
+            }
             const total = flowers.length;
 
             if (!total) {
@@ -3239,8 +3266,12 @@
         }
 
         function renderReceivedMiniBouquet(items, custom = {}) {
-            const flowers = [];
+            let flowers = [];
             receivedFlowerList(items).forEach(({ flower, quantity }) => {
+                if (isFullBouquetFlower(flower)) {
+                    flowers = Array.from({ length: 12 }, () => flower);
+                    return;
+                }
                 for (let i = 0; i < Math.min(quantity, 12); i++) flowers.push(flower);
             });
             if (!flowers.length) return '<div class="bouquet-empty">💐 Bouquet</div>';
