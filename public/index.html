@@ -851,292 +851,6 @@
             transform-origin: center;
         }
 
-        .received-message {
-            color: #62566a;
-            font-size: 13px;
-            line-height: 1.45;
-        }
-
-        /* Bouquet opening popup */
-        .gift-overlay {
-            position: fixed;
-            inset: 0;
-            background: rgba(54, 40, 61, .58);
-            display: none;
-            align-items: center;
-            justify-content: center;
-            padding: 14px;
-            z-index: 50;
-            backdrop-filter: blur(8px);
-        }
-
-        .gift-overlay.show {
-            display: flex;
-            animation: giftFade .2s ease-out;
-        }
-
-        .gift-modal {
-            position: relative;
-            width: min(430px, 100%);
-            max-height: calc(100vh - 28px);
-            overflow: auto;
-            background: linear-gradient(180deg, #fffdfd 0%, #fff8fd 58%, #fffdfd 100%);
-            border: 1px solid rgba(231, 210, 235, .95);
-            border-radius: 30px;
-            padding: 18px 18px 20px;
-            box-shadow: 0 24px 80px rgba(40, 24, 48, .36), 0 0 0 1px rgba(255, 255, 255, .55) inset;
-            animation: giftPop .3s cubic-bezier(.2, .8, .2, 1);
-        }
-
-        .gift-modal::before,
-        .gift-modal::after {
-            content: '🌸';
-            position: absolute;
-            font-size: 25px;
-            opacity: .9;
-            pointer-events: none;
-        }
-
-        .gift-modal::before {
-            top: 10px;
-            left: 18px;
-            transform: rotate(-12deg);
-        }
-
-        .gift-modal::after {
-            top: 10px;
-            right: 58px;
-            transform: rotate(10deg);
-        }
-
-        .gift-close {
-            position: absolute;
-            top: 13px;
-            right: 13px;
-            z-index: 2;
-            width: 38px;
-            height: 38px;
-            border-radius: 50%;
-            border: 1px solid #f1d8e9;
-            background: linear-gradient(135deg, #fff1f8, #f6eaff);
-            color: #866b8d;
-            font-size: 24px;
-            line-height: 1;
-            padding: 0;
-            box-shadow: 0 4px 12px rgba(100, 60, 110, .08);
-        }
-
-        .gift-title {
-            text-align: center;
-            font-size: 23px;
-            font-weight: 900;
-            color: #76517d;
-            letter-spacing: .1px;
-            padding: 3px 48px 0;
-        }
-
-        .gift-title .gift-title-flower {
-            font-size: 17px;
-            vertical-align: 2px;
-            margin: 0 4px;
-        }
-
-        .gift-from {
-            display: none;
-        }
-
-        .gift-bouquet-stage {
-            position: relative;
-            height: 280px;
-            margin: 14px 0 16px;
-            overflow: hidden;
-            border-radius: 25px;
-            background:
-                radial-gradient(circle at 50% 42%, rgba(255, 255, 255, .95) 0 13%, rgba(255, 255, 255, 0) 48%),
-                linear-gradient(135deg, #fff0f7 0%, #f7efff 100%);
-            border: 1px solid rgba(239, 221, 242, .9);
-        }
-
-        .gift-bouquet-stage::before,
-        .gift-bouquet-stage::after {
-            content: '✦';
-            position: absolute;
-            color: #d4bfdc;
-            font-size: 15px;
-            animation: giftSparkle 2s ease-in-out infinite;
-            z-index: 1;
-        }
-
-        .gift-bouquet-stage::before {
-            top: 36px;
-            left: 28%;
-        }
-
-        .gift-bouquet-stage::after {
-            top: 62px;
-            right: 23%;
-            animation-delay: .8s;
-        }
-
-        .gift-bouquet-stage .bouquet-canvas {
-            height: 100%;
-            min-height: 0;
-            padding-bottom: 28px;
-        }
-
-        .gift-bouquet-stage .bouquet-flower {
-            width: 58px;
-            height: 58px;
-            font-size: 48px;
-            z-index: 2;
-        }
-
-        .gift-bouquet-stage .bouquet-stem {
-            height: 82px;
-            bottom: -50px;
-        }
-
-        .gift-bouquet-stage .bouquet-wrap {
-            bottom: 0;
-        }
-
-        .gift-bouquet-stage .bouquet-ribbon {
-            bottom: 22px;
-        }
-
-        .gift-sender-box {
-            display: flex;
-            align-items: center;
-            gap: 11px;
-            background: linear-gradient(135deg, #fff0f8, #f9efff);
-            border: 1px solid #f0dfef;
-            border-radius: 20px;
-            padding: 11px 13px;
-            margin-bottom: 10px;
-        }
-
-        .gift-sender-avatar {
-            width: 45px;
-            height: 45px;
-            flex: 0 0 auto;
-            border-radius: 50%;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            background: linear-gradient(135deg, #ffe4ef, #e9ddff);
-            font-size: 23px;
-            border: 2px solid #fff;
-            box-shadow: 0 3px 10px rgba(120, 70, 130, .08);
-        }
-
-        .gift-sender-info {
-            min-width: 0;
-            flex: 1;
-        }
-
-        .gift-sender-name {
-            color: #79547f;
-            font-size: 17px;
-            font-weight: 900;
-        }
-
-        .gift-sender-meta {
-            color: #a18da7;
-            font-size: 12px;
-            margin-top: 2px;
-        }
-
-        .gift-message {
-            position: relative;
-            background: rgba(255, 250, 255, .92);
-            border: 1px solid #f0e1f1;
-            border-radius: 18px;
-            padding: 12px 15px;
-            color: #66566c;
-            line-height: 1.5;
-            font-size: 14px;
-            margin-bottom: 11px;
-            text-align: center;
-            font-style: italic;
-        }
-
-        .gift-message:empty {
-            display: none;
-        }
-
-        .gift-items {
-            display: flex;
-            flex-wrap: wrap;
-            gap: 6px;
-            justify-content: center;
-            color: #8b7891;
-            font-size: 11px;
-            margin: 0 0 14px;
-        }
-
-        .gift-item-pill {
-            background: #f7edf8;
-            border: 1px solid #eee0f0;
-            border-radius: 999px;
-            padding: 5px 9px;
-        }
-
-        .gift-divider {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-            margin: 4px 22px 15px;
-            color: #e1c4dd;
-            font-size: 14px;
-        }
-
-        .gift-divider::before,
-        .gift-divider::after {
-            content: '';
-            height: 1px;
-            flex: 1;
-            background: linear-gradient(90deg, transparent, #e3c9df);
-        }
-
-        .gift-divider::after {
-            background: linear-gradient(90deg, #e3c9df, transparent);
-        }
-
-        .gift-divider span {
-            line-height: 1;
-        }
-
-        .gift-primary {
-            width: 100%;
-            border: 0;
-            border-radius: 999px;
-            padding: 13px 20px;
-            background: linear-gradient(135deg, #f49ac8, #df72b2);
-            color: #fff;
-            font-size: 15px;
-            font-weight: 900;
-            box-shadow: 0 9px 22px rgba(221, 107, 173, .24), inset 0 1px 0 rgba(255, 255, 255, .45);
-            transition: transform .15s ease;
-        }
-
-        .gift-primary:active {
-            transform: scale(.98);
-        }
-
-        @keyframes giftSparkle {
-
-            0%,
-            100% {
-                opacity: .35;
-                transform: scale(.75) rotate(0deg);
-            }
-
-            50% {
-                opacity: 1;
-                transform: scale(1.15) rotate(12deg);
-            }
-        }
-
         #giftOverlay.show #giftBouquetStage .bouquet-flower {
             opacity: 0;
             transform: translateY(28px) scale(.35);
@@ -1206,6 +920,464 @@
                 opacity: 1;
                 transform: translateY(0) scale(1);
             }
+        }
+
+        .received-message {
+            color: #62566a;
+            font-size: 13px;
+            line-height: 1.45;
+        }
+
+        .gift-overlay {
+            position: fixed;
+            inset: 0;
+            background: rgba(40, 27, 46, .62);
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 18px;
+            z-index: 50;
+            backdrop-filter: blur(5px);
+        }
+
+        .gift-overlay.show {
+            display: flex;
+            animation: giftFade .2s ease-out;
+        }
+
+        .gift-modal {
+            width: min(440px, 100%);
+            max-height: calc(100vh - 36px);
+            overflow: auto;
+            background: linear-gradient(180deg, #fff, #fff8fd);
+            border-radius: 28px;
+            padding: 18px;
+            box-shadow: 0 22px 70px rgba(30, 15, 40, .35);
+            animation: giftPop .28s cubic-bezier(.2, .8, .2, 1);
+        }
+
+        .gift-close {
+            float: right;
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+            background: #f3ebf7;
+            color: #66556d;
+            font-size: 20px;
+            padding: 0;
+        }
+
+        .gift-title {
+            text-align: center;
+            font-size: 20px;
+            font-weight: 900;
+            color: #392b40;
+            padding: 4px 30px 0;
+        }
+
+        .gift-from {
+            text-align: center;
+            color: #806c88;
+            font-size: 13px;
+            margin-top: 4px;
+        }
+
+        .gift-bouquet-stage {
+            position: relative;
+            height: 260px;
+            margin: 14px 0;
+            overflow: hidden;
+            border-radius: 24px;
+            background: linear-gradient(135deg, #fff0f7, #f4efff);
+        }
+
+        .gift-bouquet-stage .bouquet-canvas {
+            height: 100%;
+            min-height: 0;
+            padding-bottom: 28px;
+        }
+
+        .gift-bouquet-stage .bouquet-flower {
+            width: 58px;
+            height: 58px;
+            font-size: 48px;
+        }
+
+        .gift-bouquet-stage .bouquet-stem {
+            height: 68px;
+            bottom: -46px;
+        }
+
+        .gift-message {
+            background: #fff;
+            border: 1px solid #eee2f2;
+            border-radius: 17px;
+            padding: 12px 14px;
+            color: #4e4354;
+            line-height: 1.5;
+            font-size: 14px;
+            margin-bottom: 12px;
+        }
+
+        .gift-items {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 6px;
+            justify-content: center;
+            color: #786a7d;
+            font-size: 12px;
+            margin-bottom: 12px;
+        }
+
+        .gift-item-pill {
+            background: #f5edf8;
+            border-radius: 999px;
+            padding: 5px 9px;
+        }
+
+        @keyframes giftPop {
+            from {
+                opacity: 0;
+                transform: scale(.9) translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: scale(1) translateY(0);
+            }
+        }
+
+        @keyframes giftFade {
+            from {
+                opacity: 0;
+            }
+
+            to {
+                opacity: 1;
+            }
+        }
+
+
+        input,
+        textarea,
+        select {
+            width: 100%;
+
+            border:
+                1px solid #eadff0;
+
+            background: white;
+
+            border-radius: 14px;
+
+            padding: 12px;
+
+            font: inherit;
+            outline: none;
+
+            margin-top: 7px;
+        }
+
+        textarea {
+            min-height: 90px;
+            resize: vertical;
+        }
+
+        label {
+            display: block;
+            font-size: 13px;
+            font-weight: 700;
+            margin-top: 14px;
+        }
+
+        .empty {
+            text-align: center;
+            padding: 35px 15px;
+            color: #918394;
+
+            background: white;
+            border-radius: 18px;
+        }
+
+        .nav {
+            position: fixed;
+
+            bottom: 10px;
+            left: 50%;
+
+            transform: translateX(-50%);
+
+            width:
+                min(490px,
+                    calc(100% - 22px));
+
+            background:
+                rgba(255, 255, 255, .94);
+
+            backdrop-filter: blur(10px);
+
+            border-radius: 20px;
+
+            padding: 7px;
+
+            display: grid;
+            grid-template-columns:
+                repeat(3, 1fr);
+
+            box-shadow:
+                0 7px 30px rgba(60, 40, 70, .16);
+        }
+
+        .nav button {
+            background: transparent;
+            padding: 9px 5px;
+            border-radius: 14px;
+
+            color: #89798f;
+            font-size: 12px;
+        }
+
+        .nav button.active {
+            background: #f0e9ff;
+            color: #7145c8;
+            font-weight: 700;
+        }
+
+        .toast {
+            position: fixed;
+
+            top: 18px;
+            left: 50%;
+
+            transform:
+                translateX(-50%);
+
+            background: #33283a;
+            color: white;
+
+            padding: 10px 16px;
+
+            border-radius: 12px;
+
+            opacity: 0;
+            pointer-events: none;
+
+            transition: opacity .2s;
+
+            z-index: 10;
+
+            font-size: 13px;
+        }
+
+        .toast.show {
+            opacity: 1;
+        }
+
+        .loading {
+            opacity: .6;
+            pointer-events: none;
+        }
+
+        .special-flower {
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(139, 92, 246, .22);
+            background: linear-gradient(135deg, #fff, #fbf7ff 55%, #fff7fb);
+        }
+
+        .special-flower::before {
+            content: '';
+            position: absolute;
+            inset: -60%;
+            background: conic-gradient(from 0deg, transparent, rgba(255, 255, 255, .85), transparent 28%);
+            animation: specialSweep 4s linear infinite;
+            pointer-events: none;
+        }
+
+        .special-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .special-icon {
+            font-size: 38px;
+            filter: drop-shadow(0 0 10px rgba(168, 85, 247, .55));
+            animation: specialFloat 2.8s ease-in-out infinite;
+        }
+
+        /* Celestial Bloom uses a transparent artwork asset instead of the square emoji. */
+        .celestial-visual {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 46px;
+            height: 46px;
+            flex: 0 0 46px;
+            filter: drop-shadow(0 0 10px rgba(139, 92, 246, .55));
+            animation: celestialBloomFloat 3.2s ease-in-out infinite;
+        }
+
+        .celestial-visual img {
+            display: block;
+            width: 100%;
+            height: 100%;
+            object-fit: contain;
+        }
+
+        .shop-item .shop-top .celestial-visual {
+            width: 52px;
+            height: 52px;
+            flex-basis: 52px;
+        }
+
+        .bouquet-flower-icon .celestial-visual {
+            width: 42px;
+            height: 42px;
+            margin: -4px auto;
+        }
+
+        .bouquet-flower .celestial-visual {
+            position: relative;
+            z-index: 2;
+            width: 62px;
+            height: 62px;
+        }
+
+        .gift-bouquet-stage .bouquet-flower .celestial-visual {
+            width: 76px;
+            height: 76px;
+        }
+
+        .gift-item-pill .celestial-visual {
+            width: 20px;
+            height: 20px;
+            flex-basis: 20px;
+            vertical-align: middle;
+            margin: -3px 2px -3px 0;
+            animation: none;
+        }
+
+        @keyframes celestialBloomFloat {
+
+            0%,
+            100% {
+                transform: translateY(0) rotate(-1deg);
+            }
+
+            50% {
+                transform: translateY(-4px) rotate(1deg) scale(1.03);
+            }
+        }
+
+        .special-badge {
+            display: inline-block;
+            margin-top: 4px;
+            padding: 3px 7px;
+            border-radius: 999px;
+            background: #f1e7ff;
+            color: #7541c8;
+            font-size: 9px;
+            font-weight: 800;
+            letter-spacing: .5px;
+            text-transform: uppercase;
+        }
+
+        .special-price {
+            font-weight: 900;
+            color: #7041c7;
+            white-space: nowrap;
+            font-size: 15px;
+        }
+
+        /* Shop cards: compact and responsive on Telegram's narrow viewport */
+        .shop-grid {
+            display: grid;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 12px;
+            width: 100%;
+        }
+
+        .shop-item {
+            min-width: 0;
+            min-height: 205px;
+            padding: 14px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+            overflow: hidden;
+        }
+
+        .shop-item .special-content {
+            min-width: 0;
+            width: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: stretch;
+            gap: 8px;
+        }
+
+        .shop-item .shop-top {
+            display: flex;
+            align-items: flex-start;
+            gap: 9px;
+            min-width: 0;
+        }
+
+        .shop-item .shop-top .special-icon,
+        .shop-item .shop-top .flower-icon {
+            flex: 0 0 42px;
+            width: 42px;
+            height: 42px;
+            display: grid;
+            place-items: center;
+            font-size: 34px;
+            line-height: 1;
+        }
+
+        .shop-item .flower-info {
+            min-width: 0;
+            flex: 1;
+        }
+
+        .shop-item .flower-name {
+            line-height: 1.2;
+            overflow-wrap: anywhere;
+        }
+
+        .shop-item .rarity {
+            margin-top: 3px;
+            line-height: 1.35;
+            overflow-wrap: anywhere;
+        }
+
+        .shop-item .special-badge {
+            max-width: 100%;
+            white-space: normal;
+            line-height: 1.15;
+        }
+
+        .shop-bottom {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            gap: 8px;
+            margin-top: 8px;
+        }
+
+        .shop-bottom .special-price {
+            min-width: 0;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .shop-buy {
+            flex: 0 0 auto;
+            width: auto !important;
+            min-width: 58px;
+            margin: 0 !important;
+            padding: 8px 12px !important;
+            border-radius: 12px !important;
+            font-size: 12px;
         }
 
         @media (max-width: 420px) {
@@ -1915,22 +2087,14 @@
 
     <div id="giftOverlay" class="gift-overlay" onclick="closeGiftPopup(event)">
         <div class="gift-modal" onclick="event.stopPropagation()">
-            <button class="gift-close" type="button" aria-label="Tutup" onclick="closeGiftPopup()">×</button>
-            <div class="gift-title"><span class="gift-title-flower">🌸</span> Bouquet <span
-                    class="gift-title-flower">🌸</span></div>
+            <button class="gift-close" type="button" onclick="closeGiftPopup()">×</button>
+            <div class="gift-title">💌 Kamu menerima bouquet!</div>
             <div id="giftFrom" class="gift-from">Seseorang mengirim bunga untukmu</div>
             <div id="giftBouquetStage" class="gift-bouquet-stage"></div>
-            <div class="gift-sender-box">
-                <div class="gift-sender-avatar">💌</div>
-                <div class="gift-sender-info">
-                    <div id="giftSenderName" class="gift-sender-name">Dari seseorang 💕</div>
-                    <div id="giftSenderMeta" class="gift-sender-meta">1 bunga • Dikirim hari ini</div>
-                </div>
-            </div>
-            <div id="giftMessage" class="gift-message"></div>
             <div id="giftItems" class="gift-items"></div>
-            <div class="gift-divider"><span>🌸</span></div>
-            <button class="gift-primary" type="button" onclick="closeGiftPopup(); showPage('received')">✨ Tutup</button>
+            <div id="giftMessage" class="gift-message"></div>
+            <button class="primary" type="button" onclick="closeGiftPopup(); showPage('received')">💐 Lihat di
+                Received</button>
         </div>
     </div>
 
@@ -3210,10 +3374,7 @@
             const b = receivedBouquets.find(x => Number(x.id) === Number(bouquetId));
             if (!b) return;
             const sender = b.sender_first_name || (b.sender_username ? `@${b.sender_username}` : 'Teman');
-            const total = (b.items || []).reduce((sum, x) => sum + Number(x.quantity || 0), 0);
             document.getElementById('giftFrom').textContent = `Dari ${sender} 💕`;
-            document.getElementById('giftSenderName').textContent = `Dari ${sender} 💕`;
-            document.getElementById('giftSenderMeta').textContent = `${total || 1} bunga • Dikirim hari ini`;
             const giftStage = document.getElementById('giftBouquetStage');
             giftStage.innerHTML = '';
             requestAnimationFrame(() => {
@@ -3222,7 +3383,7 @@
             document.getElementById('giftItems').innerHTML = receivedFlowerList(b.items || []).map(({ flower, quantity }) =>
                 `<span class="gift-item-pill">${flowerVisual(flower)} ${flower.name} ×${quantity}</span>`
             ).join('');
-            document.getElementById('giftMessage').textContent = b.message || 'Untuk kamu 🌷';
+            document.getElementById('giftMessage').textContent = b.message || 'Untukmu, dengan sayang 🌷';
             document.getElementById('giftOverlay').classList.add('show');
             document.body.style.overflow = 'hidden';
             try { localStorage.setItem(receivedStorageKey(), String(Math.max(Number(localStorage.getItem(receivedStorageKey()) || 0), Number(b.id) || 0))); } catch (_) { }
@@ -3290,9 +3451,40 @@
             }).join('');
         }
 
+        async function openBouquetFromDeepLink() {
+            try {
+                const params = new URLSearchParams(window.location.search);
+                const bouquetId = params.get('bouquet');
+                if (!bouquetId || !/^\\d+$/.test(bouquetId)) return;
+
+                const bouquet = receivedBouquets.find(
+                    x => Number(x.id) === Number(bouquetId)
+                );
+
+                if (!bouquet) {
+                    toast('Bouquet tidak ditemukan atau bukan bouquet untukmu 💌');
+                    return;
+                }
+
+                try {
+                    localStorage.setItem(receivedStorageKey(), String(bouquet.id));
+                } catch (_) { }
+
+                openReceivedBouquet(bouquet.id);
+
+                // Bersihkan query dari address bar setelah bouquet dibuka,
+                // tanpa reload atau mengubah halaman Bloom.
+                try {
+                    const cleanUrl = window.location.pathname + window.location.hash;
+                    window.history.replaceState({}, document.title, cleanUrl);
+                } catch (_) { }
+            } catch (_) { }
+        }
+
         async function loadReceived() {
             try {
                 await fetchReceived({ popup: false });
+                await openBouquetFromDeepLink();
             } catch (e) { toast(e.message); }
         }
 
