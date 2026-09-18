@@ -84,8 +84,7 @@ async function sendStartMessage(chatId) {
         'dan kirim bouquet untuk orang tersayang 💐',
         '',
         'Mau kasih bouquet ke teman?',
-        'Pastiin dia udah join Bloom dan pencet /start',
-        'di bot ini dulu yaa! 🌸',
+        'Pastiin dia udah join Bloom dan pencet /start di bot ini yaa! 🌸',
         '',
         '🎮 Main Bloom sekarang!'
     ].join('\n');
