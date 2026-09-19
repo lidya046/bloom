@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { pool } from '../db.js';
-import { isAdminTelegramId, getAdminStats } from '../admin.js';
+import { isAdminTelegramId, getAdminRole, getAdminStats } from '../admin.js';
 
 const router = Router();
 
@@ -26,7 +26,7 @@ router.get('/stats', requireAdmin, async (_req, res) => {
 });
 
 router.get('/me', requireAdmin, async (req, res) => {
-    res.json({ isAdmin: true, telegramId: String(req.user.telegram_id) });
+    res.json({ isAdmin: true, role: getAdminRole(req.user.telegram_id) });
 });
 
 router.get('/user', requireAdmin, async (req, res) => {

@@ -14,6 +14,24 @@ Copy `.env.example` to `.env` and fill in:
 - DATABASE_URL
 - TELEGRAM_BOT_TOKEN (the token from BotFather; NEVER put this in frontend code)
 
+Admin Telegram IDs use numeric Telegram user IDs. Keep the existing variable for
+backward compatibility:
+
+```env
+ADMIN_TELEGRAM_IDS=OWNER_TELEGRAM_ID,STAFF_TELEGRAM_ID
+```
+
+When explicit role variables are needed, use:
+
+```env
+ADMIN_OWNER_TELEGRAM_ID=OWNER_TELEGRAM_ID
+ADMIN_STAFF_TELEGRAM_IDS=STAFF_TELEGRAM_ID
+```
+
+If explicit role variables are omitted, the first ID in `ADMIN_TELEGRAM_IDS`
+is the owner and the remaining IDs are staff admins. Staff admins can use the
+existing admin panel, adjust user Coins/Seeds, and approve or reject Coin orders.
+
 ## 3. Database
 
 Create a PostgreSQL database named `bloom`, then run `schema.sql`.

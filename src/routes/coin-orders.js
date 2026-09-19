@@ -1,6 +1,6 @@
 import { Router } from 'express';
 import { pool } from '../db.js';
-import { isAdminTelegramId } from '../admin.js';
+import { adminIds, isAdminTelegramId } from '../admin.js';
 
 const router = Router();
 
@@ -452,16 +452,11 @@ router.post('/', async (req, res) => {
 
     const token = process.env.TELEGRAM_BOT_TOKEN;
 
-    const adminIds = String(
-        process.env.ADMIN_TELEGRAM_IDS || ''
-    )
-        .split(',')
-        .map(x => x.trim())
-        .filter(Boolean);
+    const configuredAdminIds = adminIds();
 
     let notified = 0;
 
-    if (token && adminIds.length) {
+    if (token && configuredAdminIds.length) {
         const comma = proofImage.indexOf(',');
 
         const meta =
@@ -486,7 +481,7 @@ router.post('/', async (req, res) => {
             'base64'
         );
 
-        for (const chatId of adminIds) {
+        for (const chatId of configuredAdminIds) {
             try {
                 const form = new FormData();
 

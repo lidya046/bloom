@@ -1,14 +1,44 @@
 import { pool } from './db.js';
 
-function adminIds() {
-    return String(process.env.ADMIN_TELEGRAM_IDS || '')
+function parseIds(value) {
+    return String(value || '')
         .split(',')
         .map(v => v.trim())
         .filter(Boolean);
 }
 
+function legacyAdminIds() {
+    return parseIds(process.env.ADMIN_TELEGRAM_IDS);
+}
+
+export function adminIds() {
+    return [
+        ...legacyAdminIds(),
+        ...parseIds(process.env.ADMIN_OWNER_TELEGRAM_ID),
+        ...parseIds(process.env.ADMIN_STAFF_TELEGRAM_IDS)
+    ].filter((id, index, ids) => ids.indexOf(id) === index);
+}
+
+function ownerAdminId() {
+    return String(process.env.ADMIN_OWNER_TELEGRAM_ID || '').trim() || legacyAdminIds()[0] || '';
+}
+
+function staffAdminIds() {
+    const configuredStaff = parseIds(process.env.ADMIN_STAFF_TELEGRAM_IDS);
+    if (configuredStaff.length) return configuredStaff;
+    return adminIds().filter(id => id !== ownerAdminId());
+}
+
+export function getAdminRole(id) {
+    const telegramId = String(id ?? '');
+    if (!telegramId) return null;
+    if (telegramId === ownerAdminId()) return 'owner';
+    if (staffAdminIds().includes(telegramId)) return 'staff';
+    return null;
+}
+
 export function isAdminTelegramId(id) {
-    return adminIds().includes(String(id));
+    return getAdminRole(id) !== null;
 }
 
 export function adminIdsConfigured() {
