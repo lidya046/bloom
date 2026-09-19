@@ -780,14 +780,24 @@
 
         /* Received bouquet cards + gift popup */
         .received-card {
-            background: rgba(255, 255, 255, .94);
+            background: rgba(255, 255, 255, .96);
             border: 1px solid #eadff0;
             border-radius: 22px;
-            padding: 14px;
-            margin-bottom: 12px;
-            box-shadow: 0 8px 24px rgba(80, 50, 90, .08);
+            padding: 15px;
+            margin-bottom: 14px;
+            box-shadow: 0 4px 18px rgba(80, 50, 90, .07);
             cursor: pointer;
-            transition: transform .18s, box-shadow .18s;
+            user-select: none;
+            -webkit-tap-highlight-color: transparent;
+            transition: transform .15s ease, box-shadow .15s ease, border-color .15s ease;
+        }
+
+        @media (hover: hover) {
+            .received-card:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 8px 26px rgba(80, 50, 90, .11);
+                border-color: #d8bcf4;
+            }
         }
 
         .received-card:active {
@@ -819,13 +829,22 @@
 
         .received-sender b {
             display: block;
-            font-size: 17px;
+            font-size: 15px;
+            font-weight: 800;
+            color: #33283a;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
         }
 
         .received-hint {
             color: #8b7c91;
-            font-size: 11px;
+            font-size: 11.5px;
             margin-top: 2px;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            flex-wrap: wrap;
         }
 
         .received-new {
@@ -834,16 +853,20 @@
             font-size: 10px;
             font-weight: 800;
             border-radius: 999px;
-            padding: 4px 8px;
+            padding: 4px 9px;
+            letter-spacing: .4px;
+            flex-shrink: 0;
         }
 
         .received-mini-bouquet {
             position: relative;
             height: 108px;
-            margin: 10px 0 7px;
+            margin: 10px 0 8px;
             border-radius: 18px;
             overflow: hidden;
             background: linear-gradient(135deg, #fff, #fbf1ff);
+            border: 1px solid #f2e7f7;
+            pointer-events: none;
         }
 
         .received-mini-bouquet .bouquet-flower {
@@ -923,21 +946,46 @@
         }
 
         .received-message {
-            color: #62566a;
+            color: #594c61;
             font-size: 13px;
             line-height: 1.45;
+            background: #faf6fc;
+            border-radius: 12px;
+            padding: 9px 12px;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            border: 1px solid #f4ecf7;
+        }
+
+        .received-card-footer {
+            margin-top: 9px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-size: 11px;
+            color: #9d8ca5;
+        }
+
+        .received-open-hint {
+            color: #8b5cf6;
+            font-weight: 700;
+            font-size: 11.5px;
+            display: flex;
+            align-items: center;
+            gap: 2px;
         }
 
         .gift-overlay {
             position: fixed;
             inset: 0;
-            background: rgba(40, 27, 46, .62);
+            background: rgba(36, 22, 42, .65);
             display: none;
             align-items: center;
             justify-content: center;
-            padding: 18px;
-            z-index: 50;
-            backdrop-filter: blur(5px);
+            padding: 16px;
+            z-index: 999;
+            backdrop-filter: blur(6px);
+            -webkit-backdrop-filter: blur(6px);
         }
 
         .gift-overlay.show {
@@ -946,77 +994,107 @@
         }
 
         .gift-modal {
+            position: relative;
             width: min(440px, 100%);
-            max-height: calc(100vh - 36px);
-            overflow: auto;
-            background: linear-gradient(180deg, #fff, #fff8fd);
-            border-radius: 28px;
+            max-height: calc(100vh - 32px);
+            max-height: calc(100dvh - 32px);
+            overflow-y: auto;
+            -webkit-overflow-scrolling: touch;
+            background: linear-gradient(180deg, #ffffff 0%, #fff7fc 100%);
+            border: 1px solid #ebdff0;
+            border-radius: 26px;
             padding: 18px;
-            box-shadow: 0 22px 70px rgba(30, 15, 40, .35);
+            box-shadow: 0 20px 60px rgba(35, 15, 45, .32);
             animation: giftPop .28s cubic-bezier(.2, .8, .2, 1);
         }
 
         .gift-close {
-            float: right;
-            width: 34px;
-            height: 34px;
+            position: absolute;
+            top: 14px;
+            right: 14px;
+            width: 32px;
+            height: 32px;
             border-radius: 50%;
             background: #f3ebf7;
             color: #66556d;
             font-size: 20px;
+            line-height: 1;
             padding: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 700;
+            z-index: 5;
+            transition: background .15s, transform .15s;
+        }
+
+        .gift-close:hover {
+            background: #eadef2;
         }
 
         .gift-title {
             text-align: center;
-            font-size: 20px;
+            font-size: 19px;
             font-weight: 900;
             color: #392b40;
-            padding: 4px 30px 0;
+            padding: 2px 34px 0;
         }
 
         .gift-from {
             text-align: center;
-            color: #806c88;
-            font-size: 13px;
+            color: #7b6684;
+            font-size: 13.5px;
+            font-weight: 700;
             margin-top: 4px;
+        }
+
+        .gift-date {
+            text-align: center;
+            color: #9d8ca5;
+            font-size: 11.5px;
+            font-weight: 600;
+            margin-top: 3px;
         }
 
         .gift-bouquet-stage {
             position: relative;
-            height: 260px;
-            margin: 14px 0;
+            height: 230px;
+            margin: 12px 0;
             overflow: hidden;
-            border-radius: 24px;
+            border-radius: 22px;
             background: linear-gradient(135deg, #fff0f7, #f4efff);
+            border: 1px solid #f0e2f5;
         }
 
         .gift-bouquet-stage .bouquet-canvas {
             height: 100%;
             min-height: 0;
-            padding-bottom: 28px;
+            padding-bottom: 24px;
         }
 
         .gift-bouquet-stage .bouquet-flower {
-            width: 58px;
-            height: 58px;
-            font-size: 48px;
+            width: 56px;
+            height: 56px;
+            font-size: 46px;
         }
 
         .gift-bouquet-stage .bouquet-stem {
-            height: 68px;
-            bottom: -46px;
+            height: 64px;
+            bottom: -44px;
         }
 
         .gift-message {
-            background: #fff;
+            background: #ffffff;
             border: 1px solid #eee2f2;
-            border-radius: 17px;
+            border-radius: 16px;
             padding: 12px 14px;
             color: #4e4354;
             line-height: 1.5;
-            font-size: 14px;
+            font-size: 13.5px;
             margin-bottom: 12px;
+            word-break: break-word;
+            overflow-wrap: break-word;
+            box-shadow: inset 0 2px 6px rgba(120, 80, 130, .02);
         }
 
         .gift-items {
@@ -1026,13 +1104,35 @@
             justify-content: center;
             color: #786a7d;
             font-size: 12px;
+            font-weight: 600;
             margin-bottom: 12px;
         }
 
         .gift-item-pill {
             background: #f5edf8;
+            border: 1px solid #eedef3;
             border-radius: 999px;
-            padding: 5px 9px;
+            padding: 5px 10px;
+            display: inline-flex;
+            align-items: center;
+            gap: 4px;
+        }
+
+        .gift-close-btn {
+            width: 100%;
+            background: #8b5cf6;
+            color: white;
+            padding: 13px;
+            border-radius: 14px;
+            font-weight: 700;
+            font-size: 14px;
+            margin-top: 4px;
+            box-shadow: 0 4px 14px rgba(139, 92, 246, .25);
+            transition: transform .12s, background .12s;
+        }
+
+        .gift-close-btn:hover {
+            background: #7c4ee4;
         }
 
         @keyframes giftPop {
@@ -2087,14 +2187,14 @@
 
     <div id="giftOverlay" class="gift-overlay" onclick="closeGiftPopup(event)">
         <div class="gift-modal" onclick="event.stopPropagation()">
-            <button class="gift-close" type="button" onclick="closeGiftPopup()">×</button>
-            <div class="gift-title">💌 Kamu menerima bouquet!</div>
+            <button class="gift-close" type="button" onclick="closeGiftPopup()" aria-label="Tutup">×</button>
+            <div class="gift-title">💌 Bouquet untukmu!</div>
             <div id="giftFrom" class="gift-from">Seseorang mengirim bunga untukmu</div>
+            <div id="giftDate" class="gift-date" style="display:none"></div>
             <div id="giftBouquetStage" class="gift-bouquet-stage"></div>
             <div id="giftItems" class="gift-items"></div>
             <div id="giftMessage" class="gift-message"></div>
-            <button class="primary" type="button" onclick="closeGiftPopup(); showPage('received')">💐 Lihat di
-                Received</button>
+            <button class="gift-close-btn" type="button" onclick="closeGiftPopup()">Tutup</button>
         </div>
     </div>
 
@@ -3375,6 +3475,22 @@
             if (!b) return;
             const sender = b.sender_first_name || (b.sender_username ? `@${b.sender_username}` : 'Teman');
             document.getElementById('giftFrom').textContent = `Dari ${sender} 💕`;
+
+            const dateEl = document.getElementById('giftDate');
+            if (dateEl) {
+                if (b.created_at) {
+                    try {
+                        const d = new Date(b.created_at);
+                        dateEl.textContent = `📅 ${d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
+                        dateEl.style.display = 'block';
+                    } catch (_) {
+                        dateEl.style.display = 'none';
+                    }
+                } else {
+                    dateEl.style.display = 'none';
+                }
+            }
+
             const giftStage = document.getElementById('giftBouquetStage');
             giftStage.innerHTML = '';
             requestAnimationFrame(() => {
@@ -3390,7 +3506,7 @@
         }
 
         function closeGiftPopup(event) {
-            if (event && event.target && event.target.id !== 'giftOverlay') return;
+            if (event && event.target && event.target !== document.getElementById('giftOverlay') && !event.target.closest('.gift-close') && !event.target.closest('.gift-close-btn')) return;
             const overlay = document.getElementById('giftOverlay');
             if (overlay) overlay.classList.remove('show');
             document.body.style.overflow = '';
@@ -3439,14 +3555,31 @@
                 const sender = b.sender_first_name || (b.sender_username ? `@${b.sender_username}` : 'Teman');
                 const total = (b.items || []).reduce((sum, x) => sum + Number(x.quantity || 0), 0);
                 const isNew = Number(b.id) > lastSeen;
-                return `<div class="received-card" onclick="openReceivedBouquet(${Number(b.id)})">
+                let dateStr = '';
+                if (b.created_at) {
+                    try {
+                        const d = new Date(b.created_at);
+                        dateStr = d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
+                    } catch (_) { }
+                }
+                return `<div class="received-card" onclick="openReceivedBouquet(${Number(b.id)})" role="button" tabindex="0">
                     <div class="received-card-top">
                         <div class="received-avatar">💌</div>
-                        <div class="received-sender"><b>Dari ${sender}</b><div class="received-hint">${total} bunga • Ketuk untuk membuka bouquet ✨</div></div>
+                        <div class="received-sender">
+                            <b>Dari ${sender}</b>
+                            <div class="received-hint">
+                                <span>${total} bunga</span>
+                                ${dateStr ? `<span>• ${dateStr}</span>` : ''}
+                            </div>
+                        </div>
                         ${isNew ? '<span class="received-new">BARU</span>' : ''}
                     </div>
-                    <div class="received-mini-bouquet" onclick="openReceivedBouquet(${Number(b.id)})">${renderReceivedMiniBouquet(b.items || [], b)}</div>
+                    <div class="received-mini-bouquet">${renderReceivedMiniBouquet(b.items || [], b)}</div>
                     <div class="received-message">${b.message || 'Untukmu, dengan sayang 🌷'}</div>
+                    <div class="received-card-footer">
+                        <span>💌 Tap untuk buka</span>
+                        <span class="received-open-hint">Buka Bouquet ✨</span>
+                    </div>
                 </div>`;
             }).join('');
         }
