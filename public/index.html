@@ -1323,15 +1323,22 @@
         .bouquet-flower .celestial-visual {
             position: relative;
             z-index: 2;
-            width: 48px;
-            height: 48px;
-            filter: drop-shadow(0 0 10px rgba(168, 85, 247, .65));
+            width: 72px;
+            height: 72px;
+            filter: drop-shadow(0 0 14px rgba(168, 85, 247, .85)) drop-shadow(0 0 28px rgba(139, 92, 246, .5));
+            animation: celestialBloomFloat 3.6s ease-in-out infinite;
         }
 
         .gift-bouquet-stage .bouquet-flower .celestial-visual {
-            width: 48px;
-            height: 48px;
-            filter: drop-shadow(0 0 10px rgba(168, 85, 247, .65));
+            width: 72px;
+            height: 72px;
+            filter: drop-shadow(0 0 14px rgba(168, 85, 247, .85)) drop-shadow(0 0 28px rgba(139, 92, 246, .5));
+            animation: celestialBloomFloat 3.6s ease-in-out infinite;
+        }
+
+        .received-mini-bouquet .bouquet-flower .celestial-visual {
+            width: 52px;
+            height: 52px;
         }
 
         .gift-item-pill .celestial-visual {
@@ -1347,11 +1354,13 @@
 
             0%,
             100% {
-                transform: translateY(0) rotate(-1deg);
+                transform: translateY(0) rotate(-2deg) scale(1);
+                filter: drop-shadow(0 0 12px rgba(168, 85, 247, .75)) drop-shadow(0 0 22px rgba(139, 92, 246, .4));
             }
 
             50% {
-                transform: translateY(-4px) rotate(1deg) scale(1.03);
+                transform: translateY(-5px) rotate(2deg) scale(1.06);
+                filter: drop-shadow(0 0 20px rgba(192, 132, 252, .95)) drop-shadow(0 0 34px rgba(168, 85, 247, .65));
             }
         }
 
@@ -3344,7 +3353,7 @@
             let flowers = buildBouquetFlowers();
             const fullBouquetFlower = flowers.find(isFullBouquetFlower);
             if (fullBouquetFlower) {
-                flowers = Array.from({ length: 7 }, () => fullBouquetFlower);
+                flowers = Array.from({ length: 3 }, () => fullBouquetFlower);
             }
             const total = flowers.length;
 
@@ -3455,7 +3464,7 @@
             let flowers = [];
             receivedFlowerList(items).forEach(({ flower, quantity }) => {
                 if (isFullBouquetFlower(flower)) {
-                    flowers = Array.from({ length: 7 }, () => flower);
+                    flowers = Array.from({ length: 3 }, () => flower);
                     return;
                 }
                 for (let i = 0; i < Math.min(quantity, 12); i++) flowers.push(flower);
