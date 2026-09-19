@@ -1297,7 +1297,7 @@
             width: 46px;
             height: 46px;
             flex: 0 0 46px;
-            filter: drop-shadow(0 0 10px rgba(139, 92, 246, .55));
+            filter: drop-shadow(0 2px 6px rgba(168, 85, 247, .3));
             animation: celestialBloomFloat 3.2s ease-in-out infinite;
         }
 
@@ -1323,52 +1323,52 @@
         .bouquet-flower .celestial-visual {
             position: relative;
             z-index: 2;
-            width: 96px;
-            height: 96px;
-            filter: drop-shadow(0 0 16px rgba(168, 85, 247, .9)) drop-shadow(0 0 32px rgba(139, 92, 246, .6)) drop-shadow(0 0 48px rgba(192, 132, 252, .35));
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 4px 10px rgba(168, 85, 247, .25)) drop-shadow(0 0 14px rgba(216, 180, 254, .35));
             animation: celestialBloomFloat 3.8s ease-in-out infinite;
         }
 
         .bouquet-flower:has(.celestial-visual)::before {
             content: '';
             position: absolute;
-            width: 120px;
-            height: 120px;
+            width: 110px;
+            height: 110px;
             left: 50%;
-            top: 50%;
+            top: 45%;
             transform: translate(-50%, -50%);
             border-radius: 50%;
-            background: radial-gradient(circle, rgba(192, 132, 252, 0.55) 0%, rgba(147, 51, 234, 0.22) 42%, transparent 72%);
+            background: radial-gradient(circle, rgba(233, 213, 255, 0.3) 0%, rgba(216, 180, 254, 0.08) 45%, transparent 70%);
             filter: blur(8px);
             z-index: 0;
             pointer-events: none;
-            animation: celestialNebulaPulse 3.2s ease-in-out infinite;
+            animation: celestialNebulaPulse 3.5s ease-in-out infinite;
         }
 
         @keyframes celestialNebulaPulse {
 
             0%,
             100% {
-                transform: translate(-50%, -50%) scale(0.88);
-                opacity: 0.55;
+                transform: translate(-50%, -50%) scale(0.92);
+                opacity: 0.35;
             }
 
             50% {
-                transform: translate(-50%, -50%) scale(1.15);
-                opacity: 0.95;
+                transform: translate(-50%, -50%) scale(1.08);
+                opacity: 0.65;
             }
         }
 
         .gift-bouquet-stage .bouquet-flower .celestial-visual {
-            width: 96px;
-            height: 96px;
-            filter: drop-shadow(0 0 16px rgba(168, 85, 247, .9)) drop-shadow(0 0 32px rgba(139, 92, 246, .6)) drop-shadow(0 0 48px rgba(192, 132, 252, .35));
+            width: 120px;
+            height: 120px;
+            filter: drop-shadow(0 4px 10px rgba(168, 85, 247, .25)) drop-shadow(0 0 14px rgba(216, 180, 254, .35));
             animation: celestialBloomFloat 3.8s ease-in-out infinite;
         }
 
         .received-mini-bouquet .bouquet-flower .celestial-visual {
-            width: 62px;
-            height: 62px;
+            width: 76px;
+            height: 76px;
         }
 
         .gift-item-pill .celestial-visual {
@@ -1380,17 +1380,89 @@
             animation: none;
         }
 
+        .bouquet-flower-celestial {
+            width: 120px;
+            height: 120px;
+            animation: none !important;
+        }
+
+        .bouquet-flower-celestial.bouquet-special::before,
+        .bouquet-flower-celestial.bouquet-special::after {
+            display: none !important;
+        }
+
+        .received-mini-bouquet .bouquet-flower-celestial {
+            width: 76px;
+            height: 76px;
+        }
+
+        .celestial-sparkle {
+            position: absolute;
+            pointer-events: none;
+            z-index: 6;
+            font-size: 15px;
+            line-height: 1;
+            color: #fbf7ff;
+            text-shadow: 0 0 6px rgba(192, 132, 252, 0.75), 0 0 12px rgba(168, 85, 247, 0.45);
+            animation: celestialSparkleTwinkle 2.4s ease-in-out infinite alternate;
+        }
+
+        .celestial-sparkle.sp-1 {
+            top: 2px;
+            right: 8px;
+            font-size: 17px;
+            animation-delay: 0s;
+        }
+
+        .celestial-sparkle.sp-2 {
+            top: 40%;
+            left: 4px;
+            font-size: 19px;
+            color: #fae8ff;
+            animation-delay: -0.7s;
+        }
+
+        .celestial-sparkle.sp-3 {
+            bottom: 22px;
+            left: 10px;
+            font-size: 13px;
+            color: #ede9fe;
+            animation-delay: -1.4s;
+        }
+
+        .celestial-sparkle.sp-4 {
+            top: 14px;
+            left: 12px;
+            font-size: 12px;
+            animation-delay: -1.9s;
+        }
+
+        @keyframes celestialSparkleTwinkle {
+            0% {
+                transform: scale(0.7) translateY(0);
+                opacity: 0.35;
+            }
+
+            50% {
+                transform: scale(1.15) translateY(-3px) rotate(8deg);
+                opacity: 0.95;
+            }
+
+            100% {
+                transform: scale(0.85) translateY(2px) rotate(-8deg);
+                opacity: 0.55;
+            }
+        }
+
         @keyframes celestialBloomFloat {
 
             0%,
             100% {
-                transform: translateY(0) rotate(-2deg) scale(1);
-                filter: drop-shadow(0 0 14px rgba(168, 85, 247, .8)) drop-shadow(0 0 28px rgba(139, 92, 246, .5)) drop-shadow(0 0 44px rgba(192, 132, 252, .3));
+                transform: translateY(0) rotate(-1.5deg) scale(1);
             }
 
             50% {
-                transform: translateY(-7px) rotate(2deg) scale(1.07);
-                filter: drop-shadow(0 0 24px rgba(216, 180, 254, 1)) drop-shadow(0 0 46px rgba(168, 85, 247, .85)) drop-shadow(0 0 64px rgba(147, 51, 234, .55));
+                transform: translateY(-6px) rotate(1.5deg) scale(1.04);
             }
         }
 
@@ -3338,7 +3410,7 @@
 
         function getBouquetPositions(count) {
             const layouts = {
-                1: [[50, 26, 0]],
+                1: [[50, 18, 0]],
                 2: [[42, 46, -6], [58, 46, 6]],
                 3: [[50, 30, 0], [38, 48, -8], [62, 48, 8]],
                 4: [[50, 26, 0], [36, 42, -9], [64, 42, 9], [50, 56, 0]],
@@ -3404,10 +3476,12 @@
                 const flower = flowers[index % flowers.length];
                 const special = Boolean(flower.is_special);
                 const celestial = String(flower.name || '').toLowerCase() === 'celestial bloom';
-                const spark = special ? '<span class="bouquet-spark one">✦</span>' : '';
+                const spark = celestial
+                    ? '<span class="celestial-sparkle sp-1">✦</span><span class="celestial-sparkle sp-2">✦</span><span class="celestial-sparkle sp-3">✧</span><span class="celestial-sparkle sp-4">✨</span>'
+                    : (special ? '<span class="bouquet-spark one">✦</span>' : '');
                 const visual = flowerVisual(flower, celestial ? 'bouquet-celestial-visual' : '');
-                const stem = `<span class="bouquet-stem ${celestial ? 'bouquet-stem-celestial' : ''}"></span>`;
-                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
+                const stem = celestial ? '' : '<span class="bouquet-stem"></span>';
+                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''} ${celestial ? 'bouquet-flower-celestial' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
             }).join('') + `<div class="${wrapClass}"></div><div class="bouquet-ribbon">${bouquetCustom.ribbon}</div>${decoration}`;
 
             text.textContent = fullBouquetFlower ? 'Buket Istimewa Celestial Bloom 🌌' : `${total} bunga dalam bouquet`;
@@ -3513,10 +3587,12 @@
                 const flower = flowers[index % flowers.length];
                 const special = Boolean(flower?.is_special);
                 const celestial = String(flower?.name || '').toLowerCase() === 'celestial bloom';
-                const spark = special ? '<span class="bouquet-spark one">✦</span>' : '';
+                const spark = celestial
+                    ? '<span class="celestial-sparkle sp-1">✦</span><span class="celestial-sparkle sp-2">✦</span><span class="celestial-sparkle sp-3">✧</span><span class="celestial-sparkle sp-4">✨</span>'
+                    : (special ? '<span class="bouquet-spark one">✦</span>' : '');
                 const visual = flowerVisual(flower, celestial ? 'bouquet-celestial-visual' : '');
-                const stem = `<span class="bouquet-stem ${celestial ? 'bouquet-stem-celestial' : ''}"></span>`;
-                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
+                const stem = celestial ? '' : '<span class="bouquet-stem"></span>';
+                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''} ${celestial ? 'bouquet-flower-celestial' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
             }).join('')}<div class="bouquet-wrap bouquet-wrap-${wrapping}"></div><div class="bouquet-ribbon">${ribbon}</div>${decoration}</div>`;
         }
 
