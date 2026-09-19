@@ -217,22 +217,19 @@
         }
 
         .bouquet-preview {
-            background:
-                linear-gradient(135deg,
-                    #fff,
-                    #f7edff);
-
+            background: linear-gradient(135deg, #fff, #f7edff);
             border-radius: 22px;
-            padding: 25px;
+            padding: 16px 14px;
             text-align: center;
-
-            min-height: 180px;
-
+            min-height: 185px;
             display: flex;
             flex-direction: column;
+            align-items: center;
             justify-content: center;
-
             margin-bottom: 15px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #f0e4f7;
         }
 
         .bouquet {
@@ -241,19 +238,16 @@
         }
 
         /* Multi-flower bouquet builder */
-        .bouquet-preview {
-            position: relative;
-            overflow: hidden;
-        }
-
         .bouquet-canvas {
             position: relative;
-            width: 100%;
-            min-height: 145px;
+            width: 220px;
+            height: 152px;
+            min-height: 152px;
+            margin: 0 auto;
+            padding: 0;
             display: flex;
             align-items: flex-end;
             justify-content: center;
-            padding: 8px 8px 20px;
         }
 
         .bouquet-flower {
@@ -1322,13 +1316,15 @@
         .bouquet-flower .celestial-visual {
             position: relative;
             z-index: 2;
-            width: 62px;
-            height: 62px;
+            width: 48px;
+            height: 48px;
+            filter: drop-shadow(0 0 10px rgba(168, 85, 247, .65));
         }
 
         .gift-bouquet-stage .bouquet-flower .celestial-visual {
-            width: 76px;
-            height: 76px;
+            width: 48px;
+            height: 48px;
+            filter: drop-shadow(0 0 10px rgba(168, 85, 247, .65));
         }
 
         .gift-item-pill .celestial-visual {
@@ -3296,22 +3292,40 @@
 
         function getBouquetPositions(count) {
             const layouts = {
-                1: [[50, 30, 0]],
-                2: [[43, 22, -7], [57, 22, 7]],
-                3: [[50, 10, 0], [39, 29, -8], [61, 29, 8]],
-                4: [[50, 8, 0], [37, 25, -9], [63, 25, 9], [50, 43, 0]],
-                5: [[50, 6, 0], [38, 22, -8], [62, 22, 8], [32, 40, -12], [68, 40, 12]],
-                6: [[44, 6, -6], [56, 6, 6], [35, 24, -10], [65, 24, 10], [42, 43, -7], [58, 43, 7]],
-                7: [[50, 4, 0], [38, 18, -9], [62, 18, 9], [30, 34, -13], [50, 30, 0], [70, 34, 13], [50, 48, 0]],
-                8: [[43, 4, -6], [57, 4, 6], [33, 20, -10], [50, 16, 0], [67, 20, 10], [30, 37, -13], [50, 34, 0], [70, 37, 13]],
-                9: [[50, 3, 0], [39, 16, -8], [61, 16, 8], [31, 30, -12], [45, 27, -4], [55, 27, 4], [69, 30, 12], [39, 44, -8], [61, 44, 8]]
+                1: [[50, 24, 0]],
+                2: [[42, 22, -7], [58, 22, 7]],
+                3: [[50, 10, 0], [38, 26, -8], [62, 26, 8]],
+                4: [[50, 8, 0], [36, 22, -9], [64, 22, 9], [50, 36, 0]],
+                5: [[50, 6, 0], [36, 20, -8], [64, 20, 8], [28, 34, -12], [72, 34, 12]],
+                6: [[42, 6, -6], [58, 6, 6], [32, 20, -10], [68, 20, 10], [40, 34, -7], [60, 34, 7]],
+                7: [[50, 4, 0], [36, 16, -9], [64, 16, 9], [26, 28, -13], [50, 26, 0], [74, 28, 13], [50, 40, 0]],
+                8: [[42, 4, -6], [58, 4, 6], [30, 16, -10], [50, 14, 0], [70, 16, 10], [28, 28, -13], [50, 28, 0], [72, 28, 13]],
+                9: [[50, 3, 0], [37, 14, -8], [63, 14, 8], [28, 24, -12], [44, 22, -4], [56, 22, 4], [72, 24, 12], [38, 36, -8], [62, 36, 8]],
+                10: [
+                    [50, 2, 0],
+                    [38, 12, -8], [62, 12, 8],
+                    [28, 22, -13], [44, 20, -5], [56, 20, 5], [72, 22, 13],
+                    [36, 34, -9], [50, 32, 0], [64, 34, 9]
+                ],
+                11: [
+                    [43, 2, -6], [57, 2, 6],
+                    [31, 12, -12], [50, 10, 0], [69, 12, 12],
+                    [26, 22, -14], [42, 20, -6], [58, 20, 6], [74, 22, 14],
+                    [42, 34, -7], [58, 34, 7]
+                ],
+                12: [
+                    [50, 0, 0],
+                    [38, 8, -8], [62, 8, 8],
+                    [27, 18, -13], [43, 16, -5], [57, 16, 5], [73, 18, 13],
+                    [23, 28, -15], [37, 26, -8], [50, 24, 0], [63, 26, 8], [77, 28, 15]
+                ]
             };
             if (layouts[count]) return layouts[count];
             const result = [];
             for (let i = 0; i < count; i++) {
                 const row = Math.floor(i / 3);
                 const col = i % 3;
-                result.push([32 + col * 18 + (row % 2 ? 9 : 0), 6 + row * 17, (col - 1) * 8]);
+                result.push([32 + col * 18 + (row % 2 ? 9 : 0), 4 + row * 14, (col - 1) * 8]);
             }
             return result;
         }
