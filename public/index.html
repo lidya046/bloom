@@ -1323,22 +1323,19 @@
         .bouquet-flower .celestial-visual {
             position: relative;
             z-index: 2;
-            width: 145px;
-            height: 145px;
+            width: 120px;
+            height: 120px;
             filter: drop-shadow(0 4px 10px rgba(168, 85, 247, .25)) drop-shadow(0 0 14px rgba(216, 180, 254, .35));
             animation: celestialBloomFloat 3.8s ease-in-out infinite;
-            display: flex;
-            align-items: center;
-            justify-content: center;
         }
 
         .bouquet-flower:has(.celestial-visual)::before {
             content: '';
             position: absolute;
-            width: 125px;
-            height: 125px;
+            width: 110px;
+            height: 110px;
             left: 50%;
-            top: 48%;
+            top: 45%;
             transform: translate(-50%, -50%);
             border-radius: 50%;
             background: radial-gradient(circle, rgba(233, 213, 255, 0.3) 0%, rgba(216, 180, 254, 0.08) 45%, transparent 70%);
@@ -1349,6 +1346,7 @@
         }
 
         @keyframes celestialNebulaPulse {
+
             0%,
             100% {
                 transform: translate(-50%, -50%) scale(0.92);
@@ -1362,15 +1360,15 @@
         }
 
         .gift-bouquet-stage .bouquet-flower .celestial-visual {
-            width: 145px;
-            height: 145px;
+            width: 120px;
+            height: 120px;
             filter: drop-shadow(0 4px 10px rgba(168, 85, 247, .25)) drop-shadow(0 0 14px rgba(216, 180, 254, .35));
             animation: celestialBloomFloat 3.8s ease-in-out infinite;
         }
 
         .received-mini-bouquet .bouquet-flower .celestial-visual {
-            width: 88px;
-            height: 88px;
+            width: 76px;
+            height: 76px;
         }
 
         .gift-item-pill .celestial-visual {
@@ -1383,13 +1381,8 @@
         }
 
         .bouquet-flower-celestial {
-            width: 145px !important;
-            height: 145px !important;
-            left: 50% !important;
-            transform: translateX(-50%) !important;
-            display: flex !important;
-            align-items: center !important;
-            justify-content: center !important;
+            width: 120px;
+            height: 120px;
             animation: none !important;
         }
 
@@ -1399,8 +1392,8 @@
         }
 
         .received-mini-bouquet .bouquet-flower-celestial {
-            width: 88px !important;
-            height: 88px !important;
+            width: 76px;
+            height: 76px;
         }
 
         .celestial-sparkle {
@@ -1415,32 +1408,32 @@
         }
 
         .celestial-sparkle.sp-1 {
-            top: 4px;
-            right: 4px;
-            font-size: 18px;
+            top: 2px;
+            right: 8px;
+            font-size: 17px;
             animation-delay: 0s;
         }
 
         .celestial-sparkle.sp-2 {
-            top: 36%;
-            left: 2px;
-            font-size: 20px;
+            top: 40%;
+            left: 4px;
+            font-size: 19px;
             color: #fae8ff;
             animation-delay: -0.7s;
         }
 
         .celestial-sparkle.sp-3 {
-            bottom: 24px;
-            right: 6px;
-            font-size: 14px;
+            bottom: 22px;
+            left: 10px;
+            font-size: 13px;
             color: #ede9fe;
             animation-delay: -1.4s;
         }
 
         .celestial-sparkle.sp-4 {
-            top: 10px;
-            left: 8px;
-            font-size: 13px;
+            top: 14px;
+            left: 12px;
+            font-size: 12px;
             animation-delay: -1.9s;
         }
 
@@ -1449,10 +1442,12 @@
                 transform: scale(0.7) translateY(0);
                 opacity: 0.35;
             }
+
             50% {
                 transform: scale(1.15) translateY(-3px) rotate(8deg);
                 opacity: 0.95;
             }
+
             100% {
                 transform: scale(0.85) translateY(2px) rotate(-8deg);
                 opacity: 0.55;
@@ -1460,13 +1455,14 @@
         }
 
         @keyframes celestialBloomFloat {
+
             0%,
             100% {
-                transform: translateY(0) scale(1);
+                transform: translateY(0) rotate(-1.5deg) scale(1);
             }
 
             50% {
-                transform: translateY(-5px) scale(1.03);
+                transform: translateY(-6px) rotate(1.5deg) scale(1.04);
             }
         }
 
@@ -3414,7 +3410,7 @@
 
         function getBouquetPositions(count) {
             const layouts = {
-                1: [[50, 6, 0]],
+                1: [[50, 18, 0]],
                 2: [[42, 46, -6], [58, 46, 6]],
                 3: [[50, 30, 0], [38, 48, -8], [62, 48, 8]],
                 4: [[50, 26, 0], [36, 42, -9], [64, 42, 9], [50, 56, 0]],
