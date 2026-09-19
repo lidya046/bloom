@@ -250,6 +250,11 @@
             justify-content: center;
         }
 
+        .bouquet-canvas.celestial-single {
+            height: 195px;
+            min-height: 195px;
+        }
+
         .bouquet-flower {
             position: absolute;
             width: 46px;
@@ -3460,10 +3465,14 @@
             const total = flowers.length;
 
             if (!total) {
+                preview.className = 'bouquet-canvas';
                 preview.innerHTML = '<div class="bouquet-empty">Pilih minimal 1 bunga untuk mulai merangkai 💐</div>';
                 text.textContent = 'Bouquet kosong — pilih bunga di bawah 🌷';
                 return;
             }
+
+            const isCelestialSingle = !!fullBouquetFlower;
+            preview.className = isCelestialSingle ? 'bouquet-canvas celestial-single' : 'bouquet-canvas';
 
             const positions = getBouquetPositions(Math.min(total, 12));
             const wrapClass = `bouquet-wrap bouquet-wrap-${bouquetCustom.wrapping}`;
@@ -3481,7 +3490,8 @@
                     : (special ? '<span class="bouquet-spark one">✦</span>' : '');
                 const visual = flowerVisual(flower, celestial ? 'bouquet-celestial-visual' : '');
                 const stem = celestial ? '' : '<span class="bouquet-stem"></span>';
-                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''} ${celestial ? 'bouquet-flower-celestial' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
+                const topPx = celestial ? 10 : pos[1];
+                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''} ${celestial ? 'bouquet-flower-celestial' : ''}" style="left:${pos[0]}%;top:${topPx}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
             }).join('') + `<div class="${wrapClass}"></div><div class="bouquet-ribbon">${bouquetCustom.ribbon}</div>${decoration}`;
 
             text.textContent = fullBouquetFlower ? 'Buket Istimewa Celestial Bloom 🌌' : `${total} bunga dalam bouquet`;
@@ -3583,7 +3593,9 @@
                 : custom.decoration === 'none'
                     ? ''
                     : '<span class="bouquet-spark two">✦</span><span class="bouquet-spark three">✧</span>';
-            return `<div class="bouquet-canvas">${positions.map((pos, index) => {
+            const isCelestialSingle = flowers.length === 1 && String(flowers[0]?.name || '').toLowerCase() === 'celestial bloom';
+            const canvasClass = isCelestialSingle ? 'bouquet-canvas celestial-single' : 'bouquet-canvas';
+            return `<div class="${canvasClass}">${positions.map((pos, index) => {
                 const flower = flowers[index % flowers.length];
                 const special = Boolean(flower?.is_special);
                 const celestial = String(flower?.name || '').toLowerCase() === 'celestial bloom';
@@ -3592,7 +3604,8 @@
                     : (special ? '<span class="bouquet-spark one">✦</span>' : '');
                 const visual = flowerVisual(flower, celestial ? 'bouquet-celestial-visual' : '');
                 const stem = celestial ? '' : '<span class="bouquet-stem"></span>';
-                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''} ${celestial ? 'bouquet-flower-celestial' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
+                const topPx = celestial ? 10 : pos[1];
+                return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''} ${celestial ? 'bouquet-flower-celestial' : ''}" style="left:${pos[0]}%;top:${topPx}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
             }).join('')}<div class="bouquet-wrap bouquet-wrap-${wrapping}"></div><div class="bouquet-ribbon">${ribbon}</div>${decoration}</div>`;
         }
 
