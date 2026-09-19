@@ -330,6 +330,13 @@
             z-index: 0;
         }
 
+        .bouquet-stem-celestial {
+            background: linear-gradient(180deg, #c084fc, #7e22ce) !important;
+            box-shadow: 0 0 8px rgba(168, 85, 247, 0.7);
+            opacity: 0.85 !important;
+            width: 3px !important;
+        }
+
         .bouquet-wrap {
             position: absolute;
             bottom: 0;
@@ -3292,32 +3299,32 @@
 
         function getBouquetPositions(count) {
             const layouts = {
-                1: [[50, 24, 0]],
-                2: [[42, 22, -7], [58, 22, 7]],
-                3: [[50, 10, 0], [38, 26, -8], [62, 26, 8]],
-                4: [[50, 8, 0], [36, 22, -9], [64, 22, 9], [50, 36, 0]],
-                5: [[50, 6, 0], [36, 20, -8], [64, 20, 8], [28, 34, -12], [72, 34, 12]],
-                6: [[42, 6, -6], [58, 6, 6], [32, 20, -10], [68, 20, 10], [40, 34, -7], [60, 34, 7]],
-                7: [[50, 4, 0], [36, 16, -9], [64, 16, 9], [26, 28, -13], [50, 26, 0], [74, 28, 13], [50, 40, 0]],
-                8: [[42, 4, -6], [58, 4, 6], [30, 16, -10], [50, 14, 0], [70, 16, 10], [28, 28, -13], [50, 28, 0], [72, 28, 13]],
-                9: [[50, 3, 0], [37, 14, -8], [63, 14, 8], [28, 24, -12], [44, 22, -4], [56, 22, 4], [72, 24, 12], [38, 36, -8], [62, 36, 8]],
+                1: [[50, 48, 0]],
+                2: [[42, 46, -6], [58, 46, 6]],
+                3: [[50, 30, 0], [38, 48, -8], [62, 48, 8]],
+                4: [[50, 26, 0], [36, 42, -9], [64, 42, 9], [50, 56, 0]],
+                5: [[50, 22, 0], [36, 38, -8], [64, 38, 8], [28, 52, -12], [72, 52, 12]],
+                6: [[42, 22, -6], [58, 22, 6], [32, 38, -10], [68, 38, 10], [40, 54, -7], [60, 54, 7]],
+                7: [[50, 18, 0], [36, 34, -9], [64, 34, 9], [26, 48, -13], [50, 44, 0], [74, 48, 13], [50, 58, 0]],
+                8: [[42, 18, -6], [58, 18, 6], [30, 32, -10], [50, 28, 0], [70, 32, 10], [28, 48, -13], [50, 46, 0], [72, 48, 13]],
+                9: [[50, 16, 0], [37, 28, -8], [63, 28, 8], [28, 40, -12], [44, 38, -4], [56, 38, 4], [72, 40, 12], [38, 54, -8], [62, 54, 8]],
                 10: [
-                    [50, 2, 0],
-                    [38, 12, -8], [62, 12, 8],
-                    [28, 22, -13], [44, 20, -5], [56, 20, 5], [72, 22, 13],
-                    [36, 34, -9], [50, 32, 0], [64, 34, 9]
+                    [50, 14, 0],
+                    [38, 26, -8], [62, 26, 8],
+                    [28, 38, -13], [44, 36, -5], [56, 36, 5], [72, 38, 13],
+                    [36, 52, -9], [50, 48, 0], [64, 52, 9]
                 ],
                 11: [
-                    [43, 2, -6], [57, 2, 6],
-                    [31, 12, -12], [50, 10, 0], [69, 12, 12],
-                    [26, 22, -14], [42, 20, -6], [58, 20, 6], [74, 22, 14],
-                    [42, 34, -7], [58, 34, 7]
+                    [43, 14, -6], [57, 14, 6],
+                    [31, 26, -12], [50, 24, 0], [69, 26, 12],
+                    [26, 38, -14], [42, 36, -6], [58, 36, 6], [74, 38, 14],
+                    [42, 52, -7], [58, 52, 7]
                 ],
                 12: [
-                    [50, 0, 0],
-                    [38, 8, -8], [62, 8, 8],
-                    [27, 18, -13], [43, 16, -5], [57, 16, 5], [73, 18, 13],
-                    [23, 28, -15], [37, 26, -8], [50, 24, 0], [63, 26, 8], [77, 28, 15]
+                    [50, 12, 0],
+                    [38, 22, -8], [62, 22, 8],
+                    [27, 34, -13], [43, 32, -5], [57, 32, 5], [73, 34, 13],
+                    [23, 48, -15], [37, 46, -8], [50, 44, 0], [63, 46, 8], [77, 48, 15]
                 ]
             };
             if (layouts[count]) return layouts[count];
@@ -3325,7 +3332,7 @@
             for (let i = 0; i < count; i++) {
                 const row = Math.floor(i / 3);
                 const col = i % 3;
-                result.push([32 + col * 18 + (row % 2 ? 9 : 0), 4 + row * 14, (col - 1) * 8]);
+                result.push([32 + col * 18 + (row % 2 ? 9 : 0), 16 + row * 14, (col - 1) * 8]);
             }
             return result;
         }
@@ -3337,7 +3344,7 @@
             let flowers = buildBouquetFlowers();
             const fullBouquetFlower = flowers.find(isFullBouquetFlower);
             if (fullBouquetFlower) {
-                flowers = Array.from({ length: 12 }, () => fullBouquetFlower);
+                flowers = Array.from({ length: 7 }, () => fullBouquetFlower);
             }
             const total = flowers.length;
 
@@ -3360,11 +3367,11 @@
                 const celestial = String(flower.name || '').toLowerCase() === 'celestial bloom';
                 const spark = special ? '<span class="bouquet-spark one">✦</span>' : '';
                 const visual = flowerVisual(flower, celestial ? 'bouquet-celestial-visual' : '');
-                const stem = celestial ? '' : '<span class="bouquet-stem"></span>';
+                const stem = `<span class="bouquet-stem ${celestial ? 'bouquet-stem-celestial' : ''}"></span>`;
                 return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
             }).join('') + `<div class="${wrapClass}"></div><div class="bouquet-ribbon">${bouquetCustom.ribbon}</div>${decoration}`;
 
-            text.textContent = `${total} bunga dalam bouquet`;
+            text.textContent = fullBouquetFlower ? 'Buket Spesial Celestial Bloom 🌌' : `${total} bunga dalam bouquet`;
         }
 
         function updateBouquet() {
@@ -3448,7 +3455,7 @@
             let flowers = [];
             receivedFlowerList(items).forEach(({ flower, quantity }) => {
                 if (isFullBouquetFlower(flower)) {
-                    flowers = Array.from({ length: 12 }, () => flower);
+                    flowers = Array.from({ length: 7 }, () => flower);
                     return;
                 }
                 for (let i = 0; i < Math.min(quantity, 12); i++) flowers.push(flower);
@@ -3469,7 +3476,7 @@
                 const celestial = String(flower?.name || '').toLowerCase() === 'celestial bloom';
                 const spark = special ? '<span class="bouquet-spark one">✦</span>' : '';
                 const visual = flowerVisual(flower, celestial ? 'bouquet-celestial-visual' : '');
-                const stem = celestial ? '' : '<span class="bouquet-stem"></span>';
+                const stem = `<span class="bouquet-stem ${celestial ? 'bouquet-stem-celestial' : ''}"></span>`;
                 return `<div class="bouquet-flower ${special ? 'bouquet-special' : ''}" style="left:${pos[0]}%;top:${pos[1]}px;--stem-rotate:${pos[2]}deg">${spark}${visual}${stem}</div>`;
             }).join('')}<div class="bouquet-wrap bouquet-wrap-${wrapping}"></div><div class="bouquet-ribbon">${ribbon}</div>${decoration}</div>`;
         }
