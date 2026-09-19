@@ -20,3 +20,10 @@ CREATE INDEX IF NOT EXISTS idx_coin_orders_user_id ON coin_orders(user_id);
 CREATE INDEX IF NOT EXISTS idx_coin_orders_status ON coin_orders(status);
 CREATE UNIQUE INDEX IF NOT EXISTS idx_coin_orders_one_pending_per_user
   ON coin_orders(user_id) WHERE status='pending';
+
+CREATE TABLE IF NOT EXISTS coin_order_admin_messages (
+  order_id BIGINT NOT NULL REFERENCES coin_orders(id) ON DELETE CASCADE,
+  chat_id BIGINT NOT NULL,
+  message_id BIGINT NOT NULL,
+  PRIMARY KEY (order_id, chat_id)
+);

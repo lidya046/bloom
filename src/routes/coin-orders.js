@@ -536,6 +536,13 @@ router.post('/', async (req, res) => {
 
                 if (r.ok && data.ok) {
                     notified++;
+                    await pool.query(
+                        `INSERT INTO coin_order_admin_messages (order_id, chat_id, message_id)
+                         VALUES ($1, $2, $3)
+                         ON CONFLICT (order_id, chat_id)
+                         DO UPDATE SET message_id=EXCLUDED.message_id`,
+                        [order.id, chatId, data.result.message_id]
+                    );
                 }
 
             } catch (_) { }
@@ -723,16 +730,33 @@ router.post('/telegram', async (req, res) => {
             }`
         ].join('\n');
 
-        /*
-         * Hapus pesan foto + tombol,
-         * lalu kirim hasil Approve / Reject.
-         */
-        const telegramUpdated =
-            await replaceTelegramOrderMessage(
-                cq.message?.chat?.id,
-                cq.message?.message_id,
+        const adminMessages = await pool.query(
+            `SELECT chat_id, message_id
+             FROM coin_order_admin_messages
+             WHERE order_id=$1`,
+            [order.id]
+        ).catch(() => ({ rows: [] }));
+
+        const knownMessages = adminMessages.rows;
+        if (!knownMessages.some(message =>
+            String(message.chat_id) === String(cq.message?.chat?.id) &&
+            String(message.message_id) === String(cq.message?.message_id)
+        )) {
+            knownMessages.push({
+                chat_id: cq.message?.chat?.id,
+                message_id: cq.message?.message_id
+            });
+        }
+
+        let telegramUpdated = false;
+        for (const message of knownMessages) {
+            const updatedMessage = await replaceTelegramOrderMessage(
+                message.chat_id,
+                message.message_id,
                 adminText
             );
+            telegramUpdated = updatedMessage || telegramUpdated;
+        }
 
         await answerCallback(
             cq.id,
