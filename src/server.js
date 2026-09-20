@@ -15,6 +15,7 @@ import shop from './routes/shop.js';
 import admin from './routes/admin.js';
 import coinOrders from './routes/coin-orders.js';
 import achievements from './routes/achievements.js';
+import transfers from './routes/transfers.js';
 
 const app = express();
 
@@ -52,6 +53,7 @@ app.use('/api/shop', shop);
 app.use('/api/admin', admin);
 app.use('/api/coin-orders', coinOrders);
 app.use('/api/achievements', achievements);
+app.use('/api/transfers', transfers);
 
 const port = Number(process.env.PORT || 3000);
 

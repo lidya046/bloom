@@ -63,6 +63,10 @@ All `/api/*` endpoints require the Telegram Mini App initData in:
 - POST `/api/bouquets`
 - GET `/api/bouquets/sent`
 - GET `/api/bouquets/received`
+- POST `/api/transfers` with `{ "username": "@teman", "amount": 100 }`
+- GET `/api/transfers`
+
+For existing databases, run `coin_transfers_migration.sql` after `schema.sql`.
 
 ## Important
 

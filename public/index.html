@@ -2435,6 +2435,12 @@
                     <p>Beli bunga pakai coins</p>
                 </button>
 
+                <button class="card" onclick="showPage('transfer')">
+                    <div class="icon">🪙</div>
+                    <h3>Transfer Coins</h3>
+                    <p>Kirim coins ke teman</p>
+                </button>
+
                 <button class="card" onclick="showPage('received')">
                     <div class="icon">💌</div>
                     <h3>Received</h3>
@@ -2625,6 +2631,30 @@
                     style="display:none">💸 Saya Sudah Bayar</button>
                 <div id="coinProofPreview" style="display:none;margin-top:10px"></div>
                 <div id="coinOrderStatus" class="coin-order-status" style="display:none"></div>
+            </div>
+        </section>
+
+        <!-- TRANSFER COINS -->
+
+        <section id="transfer" class="page">
+            <button class="back" onclick="showPage('home')">← Kembali</button>
+            <div class="section-title">🪙 Transfer Coins</div>
+            <div class="coin-topup-box">
+                <div class="coin-topup-title">Kirim Coins ke teman</div>
+                <div class="coin-topup-subtitle">Penerima harus sudah pernah membuka Bloom dan memiliki username
+                    Telegram.</div>
+                <label>
+                    Username Telegram penerima
+                    <input id="transferUsername" placeholder="Contoh: @budi" autocomplete="off">
+                </label>
+                <label>
+                    Jumlah Coins
+                    <input id="transferAmount" type="number" min="1" max="1000000" step="1" inputmode="numeric"
+                        placeholder="Contoh: 100">
+                </label>
+                <button id="transferButton" class="primary" type="button" onclick="submitCoinTransfer()">🪙 Kirim
+                    Coins</button>
+                <div id="transferHistory" class="coin-order-status" style="display:none;margin-top:14px"></div>
             </div>
         </section>
 
@@ -2956,6 +2986,10 @@
                 loadCoinTopup();
             }
 
+            if (id === "transfer") {
+                loadTransferHistory();
+            }
+
             if (id === "received") {
                 loadReceived();
             }
@@ -3085,6 +3119,62 @@
 
             }
 
+        }
+
+        async function submitCoinTransfer() {
+            const usernameInput = document.getElementById('transferUsername');
+            const amountInput = document.getElementById('transferAmount');
+            const button = document.getElementById('transferButton');
+            const username = String(usernameInput.value || '').trim();
+            const amount = Number(amountInput.value);
+            if (!username || !Number.isInteger(amount) || amount < 1 || amount > 1000000) {
+                toast('Isi username dan jumlah Coins yang valid.');
+                return;
+            }
+            if (amount > Number(state.user?.coins || 0)) {
+                toast('Saldo Coins tidak cukup.');
+                return;
+            }
+            if (!window.confirm(`Kirim ${amount.toLocaleString('id-ID')} Coins ke ${username.replace(/^@/, '@')}?`)) return;
+
+            button.disabled = true;
+            try {
+                const result = await api('/api/transfers', {
+                    method: 'POST',
+                    body: JSON.stringify({ username, amount })
+                });
+                state.user.coins = Number(result.balance);
+                updateStats();
+                amountInput.value = '';
+                toast(`Berhasil mengirim ${amount.toLocaleString('id-ID')} Coins 🪙`);
+                await loadTransferHistory();
+            } catch (error) {
+                toast(error.message || 'Transfer Coins gagal');
+            } finally {
+                button.disabled = false;
+            }
+        }
+
+        async function loadTransferHistory() {
+            const el = document.getElementById('transferHistory');
+            if (!el) return;
+            try {
+                const transfers = await api('/api/transfers');
+                if (!transfers.length) {
+                    el.style.display = 'block';
+                    el.innerHTML = 'Belum ada riwayat transfer.';
+                    return;
+                }
+                const currentUsername = String(state.user?.username || '').toLowerCase();
+                el.style.display = 'block';
+                el.innerHTML = `<b>Riwayat transfer</b><br>${transfers.map(transfer => {
+                    const sent = String(transfer.sender_username || '').toLowerCase() === currentUsername;
+                    const other = sent ? transfer.receiver_username : transfer.sender_username;
+                    return `${sent ? 'Keluar' : 'Masuk'}: ${sent ? '-' : '+'}${Number(transfer.amount).toLocaleString('id-ID')} Coins ${other ? `(${other})` : ''}`;
+                }).join('<br>')}`;
+            } catch (error) {
+                console.error('Transfer history error:', error);
+            }
         }
 
 
