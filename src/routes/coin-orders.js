@@ -286,6 +286,27 @@ function webhookAuthorized(req) {
     );
 }
 
+async function syncTelegramUser(telegramUser) {
+    if (!telegramUser?.id) return null;
+
+    const result = await pool.query(
+        `INSERT INTO users (telegram_id, username, first_name)
+         VALUES ($1, $2, $3)
+         ON CONFLICT (telegram_id)
+         DO UPDATE SET
+            username=EXCLUDED.username,
+            first_name=EXCLUDED.first_name
+         RETURNING id, telegram_id, username, first_name`,
+        [
+            telegramUser.id,
+            telegramUser.username ?? null,
+            telegramUser.first_name ?? null
+        ]
+    );
+
+    return result.rows[0];
+}
+
 router.get('/config', async (_req, res) => {
     res.json({
         payment: {
@@ -582,6 +603,11 @@ router.post('/telegram', async (req, res) => {
         const chatId = message?.chat?.id;
 
         if (chatId) {
+            try {
+                await syncTelegramUser(message?.from);
+            } catch (error) {
+                console.error('Telegram /start user sync error:', error);
+            }
             await sendStartMessage(chatId);
         }
 
