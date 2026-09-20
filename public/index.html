@@ -3147,7 +3147,7 @@
                 updateStats();
                 amountInput.value = '';
                 toast(`Berhasil mengirim ${amount.toLocaleString('id-ID')} Coins 🪙`);
-                await loadTransferHistory();
+                loadTransferHistory();
             } catch (error) {
                 toast(error.message || 'Transfer Coins gagal');
             } finally {
@@ -3159,7 +3159,10 @@
             const el = document.getElementById('transferHistory');
             if (!el) return;
             try {
-                const transfers = await api('/api/transfers');
+                const transfers = await Promise.race([
+                    api('/api/transfers'),
+                    new Promise((_, reject) => setTimeout(() => reject(new Error('Riwayat transfer timeout')), 8000))
+                ]);
                 if (!transfers.length) {
                     el.style.display = 'block';
                     el.innerHTML = 'Belum ada riwayat transfer.';
