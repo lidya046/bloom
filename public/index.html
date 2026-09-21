@@ -1086,6 +1086,86 @@
             box-shadow: inset 0 2px 6px rgba(120, 80, 130, .02);
         }
 
+        .gift-interaction {
+            margin: 12px 0;
+            padding: 12px;
+            border: 1px solid #eee2f2;
+            border-radius: 16px;
+            background: #fff;
+        }
+
+        .gift-interaction-title {
+            color: #594c61;
+            font-size: 13px;
+            font-weight: 800;
+            margin-bottom: 9px;
+        }
+
+        .reaction-options {
+            display: flex;
+            gap: 7px;
+            flex-wrap: wrap;
+        }
+
+        .reaction-option {
+            width: 40px;
+            height: 36px;
+            padding: 0;
+            border: 1px solid #eadff0;
+            border-radius: 12px;
+            background: #fff8fc;
+            font-size: 20px;
+        }
+
+        .reaction-option.selected {
+            border-color: #8b5cf6;
+            background: #f0e9ff;
+            box-shadow: 0 0 0 2px rgba(139, 92, 246, .12);
+        }
+
+        .gift-interaction textarea {
+            width: 100%;
+            min-height: 62px;
+            margin-top: 10px;
+            box-sizing: border-box;
+            resize: vertical;
+        }
+
+        .gift-interaction button.primary {
+            width: 100%;
+            margin-top: 9px;
+        }
+
+        .gift-reply-toggle {
+            width: 100%;
+            margin-top: 8px;
+            background: #f7f0fb;
+            color: #66556d;
+            padding: 10px;
+            border-radius: 12px;
+            font-weight: 700;
+        }
+
+        .sent-bouquet-card {
+            background: #fff;
+            border: 1px solid #eadff0;
+            border-radius: 16px;
+            padding: 13px;
+            margin-bottom: 10px;
+        }
+
+        .sent-bouquet-card small {
+            color: #8b7c91;
+        }
+
+        .sent-interaction-line {
+            margin-top: 8px;
+            color: #594c61;
+            font-size: 13px;
+            line-height: 1.45;
+            word-break: break-word;
+        }
+
         .gift-items {
             display: flex;
             flex-wrap: wrap;
@@ -2296,6 +2376,21 @@
             <div id="giftBouquetStage" class="gift-bouquet-stage"></div>
             <div id="giftItems" class="gift-items"></div>
             <div id="giftMessage" class="gift-message"></div>
+            <div class="gift-interaction">
+                <div class="gift-interaction-title">React to this bouquet</div>
+                <div id="reactionOptions" class="reaction-options"></div>
+                <textarea id="reactionMessage" maxlength="500" placeholder="Write a message..."></textarea>
+                <button id="sendReactionButton" class="primary" type="button" onclick="sendBouquetInteraction()">Send
+                    Reaction</button>
+            </div>
+            <button id="replyToggle" class="gift-reply-toggle" type="button" onclick="toggleBouquetReply()">💬
+                Reply</button>
+            <div id="replyBox" class="gift-interaction" style="display:none">
+                <div class="gift-interaction-title">Reply to this bouquet</div>
+                <textarea id="replyMessage" maxlength="500" placeholder="Write your reply..."></textarea>
+                <button id="sendReplyButton" class="primary" type="button" onclick="sendBouquetReply()">Send
+                    Reply</button>
+            </div>
             <button class="gift-close-btn" type="button" onclick="closeGiftPopup()">Tutup</button>
         </div>
     </div>
@@ -2445,6 +2540,12 @@
                     <div class="icon">💌</div>
                     <h3>Received</h3>
                     <p>Lihat bouquet dari teman</p>
+                </button>
+
+                <button class="card" onclick="showPage('sent')">
+                    <div class="icon">📨</div>
+                    <h3>Sent Bouquets</h3>
+                    <p>Lihat interaksi bouquet</p>
                 </button>
 
 
@@ -2664,6 +2765,12 @@
             <button class="back" onclick="showPage('home')">← Kembali</button>
             <div class="section-title">💌 Received Bouquets</div>
             <div id="receivedList"></div>
+        </section>
+
+        <section id="sent" class="page">
+            <button class="back" onclick="showPage('home')">← Kembali</button>
+            <div class="section-title">📨 Sent Bouquets</div>
+            <div id="sentList"></div>
         </section>
 
 
@@ -2992,6 +3099,10 @@
 
             if (id === "received") {
                 loadReceived();
+            }
+
+            if (id === "sent") {
+                loadSent();
             }
 
             if (id === "admin") {
@@ -3648,6 +3759,74 @@
 
         let receivedBouquets = [];
         let receivedPollingStarted = false;
+        let activeReceivedBouquetId = null;
+        let selectedBouquetReaction = null;
+        const bouquetReactions = ['❤️', '😍', '🌸', '🥹', '😂', '✨'];
+
+        function escapeHtml(value) {
+            return String(value ?? '').replace(/[&<>'"]/g, character => ({
+                '&': '&amp;', '<': '&lt;', '>': '&gt;', "'": '&#39;', '"': '&quot;'
+            }[character]));
+        }
+
+        function renderReactionOptions() {
+            const el = document.getElementById('reactionOptions');
+            if (!el) return;
+            el.innerHTML = bouquetReactions.map(reaction =>
+                `<button class="reaction-option ${selectedBouquetReaction === reaction ? 'selected' : ''}" type="button" onclick="selectBouquetReaction('${reaction}')" aria-label="${reaction}">${reaction}</button>`
+            ).join('');
+        }
+
+        function selectBouquetReaction(reaction) {
+            selectedBouquetReaction = selectedBouquetReaction === reaction ? null : reaction;
+            renderReactionOptions();
+        }
+
+        function toggleBouquetReply() {
+            const box = document.getElementById('replyBox');
+            if (box) box.style.display = box.style.display === 'none' ? 'block' : 'none';
+        }
+
+        async function sendBouquetInteraction() {
+            if (!activeReceivedBouquetId) return;
+            const messageEl = document.getElementById('reactionMessage');
+            const button = document.getElementById('sendReactionButton');
+            const message = String(messageEl?.value || '').trim();
+            if (!selectedBouquetReaction && !message) {
+                toast('Pilih reaction atau tulis pesan dulu.');
+                return;
+            }
+            button.disabled = true;
+            try {
+                await api(`/api/bouquets/${encodeURIComponent(activeReceivedBouquetId)}/interaction`, {
+                    method: 'POST', body: JSON.stringify({ reaction: selectedBouquetReaction, message })
+                });
+                const bouquet = receivedBouquets.find(item => String(item.id) === String(activeReceivedBouquetId));
+                if (bouquet) { bouquet.interaction_reaction = selectedBouquetReaction; bouquet.interaction_message = message; }
+                renderReceivedList();
+                toast('Reaction berhasil dikirim 💌');
+            } catch (error) { toast(error.message); }
+            finally { button.disabled = false; }
+        }
+
+        async function sendBouquetReply() {
+            if (!activeReceivedBouquetId) return;
+            const messageEl = document.getElementById('replyMessage');
+            const button = document.getElementById('sendReplyButton');
+            const reply = String(messageEl?.value || '').trim();
+            if (!reply) { toast('Tulis reply terlebih dahulu.'); return; }
+            button.disabled = true;
+            try {
+                await api(`/api/bouquets/${encodeURIComponent(activeReceivedBouquetId)}/reply`, {
+                    method: 'POST', body: JSON.stringify({ reply })
+                });
+                const bouquet = receivedBouquets.find(item => String(item.id) === String(activeReceivedBouquetId));
+                if (bouquet) bouquet.interaction_reply = reply;
+                renderReceivedList();
+                toast('Reply berhasil dikirim 💌');
+            } catch (error) { toast(error.message); }
+            finally { button.disabled = false; }
+        }
 
         function receivedStorageKey() {
             return `bloom_last_received_id_${state.user?.telegram_id || 'guest'}`;
@@ -3706,6 +3885,15 @@
             if (bouquetId === undefined || bouquetId === null) return;
             const b = receivedBouquets.find(x => String(x.id) === String(bouquetId) || Number(x.id) === Number(bouquetId));
             if (!b) return;
+            activeReceivedBouquetId = b.id;
+            selectedBouquetReaction = b.interaction_reaction || null;
+            renderReactionOptions();
+            const reactionMessage = document.getElementById('reactionMessage');
+            if (reactionMessage) reactionMessage.value = b.interaction_message || '';
+            const replyMessage = document.getElementById('replyMessage');
+            if (replyMessage) replyMessage.value = b.interaction_reply || '';
+            const replyBox = document.getElementById('replyBox');
+            if (replyBox) replyBox.style.display = b.interaction_reply ? 'block' : 'none';
 
             const sender = b.sender_first_name || (b.sender_username ? `@${b.sender_username}` : 'Teman');
             const giftFrom = document.getElementById('giftFrom');
@@ -3875,6 +4063,31 @@
                 await fetchReceived({ popup: false });
                 await openBouquetFromDeepLink();
             } catch (e) { toast(e.message); }
+        }
+
+        let sentBouquets = [];
+
+        async function loadSent() {
+            try {
+                sentBouquets = await api('/api/bouquets/sent');
+                renderSentList();
+            } catch (e) { toast(e.message); }
+        }
+
+        function renderSentList() {
+            const el = document.getElementById('sentList');
+            if (!el) return;
+            if (!sentBouquets.length) {
+                el.innerHTML = '<div class="empty">Belum ada bouquet terkirim 💌</div>';
+                return;
+            }
+            el.innerHTML = sentBouquets.map(bouquet => {
+                const recipient = bouquet.receiver_username ? `@${escapeHtml(bouquet.receiver_username)}` : `ID ${escapeHtml(bouquet.receiver_telegram_id)}`;
+                const reaction = bouquet.interaction_reaction ? `<div class="sent-interaction-line"><b>Reaction:</b> ${escapeHtml(bouquet.interaction_reaction)}</div>` : '<div class="sent-interaction-line">No reaction yet</div>';
+                const message = bouquet.interaction_message ? `<div class="sent-interaction-line"><b>Message:</b> "${escapeHtml(bouquet.interaction_message)}"</div>` : '';
+                const reply = bouquet.interaction_reply ? `<div class="sent-interaction-line"><b>Reply:</b> "${escapeHtml(bouquet.interaction_reply)}"</div>` : '<div class="sent-interaction-line">No reply yet</div>';
+                return `<div class="sent-bouquet-card"><b>💐 Sent to ${recipient}</b>${reaction}${message}${reply}</div>`;
+            }).join('');
         }
 
         function startReceivedPolling() {
