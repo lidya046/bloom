@@ -99,7 +99,7 @@ router.post('/:bouquetId/interaction', async (req, res) => {
   const { reaction = null, message = '' } = req.body || {};
   const safeReaction = reaction === null || reaction === '' ? null : String(reaction);
   const safeMessage = String(message || '').trim();
-  const allowedReactions = ['❤️', '😍', '🌸', '🥹', '😂', '✨'];
+  const allowedReactions = ['❤️', '😍', '🌸', '🥹', '😂', '✨', '😢', '😭', '😔', '🤢', '😒'];
   if (safeReaction !== null && !allowedReactions.includes(safeReaction)) return res.status(400).json({ error: 'Reaction tidak valid' });
   if (safeMessage.length > 500) return res.status(400).json({ error: 'Pesan maksimal 500 karakter' });
 

@@ -8,7 +8,7 @@ CREATE TABLE IF NOT EXISTS bouquet_interactions (
   reply TEXT NOT NULL DEFAULT '',
   created_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
   updated_at TIMESTAMPTZ NOT NULL DEFAULT NOW(),
-  CHECK (reaction IS NULL OR reaction IN ('❤️','😍','🌸','🥹','😂','✨')),
+  CHECK (reaction IS NULL OR reaction IN ('❤️','😍','🌸','🥹','😂','✨','😢','😭','😔','🤢','😒')),
   CHECK (char_length(message) <= 500),
   CHECK (char_length(reply) <= 500)
 );

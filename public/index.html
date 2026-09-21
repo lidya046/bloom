@@ -1136,6 +1136,19 @@
             margin-top: 9px;
         }
 
+        .interaction-status {
+            min-height: 18px;
+            margin-top: 8px;
+            color: #6b4bb5;
+            font-size: 12px;
+            font-weight: 700;
+            text-align: center;
+        }
+
+        .interaction-status.error {
+            color: #c04b68;
+        }
+
         .gift-reply-toggle {
             width: 100%;
             margin-top: 8px;
@@ -2379,9 +2392,10 @@
             <div class="gift-interaction">
                 <div class="gift-interaction-title">React to this bouquet</div>
                 <div id="reactionOptions" class="reaction-options"></div>
-                <textarea id="reactionMessage" maxlength="500" placeholder="Write a message..."></textarea>
+                <textarea id="reactionMessage" maxlength="500" placeholder="Optional message..."></textarea>
                 <button id="sendReactionButton" class="primary" type="button" onclick="sendBouquetInteraction()">Send
                     Reaction</button>
+                <div id="reactionStatus" class="interaction-status" role="status" aria-live="polite"></div>
             </div>
             <button id="replyToggle" class="gift-reply-toggle" type="button" onclick="toggleBouquetReply()">💬
                 Reply</button>
@@ -2390,6 +2404,7 @@
                 <textarea id="replyMessage" maxlength="500" placeholder="Write your reply..."></textarea>
                 <button id="sendReplyButton" class="primary" type="button" onclick="sendBouquetReply()">Send
                     Reply</button>
+                <div id="replyStatus" class="interaction-status" role="status" aria-live="polite"></div>
             </div>
             <button class="gift-close-btn" type="button" onclick="closeGiftPopup()">Tutup</button>
         </div>
@@ -3761,7 +3776,14 @@
         let receivedPollingStarted = false;
         let activeReceivedBouquetId = null;
         let selectedBouquetReaction = null;
-        const bouquetReactions = ['❤️', '😍', '🌸', '🥹', '😂', '✨'];
+        const bouquetReactions = ['❤️', '😍', '🌸', '🥹', '😂', '✨', '😢', '😭', '😔', '🤢', '😒'];
+
+        function setInteractionStatus(id, message, isError = false) {
+            const el = document.getElementById(id);
+            if (!el) return;
+            el.textContent = message;
+            el.classList.toggle('error', isError);
+        }
 
         function escapeHtml(value) {
             return String(value ?? '').replace(/[&<>'"]/g, character => ({
@@ -3793,6 +3815,7 @@
             const button = document.getElementById('sendReactionButton');
             const message = String(messageEl?.value || '').trim();
             if (!selectedBouquetReaction && !message) {
+                setInteractionStatus('reactionStatus', 'Pilih emoji atau tulis pesan terlebih dahulu.', true);
                 toast('Pilih reaction atau tulis pesan dulu.');
                 return;
             }
@@ -3804,8 +3827,12 @@
                 const bouquet = receivedBouquets.find(item => String(item.id) === String(activeReceivedBouquetId));
                 if (bouquet) { bouquet.interaction_reaction = selectedBouquetReaction; bouquet.interaction_message = message; }
                 renderReceivedList();
+                setInteractionStatus('reactionStatus', 'Terkirim ✓');
                 toast('Reaction berhasil dikirim 💌');
-            } catch (error) { toast(error.message); }
+            } catch (error) {
+                setInteractionStatus('reactionStatus', `Gagal terkirim: ${error.message}`, true);
+                toast(error.message);
+            }
             finally { button.disabled = false; }
         }
 
@@ -3814,7 +3841,11 @@
             const messageEl = document.getElementById('replyMessage');
             const button = document.getElementById('sendReplyButton');
             const reply = String(messageEl?.value || '').trim();
-            if (!reply) { toast('Tulis reply terlebih dahulu.'); return; }
+            if (!reply) {
+                setInteractionStatus('replyStatus', 'Tulis reply terlebih dahulu.', true);
+                toast('Tulis reply terlebih dahulu.');
+                return;
+            }
             button.disabled = true;
             try {
                 await api(`/api/bouquets/${encodeURIComponent(activeReceivedBouquetId)}/reply`, {
@@ -3823,8 +3854,12 @@
                 const bouquet = receivedBouquets.find(item => String(item.id) === String(activeReceivedBouquetId));
                 if (bouquet) bouquet.interaction_reply = reply;
                 renderReceivedList();
+                setInteractionStatus('replyStatus', 'Terkirim ✓');
                 toast('Reply berhasil dikirim 💌');
-            } catch (error) { toast(error.message); }
+            } catch (error) {
+                setInteractionStatus('replyStatus', `Gagal terkirim: ${error.message}`, true);
+                toast(error.message);
+            }
             finally { button.disabled = false; }
         }
 
@@ -3888,6 +3923,8 @@
             activeReceivedBouquetId = b.id;
             selectedBouquetReaction = b.interaction_reaction || null;
             renderReactionOptions();
+            setInteractionStatus('reactionStatus', '');
+            setInteractionStatus('replyStatus', '');
             const reactionMessage = document.getElementById('reactionMessage');
             if (reactionMessage) reactionMessage.value = b.interaction_message || '';
             const replyMessage = document.getElementById('replyMessage');

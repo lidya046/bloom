@@ -69,7 +69,9 @@ All `/api/*` endpoints require the Telegram Mini App initData in:
 - GET `/api/transfers`
 
 For existing databases, run `coin_transfers_migration.sql` and
-`bouquet_interactions_migration.sql` after `schema.sql`.
+`bouquet_interactions_migration.sql` after `schema.sql`. If the interaction
+table already exists, also run `bouquet_interactions_reactions_migration.sql`
+to enable the expanded reaction set.
 
 ## Important
 
