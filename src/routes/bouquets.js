@@ -92,8 +92,8 @@ router.post('/', async (req, res) => {
     res.json({ bouquet: b, cost, xp: 15, level: xpResult.level, leveledUp: xpResult.leveledUp, receiver: { username: receiver.username, first_name: receiver.first_name }, notification });
   } catch (e) { await client.query('ROLLBACK'); res.status(400).json({ error: e.message }); } finally { client.release(); }
 });
-router.get('/sent', async (req, res) => { const r = await pool.query(`SELECT b.*,i.reaction AS interaction_reaction,i.message AS interaction_message,i.reply AS interaction_reply,json_agg(json_build_object('flowerId',bi.flower_id,'quantity',bi.quantity)) items FROM bouquets b JOIN bouquet_items bi ON bi.bouquet_id=b.id LEFT JOIN bouquet_interactions i ON i.bouquet_id=b.id WHERE b.sender_id=$1 GROUP BY b.id,i.reaction,i.message,i.reply ORDER BY b.created_at DESC`, [req.user.id]); res.json(r.rows); });
-router.get('/received', async (req, res) => { const r = await pool.query(`SELECT b.*,u.first_name AS sender_first_name,u.username AS sender_username,i.reaction AS interaction_reaction,i.message AS interaction_message,i.reply AS interaction_reply,json_agg(json_build_object('flowerId',bi.flower_id,'quantity',bi.quantity)) items FROM bouquets b JOIN bouquet_items bi ON bi.bouquet_id=b.id LEFT JOIN users u ON u.id=b.sender_id LEFT JOIN bouquet_interactions i ON i.bouquet_id=b.id WHERE b.receiver_telegram_id=$1 GROUP BY b.id,u.first_name,u.username,i.reaction,i.message,i.reply ORDER BY b.created_at DESC`, [req.user.telegram_id]); res.json(r.rows); });
+router.get('/sent', async (req, res) => { const r = await pool.query(`SELECT b.*,i.reaction AS interaction_reaction,i.message AS interaction_message,json_agg(json_build_object('flowerId',bi.flower_id,'quantity',bi.quantity)) items FROM bouquets b JOIN bouquet_items bi ON bi.bouquet_id=b.id LEFT JOIN bouquet_interactions i ON i.bouquet_id=b.id WHERE b.sender_id=$1 GROUP BY b.id,i.reaction,i.message ORDER BY b.created_at DESC`, [req.user.id]); res.json(r.rows); });
+router.get('/received', async (req, res) => { const r = await pool.query(`SELECT b.*,u.first_name AS sender_first_name,u.username AS sender_username,i.reaction AS interaction_reaction,i.message AS interaction_message,json_agg(json_build_object('flowerId',bi.flower_id,'quantity',bi.quantity)) items FROM bouquets b JOIN bouquet_items bi ON bi.bouquet_id=b.id LEFT JOIN users u ON u.id=b.sender_id LEFT JOIN bouquet_interactions i ON i.bouquet_id=b.id WHERE b.receiver_telegram_id=$1 GROUP BY b.id,u.first_name,u.username,i.reaction,i.message ORDER BY b.created_at DESC`, [req.user.telegram_id]); res.json(r.rows); });
 
 router.post('/:bouquetId/interaction', async (req, res) => {
   const { reaction = null, message = '' } = req.body || {};
@@ -115,26 +115,6 @@ router.post('/:bouquetId/interaction', async (req, res) => {
       [bouquet.id, bouquet.sender_telegram_id, req.user.telegram_id, safeReaction, safeMessage]
     );
     if (safeReaction || safeMessage) notifyInteraction(bouquet.sender_telegram_id, `${req.user.username ? `@${req.user.username}` : req.user.first_name || 'Seseorang'} berinteraksi dengan bouquet kamu${safeReaction ? ` ${safeReaction}` : ''}${safeMessage ? `: ${safeMessage}` : ''}`).catch(() => { });
-    res.json({ interaction: result.rows[0] });
-  } catch (e) { res.status(400).json({ error: e.message }); }
-});
-
-router.post('/:bouquetId/reply', async (req, res) => {
-  const reply = String(req.body?.reply || '').trim();
-  if (!reply) return res.status(400).json({ error: 'Reply tidak boleh kosong' });
-  if (reply.length > 500) return res.status(400).json({ error: 'Reply maksimal 500 karakter' });
-
-  try {
-    const bouquet = await getReceivedBouquetInteraction(req.params.bouquetId, req.user.telegram_id);
-    if (!bouquet) return res.status(404).json({ error: 'Bouquet tidak ditemukan' });
-    const result = await pool.query(
-      `INSERT INTO bouquet_interactions (bouquet_id,sender_telegram_id,receiver_telegram_id,reply)
-       VALUES ($1,$2,$3,$4)
-       ON CONFLICT (bouquet_id) DO UPDATE SET reply=EXCLUDED.reply, updated_at=NOW()
-       RETURNING *`,
-      [bouquet.id, bouquet.sender_telegram_id, req.user.telegram_id, reply]
-    );
-    notifyInteraction(bouquet.sender_telegram_id, `${req.user.username ? `@${req.user.username}` : req.user.first_name || 'Seseorang'} membalas bouquet kamu: "${reply}"`).catch(() => { });
     res.json({ interaction: result.rows[0] });
   } catch (e) { res.status(400).json({ error: e.message }); }
 });

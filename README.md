@@ -64,7 +64,6 @@ All `/api/*` endpoints require the Telegram Mini App initData in:
 - GET `/api/bouquets/sent`
 - GET `/api/bouquets/received`
 - POST `/api/bouquets/:bouquetId/interaction` with `{ "reaction": "❤️", "message": "..." }`
-- POST `/api/bouquets/:bouquetId/reply` with `{ "reply": "..." }`
 - POST `/api/transfers` with `{ "username": "@teman", "amount": 100 }`
 - GET `/api/transfers`
 
