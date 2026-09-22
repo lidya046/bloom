@@ -275,9 +275,7 @@
         }
 
         .bouquet-special {
-            animation: premiumFlowerFloat 4.8s cubic-bezier(.45, 0, .25, 1) infinite, premiumFlowerGlow 2.4s ease-in-out infinite;
-            transform-style: preserve-3d;
-            backface-visibility: visible;
+            animation: premiumFlowerFloat 5.6s ease-in-out infinite, premiumFlowerGlow 3.2s ease-in-out infinite;
             isolation: isolate;
         }
 
@@ -308,7 +306,7 @@
             opacity: 0;
             z-index: 7;
             pointer-events: none;
-            animation: premiumShimmer 2.4s ease-in-out infinite;
+            animation: premiumShimmer 3.4s ease-in-out infinite;
         }
 
         .bouquet-special>span:not(.bouquet-stem) {
@@ -697,27 +695,19 @@
 
             0%,
             100% {
-                transform: translateX(-50%) perspective(240px) translateY(0) rotateY(0deg) rotateZ(-2deg) scale(1);
+                transform: translateX(-50%) translateY(0) rotate(-2deg) scale(1);
             }
 
-            18% {
-                transform: translateX(-50%) perspective(240px) translateY(-3px) rotateY(72deg) rotateZ(1deg) scale(1.02);
+            25% {
+                transform: translateX(-50%) translateY(-4px) rotate(1deg) scale(1.025);
             }
 
-            35% {
-                transform: translateX(-50%) perspective(240px) translateY(-5px) rotateY(145deg) rotateZ(2deg) scale(1.035);
+            55% {
+                transform: translateX(-50%) translateY(-7px) rotate(2deg) scale(1.045);
             }
 
-            50% {
-                transform: translateX(-50%) perspective(240px) translateY(-3px) rotateY(220deg) rotateZ(-1deg) scale(1.025);
-            }
-
-            68% {
-                transform: translateX(-50%) perspective(240px) translateY(-2px) rotateY(290deg) rotateZ(-1deg) scale(1.015);
-            }
-
-            85% {
-                transform: translateX(-50%) perspective(240px) translateY(-1px) rotateY(340deg) rotateZ(0deg) scale(1.01);
+            78% {
+                transform: translateX(-50%) translateY(-3px) rotate(-1deg) scale(1.018);
             }
         }
 
@@ -728,12 +718,16 @@
                 filter: drop-shadow(0 5px 4px rgba(80, 50, 90, .12));
             }
 
-            45% {
+            42% {
                 filter: drop-shadow(0 0 8px rgba(168, 85, 247, .42)) drop-shadow(0 0 16px rgba(255, 255, 255, .28));
             }
 
-            58% {
-                filter: drop-shadow(0 0 14px rgba(168, 85, 247, .7)) drop-shadow(0 0 22px rgba(255, 255, 255, .38));
+            54% {
+                filter: drop-shadow(0 0 17px rgba(168, 85, 247, .72)) drop-shadow(0 0 26px rgba(255, 255, 255, .42));
+            }
+
+            68% {
+                filter: drop-shadow(0 0 9px rgba(168, 85, 247, .48)) drop-shadow(0 0 15px rgba(255, 255, 255, .22));
             }
         }
 
@@ -754,20 +748,20 @@
         @keyframes premiumShimmer {
 
             0%,
-            18% {
+            20% {
                 opacity: 0;
                 transform: translate(-50%, -50%) scale(.4) rotate(0deg);
             }
 
-            35% {
+            38% {
                 opacity: 1;
-                transform: translate(18px, -24px) scale(1.15) rotate(90deg);
+                transform: translate(20px, -26px) scale(1.2) rotate(90deg);
             }
 
             52%,
             100% {
                 opacity: 0;
-                transform: translate(34px, -40px) scale(.55) rotate(180deg);
+                transform: translate(38px, -46px) scale(.55) rotate(180deg);
             }
         }
 
