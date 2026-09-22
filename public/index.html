@@ -628,17 +628,19 @@
         }
 
         .garden-flower-detail {
+            position: relative;
+            width: min(390px, 100%);
             display: grid;
             grid-template-columns: 64px 1fr;
             gap: 12px;
             align-items: center;
-            margin-top: 12px;
             padding: 13px;
             border: 1px solid #dcebd6;
             border-radius: 18px;
             background: #f8fff4;
             color: #315f3b;
-            box-shadow: 0 6px 16px rgba(73, 112, 67, .08);
+            box-shadow: 0 20px 55px rgba(45, 82, 48, .26);
+            animation: gardenDetailPop .24s cubic-bezier(.2, .8, .2, 1);
         }
 
         .garden-flower-detail[hidden] {
@@ -679,6 +681,38 @@
             color: #527355;
             font-size: 11px;
             line-height: 1.4;
+        }
+
+        .garden-detail-close {
+            position: absolute;
+            top: 8px;
+            right: 8px;
+            width: 28px;
+            height: 28px;
+            padding: 0;
+            border: 0;
+            border-radius: 50%;
+            background: #e5f1df;
+            color: #527355;
+            font-size: 19px;
+            line-height: 1;
+            cursor: pointer;
+        }
+
+        .garden-detail-close:hover {
+            background: #d5e9cc;
+        }
+
+        @keyframes gardenDetailPop {
+            from {
+                opacity: 0;
+                transform: translateY(8px) scale(.96);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
         }
 
         @keyframes gardenPlantSway {
@@ -3030,7 +3064,10 @@
                 <div id="gardenFlowers" class="garden-plots"></div>
                 <div class="garden-footnote">Ada ruang untuk lebih banyak kehidupan di sini.</div>
             </div>
-            <div id="gardenFlowerDetail" class="garden-flower-detail" hidden></div>
+            <div id="gardenFlowerOverlay" class="gift-overlay" onclick="closeGardenFlower(event)">
+                <div id="gardenFlowerDetail" class="garden-flower-detail" role="dialog" aria-modal="true"
+                    aria-label="Detail bunga" hidden onclick="event.stopPropagation()"></div>
+            </div>
 
         </section>
 
@@ -3810,6 +3847,7 @@
                 : 'Tanaman ini sudah tumbuh di kebunmu dan siap dirawat.';
 
             detail.innerHTML = `
+                <button class="garden-detail-close" type="button" aria-label="Tutup detail" onclick="closeGardenFlower()">×</button>
                 <div class="garden-detail-visual">${visual}</div>
                 <div>
                     <div class="garden-detail-name">${flower.name}</div>
@@ -3822,6 +3860,15 @@
                 </div>
             `;
             detail.hidden = false;
+            document.getElementById('gardenFlowerOverlay')?.classList.add('show');
+        }
+
+        function closeGardenFlower(event) {
+            if (event && event.currentTarget !== event.target) return;
+            const overlay = document.getElementById('gardenFlowerOverlay');
+            const detail = document.getElementById('gardenFlowerDetail');
+            overlay?.classList.remove('show');
+            if (detail) detail.hidden = true;
         }
 
 
