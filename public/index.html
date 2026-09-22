@@ -627,6 +627,60 @@
             text-align: center;
         }
 
+        .garden-flower-detail {
+            display: grid;
+            grid-template-columns: 64px 1fr;
+            gap: 12px;
+            align-items: center;
+            margin-top: 12px;
+            padding: 13px;
+            border: 1px solid #dcebd6;
+            border-radius: 18px;
+            background: #f8fff4;
+            color: #315f3b;
+            box-shadow: 0 6px 16px rgba(73, 112, 67, .08);
+        }
+
+        .garden-flower-detail[hidden] {
+            display: none;
+        }
+
+        .garden-detail-visual {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 58px;
+            border-radius: 14px;
+            background: linear-gradient(180deg, #e7f7df, #cfe8bd);
+            font-size: 38px;
+        }
+
+        .garden-detail-visual .celestial-visual {
+            width: 54px;
+            height: 54px;
+        }
+
+        .garden-detail-name {
+            font-size: 15px;
+            font-weight: 800;
+        }
+
+        .garden-detail-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px 10px;
+            margin-top: 4px;
+            color: #668265;
+            font-size: 11px;
+        }
+
+        .garden-detail-note {
+            margin-top: 7px;
+            color: #527355;
+            font-size: 11px;
+            line-height: 1.4;
+        }
+
         @keyframes gardenPlantSway {
 
             0%,
@@ -2976,6 +3030,7 @@
                 <div id="gardenFlowers" class="garden-plots"></div>
                 <div class="garden-footnote">Ada ruang untuk lebih banyak kehidupan di sini.</div>
             </div>
+            <div id="gardenFlowerDetail" class="garden-flower-detail" hidden></div>
 
         </section>
 
@@ -3725,7 +3780,7 @@
                 const visual = flowerVisual(flower, 'garden-celestial-visual');
                 const label = quantity < 1 ? 'Tempat menanam' : flower.name;
                 return `
-                                        <div class="garden-plot" data-growth="${growth}" aria-label="${label}">
+                            <div class="garden-plot" data-growth="${growth}" aria-label="${label}" role="button" tabindex="0" onclick="showGardenFlower(${flower.id})" onkeydown="if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); showGardenFlower(${flower.id}); }">
                                                 <div class="garden-plant">
                                                         <div class="garden-flower-visual">${quantity < 1 ? '🌱' : visual}</div>
                                                 </div>
@@ -3734,6 +3789,39 @@
                                 `;
             }).join('');
 
+        }
+
+        function showGardenFlower(flowerId) {
+            const flower = state.flowers.find(item => Number(item.id) === Number(flowerId));
+            const detail = document.getElementById('gardenFlowerDetail');
+            if (!flower || !detail) return;
+
+            const quantity = getQuantity(flower.id);
+            const growth = quantity < 1 ? 'seed' : quantity === 1 ? 'sprout' : quantity < 3 ? 'growing' : 'bloomed';
+            const growthLabels = {
+                seed: 'Tempat menanam',
+                sprout: 'Tunas baru',
+                growing: 'Sedang tumbuh',
+                bloomed: 'Mekar di kebun'
+            };
+            const visual = quantity < 1 ? '🌱' : flowerVisual(flower, 'garden-detail-celestial');
+            const note = quantity < 1
+                ? 'Belum ada di kebunmu. Tanam benih untuk mendapatkan bunga secara acak.'
+                : 'Tanaman ini sudah tumbuh di kebunmu dan siap dirawat.';
+
+            detail.innerHTML = `
+                <div class="garden-detail-visual">${visual}</div>
+                <div>
+                    <div class="garden-detail-name">${flower.name}</div>
+                    <div class="garden-detail-meta">
+                        <span>${growthLabels[growth]}</span>
+                        <span>Rarity: ${flower.rarity}</span>
+                        <span>Dimiliki: ${quantity}</span>
+                    </div>
+                    <div class="garden-detail-note">${note}</div>
+                </div>
+            `;
+            detail.hidden = false;
         }
 
 
