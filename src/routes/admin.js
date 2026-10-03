@@ -1,5 +1,6 @@
 import crypto from 'crypto';
 import fs from 'fs/promises';
+import os from 'os';
 import path from 'path';
 import multer from 'multer';
 import { Router } from 'express';
@@ -22,9 +23,7 @@ const AUDIO_MIME_TYPES = new Set([
     'audio/ogg',
     'audio/x-wav'
 ]);
-const TEMP_UPLOAD_DIR = path.join(process.cwd(), 'storage', 'broadcast-temp');
-
-await fs.mkdir(TEMP_UPLOAD_DIR, { recursive: true });
+const TEMP_UPLOAD_DIR = path.join(os.tmpdir(), 'bloom-broadcast-temp');
 
 const storage = multer.diskStorage({
     destination: async (_req, _file, cb) => {
