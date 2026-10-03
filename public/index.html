@@ -3252,10 +3252,34 @@
                     <div id="adminUserResult" class="admin-user"></div>
                 </div>
                 <div class="admin-box">
-                    <div style="font-weight:800">� Broadcast Message</div>
+                    <div style="font-weight:800">📢 Broadcast Message</div>
                     <textarea id="broadcastMessage" rows="5" maxlength="4096"
                         placeholder="Tulis pesan yang ingin dikirim ke semua user Bloom..."
                         style="width:100%;box-sizing:border-box;resize:vertical;border:1px solid #e5d9f5;border-radius:12px;padding:12px;font:inherit;margin-top:10px"></textarea>
+
+                    <div style="margin-top:14px;">
+                        <div style="font-weight:800;font-size:12px;margin-bottom:8px">🎵 Audio</div>
+                        <input id="broadcastAudioInput" type="file"
+                            accept=".mp3,.m4a,.wav,.ogg,.aac,audio/mpeg,audio/mp4,audio/wav,audio/ogg,audio/aac" hidden>
+                        <button class="admin-primary" type="button" style="margin-top:0;"
+                            onclick="document.getElementById('broadcastAudioInput').click()">🎵 Choose Audio</button>
+                        <div id="broadcastAudioMeta"
+                            style="display:none;margin-top:8px;padding:8px 10px;border-radius:10px;background:#f9f5ff;border:1px solid #e6d9ff;font-size:12px;color:#4b2f5d;display:flex;align-items:center;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                            <span id="broadcastAudioName" style="word-break:break-all;flex:1;min-width:120px"></span>
+                            <button type="button" class="admin-primary"
+                                style="margin:0;padding:7px 10px;font-size:11px;min-width:auto;"
+                                onclick="clearBroadcastAudio()">Remove</button>
+                        </div>
+                        <audio id="broadcastAudioPreview" controls
+                            style="display:none;width:100%;margin-top:8px"></audio>
+                    </div>
+
+                    <label
+                        style="display:flex;align-items:center;gap:8px;margin-top:12px;font-size:12px;color:#5c4768;">
+                        <input id="broadcastRoseReward" type="checkbox" checked>
+                        <span>🌹 Rose × 1</span>
+                    </label>
+
                     <div id="broadcastRecipients" style="font-size:12px;color:#7b6a8a;margin-top:8px;font-weight:700">
                         Recipients: menghitung...</div>
                     <div id="broadcastPreview"
@@ -3270,7 +3294,7 @@
                     <div id="broadcastStatus" style="font-size:12px;color:#5b6b7f;margin-top:10px"></div>
                 </div>
                 <div class="admin-box">
-                    <div style="font-weight:800">�💰 Tambah Balance</div>
+                    <div style="font-weight:800">💰 Tambah Balance</div>
 
                     <div style="margin-top:12px">
                         <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px">🪙 Jumlah
@@ -4208,8 +4232,8 @@
                     : '<span class="bouquet-spark two">✦</span><span class="bouquet-spark three">✧</span>';
             preview.innerHTML = positions.map((pos, index) => {
                 const flower = flowers[index % flowers.length];
-                const special = Boolean(flower.is_special);
-                const celestial = String(flower.name || '').toLowerCase() === 'celestial bloom';
+                const special = Boolean(flower?.is_special);
+                const celestial = String(flower?.name || '').toLowerCase() === 'celestial bloom';
                 const spark = celestial
                     ? '<span class="celestial-sparkle sp-1">✦</span><span class="celestial-sparkle sp-2">✦</span><span class="celestial-sparkle sp-3">✧</span><span class="celestial-sparkle sp-4">✨</span>'
                     : (special ? '<span class="bouquet-spark one">✦</span>' : '');
@@ -4412,9 +4436,7 @@
                         const d = new Date(b.created_at);
                         dateEl.textContent = `📅 ${d.toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric', hour: '2-digit', minute: '2-digit' })}`;
                         dateEl.style.display = 'block';
-                    } catch (_) {
-                        dateEl.style.display = 'none';
-                    }
+                    } catch (_) { }
                 } else {
                     dateEl.style.display = 'none';
                 }
@@ -4769,7 +4791,7 @@
                 adminTarget = u;
                 out.innerHTML = `
                     <div style="font-weight:800">@${u.username || '-'}</div>
-                    <div>👤 ${u.first_name || '-'} · Telegram ID: ${u.telegram_id}</div>
+                    <div>👤 ${u.first_name || '-'}</div>
                     <div>🪙 Coins: <b>${u.coins}</b> · 🌱 Seeds: <b>${u.seeds}</b></div>`;
                 toast('User ditemukan ✅');
             } catch (e) {
@@ -4836,6 +4858,94 @@
             }
         }
 
+        const VALID_BROADCAST_AUDIO_TYPES = ['audio/mpeg', 'audio/mp3', 'audio/mp4', 'audio/x-m4a', 'audio/aac', 'audio/wav', 'audio/wave', 'audio/ogg', 'audio/x-wav'];
+        const MAX_BROADCAST_AUDIO_SIZE = 15 * 1024 * 1024;
+
+        function validateBroadcastAudioFile(file) {
+            if (!file) return { valid: false, error: 'Tidak ada file audio.' };
+
+            const mime = String(file.type || '').toLowerCase();
+            const name = String(file.name || '').toLowerCase();
+            const extAllowed = /\.(mp3|m4a|wav|ogg|aac)$/i.test(name);
+            const mimeAllowed = VALID_BROADCAST_AUDIO_TYPES.includes(mime) || extAllowed;
+            const sizeAllowed = file.size <= MAX_BROADCAST_AUDIO_SIZE;
+
+            if (!mimeAllowed) {
+                return { valid: false, error: 'Format audio tidak didukung. Gunakan MP3, M4A, WAV, OGG, atau AAC.' };
+            }
+
+            if (!sizeAllowed) {
+                return { valid: false, error: 'Ukuran audio terlalu besar. Maksimal 15 MB.' };
+            }
+
+            return { valid: true };
+        }
+
+        function clearBroadcastAudio() {
+            const input = document.getElementById('broadcastAudioInput');
+            const meta = document.getElementById('broadcastAudioMeta');
+            const audioPreview = document.getElementById('broadcastAudioPreview');
+            if (input) input.value = '';
+            if (meta) meta.style.display = 'none';
+            if (audioPreview) {
+                audioPreview.pause();
+                audioPreview.src = '';
+                audioPreview.style.display = 'none';
+            }
+            window.__selectedBroadcastAudio = null;
+        }
+
+        function renderSelectedBroadcastAudio(file) {
+            const meta = document.getElementById('broadcastAudioMeta');
+            const nameEl = document.getElementById('broadcastAudioName');
+            const audioPreview = document.getElementById('broadcastAudioPreview');
+
+            if (!file) {
+                clearBroadcastAudio();
+                return;
+            }
+
+            if (meta) meta.style.display = 'flex';
+            if (nameEl) nameEl.textContent = file.name;
+            if (audioPreview) {
+                const objectUrl = URL.createObjectURL(file);
+                audioPreview.src = objectUrl;
+                audioPreview.style.display = 'block';
+            }
+            window.__selectedBroadcastAudio = file;
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageInput = document.getElementById('broadcastMessage');
+            const audioInput = document.getElementById('broadcastAudioInput');
+
+            if (messageInput) {
+                messageInput.addEventListener('input', async () => {
+                    const value = String(messageInput.value || '').trim();
+                    if (!value) {
+                        document.getElementById('broadcastRecipients').textContent = 'Recipients: menghitung...';
+                        document.getElementById('broadcastPreview').style.display = 'none';
+                        return;
+                    }
+                    await refreshBroadcastRecipients();
+                    renderBroadcastPreview(value);
+                });
+            }
+
+            if (audioInput) {
+                audioInput.addEventListener('change', () => {
+                    const file = audioInput.files?.[0] || null;
+                    const validated = validateBroadcastAudioFile(file);
+                    if (!validated.valid) {
+                        clearBroadcastAudio();
+                        toast(validated.error);
+                        return;
+                    }
+                    renderSelectedBroadcastAudio(file);
+                });
+            }
+        });
+
         async function refreshBroadcastRecipients() {
             const el = document.getElementById('broadcastRecipients');
             if (!el || !isAdmin) return;
@@ -4868,8 +4978,8 @@
             const input = document.getElementById('broadcastMessage');
             const message = String(input?.value || '').trim();
 
-            if (!message) {
-                toast('Tulis pesan broadcast dulu 📢');
+            if (!message && !window.__selectedBroadcastAudio) {
+                toast('Tulis pesan atau pilih audio 🎵');
                 return;
             }
 
@@ -4881,7 +4991,7 @@
 
                 const count = Number(data.totalRecipients || 0);
                 document.getElementById('broadcastRecipients').textContent = `Recipients: ${count.toLocaleString('id-ID')} users`;
-                renderBroadcastPreview(data.preview || message);
+                renderBroadcastPreview(data.preview || message || '🎵 Audio broadcast siap dikirim');
                 toast(`Preview siap — ${count.toLocaleString('id-ID')} pengguna eligible.`);
             } catch (e) {
                 toast(e.message);
@@ -4891,12 +5001,17 @@
         async function sendBroadcast(event) {
             const input = document.getElementById('broadcastMessage');
             const status = document.getElementById('broadcastStatus');
+            const rewardCheckbox = document.getElementById('broadcastRoseReward');
             const message = String(input?.value || '').trim();
+            const file = window.__selectedBroadcastAudio || null;
 
-            if (!message) {
-                toast('Tulis pesan broadcast dulu 📢');
+            if (!message && !file) {
+                toast('Tulis pesan atau pilih audio 🎵');
                 return;
             }
+
+            const broadcastId = (window.__broadcastRequestId || crypto?.randomUUID?.() || `${Date.now()}`);
+            window.__broadcastRequestId = broadcastId;
 
             const sendButton = event?.currentTarget || null;
             if (sendButton) sendButton.disabled = true;
@@ -4904,18 +5019,31 @@
             status.style.color = '#5b6b7f';
 
             try {
-                const result = await api('/api/admin/broadcast', {
+                const form = new FormData();
+                form.append('message', message);
+                form.append('rewardRose', String(Boolean(rewardCheckbox?.checked)));
+                form.append('broadcastId', broadcastId);
+                if (file) form.append('audio', file, file.name);
+
+                const response = await fetch(API_URL + '/api/admin/broadcast', {
                     method: 'POST',
-                    body: JSON.stringify({ message })
+                    headers: {
+                        Authorization: `tma ${getTelegramInitData()}`
+                    },
+                    body: form
                 });
+
+                const result = await response.json().catch(() => ({}));
+                if (!response.ok) throw new Error(result.error || `Broadcast gagal (${response.status})`);
 
                 const sent = Number(result.sent || 0);
                 const failed = Number(result.failed || 0);
                 const total = Number(result.total || 0);
-                status.textContent = `Broadcast completed. Sent: ${sent.toLocaleString('id-ID')} · Failed: ${failed.toLocaleString('id-ID')} · Total: ${total.toLocaleString('id-ID')}`;
+                const rewarded = Number(result.rewarded || 0);
+                status.textContent = `Broadcast completed. Sent: ${sent.toLocaleString('id-ID')} · Failed: ${failed.toLocaleString('id-ID')} · Total: ${total.toLocaleString('id-ID')} · Rose rewards: ${rewarded.toLocaleString('id-ID')}`;
                 status.style.color = '#285d47';
                 toast(`Broadcast selesai ✅ Sent: ${sent} · Failed: ${failed}`);
-                renderBroadcastPreview(message);
+                renderBroadcastPreview(message || '🎵 Audio broadcast siap dikirim');
             } catch (e) {
                 status.textContent = e.message;
                 status.style.color = '#a53535';
@@ -4924,22 +5052,6 @@
                 if (sendButton) sendButton.disabled = false;
             }
         }
-
-        document.addEventListener('DOMContentLoaded', () => {
-            const messageInput = document.getElementById('broadcastMessage');
-            if (messageInput) {
-                messageInput.addEventListener('input', async () => {
-                    const value = String(messageInput.value || '').trim();
-                    if (!value) {
-                        document.getElementById('broadcastRecipients').textContent = 'Recipients: menghitung...';
-                        document.getElementById('broadcastPreview').style.display = 'none';
-                        return;
-                    }
-                    await refreshBroadcastRecipients();
-                    renderBroadcastPreview(value);
-                });
-            }
-        });
 
 
 
