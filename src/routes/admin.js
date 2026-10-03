@@ -3,10 +3,95 @@ import { pool } from '../db.js';
 import { isAdminTelegramId, getAdminRole, getAdminStats } from '../admin.js';
 
 const router = Router();
+const BROADCAST_BATCH_SIZE = 20;
+const BROADCAST_DELAY_MS = 250;
 
 function requireAdmin(req, res, next) {
     if (!isAdminTelegramId(req.user?.telegram_id)) return res.status(403).json({ error: 'Admin only' });
     next();
+}
+
+function sleep(ms) {
+    return new Promise(resolve => setTimeout(resolve, ms));
+}
+
+function sanitizeBroadcastMessage(rawValue) {
+    return String(rawValue ?? '').replace(/\r\n/g, '\n').trim();
+}
+
+async function getEligibleBroadcastRecipients() {
+    const result = await pool.query(`
+        SELECT DISTINCT telegram_id
+        FROM users
+        WHERE telegram_id IS NOT NULL
+          AND telegram_id <> 0
+        ORDER BY telegram_id ASC
+    `);
+
+    return result.rows
+        .map(row => Number(row.telegram_id))
+        .filter(id => Number.isFinite(id) && id !== 0);
+}
+
+async function sendTelegramBroadcastMessage(chatId, text) {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    if (!token || !chatId) {
+        return { ok: false, reason: 'missing_bot_token_or_chat_id' };
+    }
+
+    try {
+        const response = await fetch(`https://api.telegram.org/bot${token}/sendMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({
+                chat_id: chatId,
+                text,
+                disable_web_page_preview: true
+            })
+        });
+
+        const data = await response.json().catch(() => ({}));
+
+        if (!response.ok || !data.ok) {
+            return {
+                ok: false,
+                reason: data.description || `telegram_http_${response.status || 'unknown'}`
+            };
+        }
+
+        return { ok: true };
+    } catch (error) {
+        return { ok: false, reason: error?.message || 'telegram_request_failed' };
+    }
+}
+
+async function processBroadcast(adminTelegramId, message, recipients) {
+    let sent = 0;
+    let failed = 0;
+
+    for (let index = 0; index < recipients.length; index += BROADCAST_BATCH_SIZE) {
+        const batch = recipients.slice(index, index + BROADCAST_BATCH_SIZE);
+        const results = await Promise.all(
+            batch.map(chatId => sendTelegramBroadcastMessage(chatId, message))
+        );
+
+        for (const result of results) {
+            if (result.ok) sent += 1;
+            else failed += 1;
+        }
+
+        if (index + BROADCAST_BATCH_SIZE < recipients.length) {
+            await sleep(BROADCAST_DELAY_MS);
+        }
+    }
+
+    await pool.query(
+        `INSERT INTO broadcast_history (admin_id, message, total_recipients, successful_count, failed_count)
+         VALUES ($1, $2, $3, $4, $5)`,
+        [adminTelegramId, message, recipients.length, sent, failed]
+    );
+
+    return { total: recipients.length, sent, failed };
 }
 
 router.get('/stats', requireAdmin, async (_req, res) => {
@@ -27,6 +112,83 @@ router.get('/stats', requireAdmin, async (_req, res) => {
 
 router.get('/me', requireAdmin, async (req, res) => {
     res.json({ isAdmin: true, role: getAdminRole(req.user.telegram_id) });
+});
+
+router.get('/broadcast/count', requireAdmin, async (_req, res) => {
+    try {
+        const recipients = await getEligibleBroadcastRecipients();
+        res.json({ totalRecipients: recipients.length });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+router.post('/broadcast/preview', requireAdmin, async (req, res) => {
+    const message = sanitizeBroadcastMessage(req.body?.message);
+
+    if (!message) {
+        return res.status(400).json({ error: 'Pesan broadcast wajib diisi' });
+    }
+
+    if (message.length > 4096) {
+        return res.status(400).json({ error: 'Pesan broadcast terlalu panjang. Maksimal 4096 karakter.' });
+    }
+
+    try {
+        const recipients = await getEligibleBroadcastRecipients();
+        res.json({
+            totalRecipients: recipients.length,
+            preview: message.length > 240 ? `${message.slice(0, 240)}...` : message
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+router.post('/broadcast', requireAdmin, async (req, res) => {
+    const message = sanitizeBroadcastMessage(req.body?.message);
+
+    if (!message) {
+        return res.status(400).json({ error: 'Pesan broadcast wajib diisi' });
+    }
+
+    if (message.length > 4096) {
+        return res.status(400).json({ error: 'Pesan broadcast terlalu panjang. Maksimal 4096 karakter.' });
+    }
+
+    try {
+        const recipients = await getEligibleBroadcastRecipients();
+
+        if (!recipients.length) {
+            await pool.query(
+                `INSERT INTO broadcast_history (admin_id, message, total_recipients, successful_count, failed_count)
+                 VALUES ($1, $2, $3, $4, $5)`,
+                [req.user.telegram_id, message, 0, 0, 0]
+            );
+
+            return res.json({
+                ok: true,
+                message: 'Broadcast completed.',
+                sent: 0,
+                failed: 0,
+                total: 0,
+                recipients: 0
+            });
+        }
+
+        const result = await processBroadcast(req.user.telegram_id, message, recipients);
+
+        res.json({
+            ok: true,
+            message: 'Broadcast completed.',
+            sent: result.sent,
+            failed: result.failed,
+            total: result.total,
+            recipients: result.total
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
 });
 
 router.get('/user', requireAdmin, async (req, res) => {

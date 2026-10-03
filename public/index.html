@@ -3252,7 +3252,25 @@
                     <div id="adminUserResult" class="admin-user"></div>
                 </div>
                 <div class="admin-box">
-                    <div style="font-weight:800">💰 Tambah Balance</div>
+                    <div style="font-weight:800">� Broadcast Message</div>
+                    <textarea id="broadcastMessage" rows="5" maxlength="4096"
+                        placeholder="Tulis pesan yang ingin dikirim ke semua user Bloom..."
+                        style="width:100%;box-sizing:border-box;resize:vertical;border:1px solid #e5d9f5;border-radius:12px;padding:12px;font:inherit;margin-top:10px"></textarea>
+                    <div id="broadcastRecipients" style="font-size:12px;color:#7b6a8a;margin-top:8px;font-weight:700">
+                        Recipients: menghitung...</div>
+                    <div id="broadcastPreview"
+                        style="display:none;background:#faf6ff;border:1px solid #e9dcff;border-radius:12px;padding:12px;margin-top:10px;font-size:12px;line-height:1.5;color:#4b3859;white-space:pre-wrap;word-break:break-word">
+                    </div>
+                    <div style="display:flex;gap:8px;margin-top:12px;flex-wrap:wrap">
+                        <button class="admin-primary" style="flex:1 1 140px;min-width:140px"
+                            onclick="previewBroadcast()">👀 Preview</button>
+                        <button class="admin-primary" style="flex:1 1 140px;min-width:140px;background:#7c3aed"
+                            onclick="sendBroadcast(event)">📣 Send Broadcast</button>
+                    </div>
+                    <div id="broadcastStatus" style="font-size:12px;color:#5b6b7f;margin-top:10px"></div>
+                </div>
+                <div class="admin-box">
+                    <div style="font-weight:800">�💰 Tambah Balance</div>
 
                     <div style="margin-top:12px">
                         <label style="display:block;font-size:12px;font-weight:700;margin-bottom:6px">🪙 Jumlah
@@ -4713,6 +4731,7 @@
                 if (page) page.style.display = 'block';
 
                 await loadAdminStats();
+                await refreshBroadcastRecipients();
             } catch (e) {
                 isAdmin = false;
                 if (nav) nav.style.display = 'none';
@@ -4816,6 +4835,111 @@
                 toast(e.message);
             }
         }
+
+        async function refreshBroadcastRecipients() {
+            const el = document.getElementById('broadcastRecipients');
+            if (!el || !isAdmin) return;
+
+            try {
+                const data = await api('/api/admin/broadcast/count');
+                const count = Number(data.totalRecipients || 0);
+                el.textContent = `Recipients: ${count.toLocaleString('id-ID')} users`;
+            } catch (e) {
+                el.textContent = 'Recipients: tidak dapat dihitung';
+            }
+        }
+
+        function renderBroadcastPreview(message) {
+            const preview = document.getElementById('broadcastPreview');
+            if (!preview) return;
+
+            const value = String(message || '').trim();
+            if (!value) {
+                preview.style.display = 'none';
+                preview.textContent = '';
+                return;
+            }
+
+            preview.textContent = value;
+            preview.style.display = 'block';
+        }
+
+        async function previewBroadcast() {
+            const input = document.getElementById('broadcastMessage');
+            const message = String(input?.value || '').trim();
+
+            if (!message) {
+                toast('Tulis pesan broadcast dulu 📢');
+                return;
+            }
+
+            try {
+                const data = await api('/api/admin/broadcast/preview', {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                });
+
+                const count = Number(data.totalRecipients || 0);
+                document.getElementById('broadcastRecipients').textContent = `Recipients: ${count.toLocaleString('id-ID')} users`;
+                renderBroadcastPreview(data.preview || message);
+                toast(`Preview siap — ${count.toLocaleString('id-ID')} pengguna eligible.`);
+            } catch (e) {
+                toast(e.message);
+            }
+        }
+
+        async function sendBroadcast(event) {
+            const input = document.getElementById('broadcastMessage');
+            const status = document.getElementById('broadcastStatus');
+            const message = String(input?.value || '').trim();
+
+            if (!message) {
+                toast('Tulis pesan broadcast dulu 📢');
+                return;
+            }
+
+            const sendButton = event?.currentTarget || null;
+            if (sendButton) sendButton.disabled = true;
+            status.textContent = 'Mengirim broadcast...';
+            status.style.color = '#5b6b7f';
+
+            try {
+                const result = await api('/api/admin/broadcast', {
+                    method: 'POST',
+                    body: JSON.stringify({ message })
+                });
+
+                const sent = Number(result.sent || 0);
+                const failed = Number(result.failed || 0);
+                const total = Number(result.total || 0);
+                status.textContent = `Broadcast completed. Sent: ${sent.toLocaleString('id-ID')} · Failed: ${failed.toLocaleString('id-ID')} · Total: ${total.toLocaleString('id-ID')}`;
+                status.style.color = '#285d47';
+                toast(`Broadcast selesai ✅ Sent: ${sent} · Failed: ${failed}`);
+                renderBroadcastPreview(message);
+            } catch (e) {
+                status.textContent = e.message;
+                status.style.color = '#a53535';
+                toast(e.message);
+            } finally {
+                if (sendButton) sendButton.disabled = false;
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            const messageInput = document.getElementById('broadcastMessage');
+            if (messageInput) {
+                messageInput.addEventListener('input', async () => {
+                    const value = String(messageInput.value || '').trim();
+                    if (!value) {
+                        document.getElementById('broadcastRecipients').textContent = 'Recipients: menghitung...';
+                        document.getElementById('broadcastPreview').style.display = 'none';
+                        return;
+                    }
+                    await refreshBroadcastRecipients();
+                    renderBroadcastPreview(value);
+                });
+            }
+        });
 
 
 
