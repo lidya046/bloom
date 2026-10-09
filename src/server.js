@@ -4,6 +4,7 @@ import { fileURLToPath } from 'url';
 import cors from 'cors';
 import 'dotenv/config';
 
+import { ensureBroadcastHistoryRewardKey } from './db.js';
 import { telegramAuth } from './authMiddleware.js';
 
 import user from './routes/user.js';
@@ -57,6 +58,14 @@ app.use('/api/transfers', transfers);
 
 const port = Number(process.env.PORT || 3000);
 
-app.listen(port, () => {
-    console.log(`Bloom backend running on http://localhost:${port}`);
+async function startServer() {
+    await ensureBroadcastHistoryRewardKey();
+    app.listen(port, () => {
+        console.log(`Bloom backend running on http://localhost:${port}`);
+    });
+}
+
+startServer().catch((error) => {
+    console.error('Failed to initialize database:', error);
+    process.exit(1);
 });

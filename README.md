@@ -41,6 +41,8 @@ Example:
 psql "$DATABASE_URL" -f schema.sql
 ```
 
+For older databases that were created before the broadcast reward feature, the app will automatically add the missing `broadcast_history.reward_key` column and unique index on startup.
+
 ## 4. Run
 
 ```bash
