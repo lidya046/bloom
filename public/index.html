@@ -3294,6 +3294,10 @@
                     <div id="broadcastStatus" style="font-size:12px;color:#5b6b7f;margin-top:10px"></div>
                 </div>
                 <div class="admin-box">
+                    <div style="font-weight:800">🗂️ Recent Broadcasts</div>
+                    <div id="broadcastHistoryList" style="margin-top:10px;display:grid;gap:10px"></div>
+                </div>
+                <div class="admin-box">
                     <div style="font-weight:800">💰 Tambah Balance</div>
 
                     <div style="margin-top:12px">
@@ -4754,6 +4758,7 @@
 
                 await loadAdminStats();
                 await refreshBroadcastRecipients();
+                await loadBroadcastHistory();
             } catch (e) {
                 isAdmin = false;
                 if (nav) nav.style.display = 'none';
@@ -4974,6 +4979,68 @@
             preview.style.display = 'block';
         }
 
+        async function loadBroadcastHistory() {
+            const list = document.getElementById('broadcastHistoryList');
+            if (!list || !isAdmin) return;
+
+            try {
+                const data = await api('/api/admin/broadcast/history');
+                const items = Array.isArray(data.items) ? data.items : [];
+
+                if (!items.length) {
+                    list.innerHTML = '<div class="empty">Belum ada broadcast yang dikirim.</div>';
+                    return;
+                }
+
+                list.innerHTML = items.map(item => {
+                    const messageText = item.message ? escapeHtml(item.message) : '🎵 Audio broadcast';
+                    const statusText = item.deleted_at ? 'Sudah dihapus' : 'Aktif';
+                    const subtitle = `${new Date(item.created_at).toLocaleString('id-ID')} · ${Number(item.total_recipients || 0).toLocaleString('id-ID')} target`;
+
+                    return `
+                        <div style="border:1px solid #eadcff;border-radius:12px;padding:10px 12px;background:#faf6ff;display:grid;gap:6px;">
+                            <div style="display:flex;justify-content:space-between;gap:8px;align-items:flex-start;">
+                                <div style="font-size:12px;font-weight:700;color:#3e2c4b;white-space:pre-wrap;word-break:break-word;max-width:70%">${messageText}</div>
+                                <button type="button" class="admin-primary" style="margin:0;padding:7px 10px;font-size:11px;min-width:auto;${item.deleted_at ? 'opacity:0.5;cursor:not-allowed;' : ''}" ${item.deleted_at ? 'disabled' : ''} onclick="deleteBroadcast(${Number(item.id)})">${item.deleted_at ? 'Deleted' : 'Hapus'}</button>
+                            </div>
+                            <div style="font-size:11px;color:#6b5777;display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;">
+                                <span>${subtitle}</span>
+                                <span>${statusText}</span>
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+            } catch (e) {
+                list.innerHTML = `<div class="empty">Gagal memuat history broadcast: ${escapeHtml(e.message || 'unknown error')}</div>`;
+            }
+        }
+
+        async function deleteBroadcast(id) {
+            if (!id || !Number.isFinite(Number(id))) {
+                toast('ID broadcast tidak valid');
+                return;
+            }
+
+            const confirmed = window.confirm('Hapus broadcast ini dari Telegram dan record-nya?');
+            if (!confirmed) return;
+
+            try {
+                const data = await api(`/api/admin/broadcast/${id}/delete`, {
+                    method: 'POST'
+                });
+
+                if (data.alreadyDeleted) {
+                    toast('Broadcast sudah dihapus sebelumnya.');
+                } else {
+                    toast(`Broadcast dihapus (${data.deleted ?? 0} pesan berhasil dihapus).`);
+                }
+
+                await loadBroadcastHistory();
+            } catch (e) {
+                toast(e.message);
+            }
+        }
+
         async function previewBroadcast() {
             const input = document.getElementById('broadcastMessage');
             const message = String(input?.value || '').trim();
@@ -5044,6 +5111,7 @@
                 status.style.color = '#285d47';
                 toast(`Broadcast selesai ✅ Sent: ${sent} · Failed: ${failed}`);
                 renderBroadcastPreview(message || '🎵 Audio broadcast siap dikirim');
+                await loadBroadcastHistory();
             } catch (e) {
                 status.textContent = e.message;
                 status.style.color = '#a53535';

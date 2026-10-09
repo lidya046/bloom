@@ -110,9 +110,36 @@ async function sendTelegramBroadcastMessage(chatId, text) {
             };
         }
 
-        return { ok: true };
+        return { ok: true, messageId: Number(data.result?.message_id ?? 0) || null };
     } catch (error) {
         return { ok: false, reason: error?.message || 'telegram_request_failed' };
+    }
+}
+
+async function deleteTelegramMessage(chatId, messageId) {
+    const token = process.env.TELEGRAM_BOT_TOKEN;
+    if (!token || !chatId || !messageId) {
+        return { ok: false, reason: 'missing_bot_token_or_chat_id_or_message' };
+    }
+
+    try {
+        const response = await fetch(`https://api.telegram.org/bot${token}/deleteMessage`, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ chat_id: chatId, message_id: messageId })
+        });
+
+        const data = await response.json().catch(() => ({}));
+        if (!response.ok || !data.ok) {
+            return {
+                ok: false,
+                reason: data.description || `telegram_http_${response.status || 'unknown'}`
+            };
+        }
+
+        return { ok: true };
+    } catch (error) {
+        return { ok: false, reason: error?.message || 'telegram_delete_failed' };
     }
 }
 
@@ -143,7 +170,11 @@ async function sendTelegramAudio(chatId, filePath, mimeType, caption = '') {
             };
         }
 
-        return { ok: true, file_id: data.result?.audio?.file_id || data.result?.document?.file_id || null };
+        return {
+            ok: true,
+            file_id: data.result?.audio?.file_id || data.result?.document?.file_id || null,
+            messageId: Number(data.result?.message_id ?? 0) || null
+        };
     } catch (error) {
         return { ok: false, reason: error?.message || 'telegram_audio_failed' };
     }
@@ -205,9 +236,10 @@ async function processBroadcast(adminTelegramId, message, recipients, audioFileP
     let sent = 0;
     let failed = 0;
     let finalMessage = sanitizeBroadcastMessage(message);
+    const sentMessageIds = [];
 
     if (!finalMessage && !audioFilePath && !rewardRose) {
-        return { total: recipients.length, sent, failed, rewarded: 0 };
+        return { total: recipients.length, sent, failed, rewarded: 0, sentMessageIds };
     }
 
     if (!finalMessage && !audioFilePath && rewardRose) {
@@ -219,15 +251,27 @@ async function processBroadcast(adminTelegramId, message, recipients, audioFileP
         const results = await Promise.all(
             batch.map(async chatId => {
                 if (audioFilePath) {
-                    return sendTelegramAudio(chatId, audioFilePath, mimeType, finalMessage || '');
+                    const result = await sendTelegramAudio(chatId, audioFilePath, mimeType, finalMessage || '');
+                    return { chatId, ...result };
                 }
-                return sendTelegramBroadcastMessage(chatId, finalMessage || '');
+
+                const result = await sendTelegramBroadcastMessage(chatId, finalMessage || '');
+                return { chatId, ...result };
             })
         );
 
         for (const result of results) {
-            if (result.ok) sent += 1;
-            else failed += 1;
+            if (result.ok) {
+                sent += 1;
+                if (result.messageId) {
+                    sentMessageIds.push({
+                        chat_id: Number(result.chatId),
+                        message_id: Number(result.messageId)
+                    });
+                }
+            } else {
+                failed += 1;
+            }
         }
 
         if (index + BROADCAST_BATCH_SIZE < recipients.length) {
@@ -242,13 +286,101 @@ async function processBroadcast(adminTelegramId, message, recipients, audioFileP
     }
 
     await pool.query(
-        `INSERT INTO broadcast_history (admin_id, message, total_recipients, successful_count, failed_count, reward_key)
-         VALUES ($1, $2, $3, $4, $5, $6)`,
-        [adminTelegramId, finalMessage || '', recipients.length, sent, failed, rewardKey || null]
+        `INSERT INTO broadcast_history (admin_id, message, total_recipients, successful_count, failed_count, reward_key, sent_message_ids)
+         VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+        [adminTelegramId, finalMessage || '', recipients.length, sent, failed, rewardKey || null, JSON.stringify(sentMessageIds)]
     );
 
-    return { total: recipients.length, sent, failed, rewarded };
+    return { total: recipients.length, sent, failed, rewarded, sentMessageIds };
 }
+
+async function deleteBroadcastById(broadcastId) {
+    const id = Number(broadcastId);
+    if (!Number.isInteger(id)) {
+        return { ok: false, error: 'broadcast_id_invalid' };
+    }
+
+    const history = await pool.query(
+        `SELECT id, sent_message_ids, deleted_at
+         FROM broadcast_history
+         WHERE id = $1
+         LIMIT 1`,
+        [id]
+    );
+
+    if (!history.rows[0]) {
+        return { ok: false, error: 'broadcast_not_found' };
+    }
+
+    if (history.rows[0].deleted_at) {
+        return { ok: true, deleted: 0, alreadyDeleted: true };
+    }
+
+    const entries = Array.isArray(history.rows[0].sent_message_ids)
+        ? history.rows[0].sent_message_ids
+        : [];
+
+    let deleted = 0;
+
+    for (const entry of entries) {
+        const chatId = Number(entry?.chat_id ?? entry?.chatId);
+        const messageId = Number(entry?.message_id ?? entry?.messageId);
+
+        if (!Number.isFinite(chatId) || !Number.isFinite(messageId)) {
+            continue;
+        }
+
+        const result = await deleteTelegramMessage(chatId, messageId);
+        if (result.ok) {
+            deleted += 1;
+        }
+    }
+
+    await pool.query(
+        `UPDATE broadcast_history
+         SET deleted_at = NOW(), deleted_count = $2
+         WHERE id = $1`,
+        [id, deleted]
+    );
+
+    return { ok: true, deleted, alreadyDeleted: false };
+}
+
+router.get('/broadcast/history', requireAdmin, async (_req, res) => {
+    try {
+        const rows = await pool.query(`
+            SELECT id, admin_id, message, total_recipients, successful_count, failed_count, reward_key, deleted_at, deleted_count, created_at
+            FROM broadcast_history
+            ORDER BY created_at DESC
+            LIMIT 10
+        `);
+
+        res.json({ items: rows.rows });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
+
+router.post('/broadcast/:id/delete', requireAdmin, async (req, res) => {
+    try {
+        const result = await deleteBroadcastById(req.params.id);
+
+        if (!result.ok) {
+            if (result.error === 'broadcast_not_found') {
+                return res.status(404).json({ error: 'Broadcast tidak ditemukan' });
+            }
+            return res.status(400).json({ error: 'ID broadcast tidak valid' });
+        }
+
+        res.json({
+            ok: true,
+            deleted: result.deleted,
+            alreadyDeleted: result.alreadyDeleted
+        });
+    } catch (e) {
+        res.status(500).json({ error: e.message });
+    }
+});
 
 router.get('/stats', requireAdmin, async (_req, res) => {
     try {
@@ -322,9 +454,9 @@ router.post('/broadcast', requireAdmin, upload.single('audio'), async (req, res)
 
         if (!recipients.length) {
             await pool.query(
-                `INSERT INTO broadcast_history (admin_id, message, total_recipients, successful_count, failed_count, reward_key)
-                 VALUES ($1, $2, $3, $4, $5, $6)`,
-                [req.user.telegram_id, message || '', 0, 0, 0, rewardKey]
+                `INSERT INTO broadcast_history (admin_id, message, total_recipients, successful_count, failed_count, reward_key, sent_message_ids)
+                 VALUES ($1, $2, $3, $4, $5, $6, $7)`,
+                [req.user.telegram_id, message || '', 0, 0, 0, rewardKey, '[]' ]
             );
 
             if (audioFile?.path) {
